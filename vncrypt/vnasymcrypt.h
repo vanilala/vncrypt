@@ -8,6 +8,8 @@ typedef struct tagVNAsymCryptCtx VNAsymCryptCtx_t;
 typedef struct tagVNAsymCryptMethod {
 	int ( * mGenKeys ) ( VNAsymCryptCtx_t * ctx, int keyBits );
 
+	void ( * mClearKeys ) ( VNAsymCryptCtx_t * ctx );
+
 	int ( * mDumpPubKey ) ( const VNAsymCryptCtx_t * ctx,
 		struct iovec * hexPubKey );
 

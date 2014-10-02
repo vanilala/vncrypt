@@ -25,9 +25,13 @@ void PrintKey( VNAsymCryptCtx_t * ctx )
 {
 	struct iovec pubKey, privKey;
 
+	ctx->mMethod.mDumpPubKey( ctx, &pubKey );
+	printf( "PubKey: %zd, %s\n", pubKey.iov_len, (char*)pubKey.iov_base );
+
+	free( pubKey.iov_base );
+
 	ctx->mMethod.mDumpPrivKey( ctx, &pubKey, &privKey );
 
-	printf( "PubKey: %zd, %s\n", pubKey.iov_len, (char*)pubKey.iov_base );
 	printf( "PirvKey: %zd, %s\n", privKey.iov_len, (char*)privKey.iov_base );
 
 	free( pubKey.iov_base );
@@ -40,9 +44,14 @@ void VN_Test( VNAsymCryptCtx_t * ctx, int keyBits, long length, int value, int e
 	unsigned char text[ 4096 ], tmp;
 	struct iovec plainText, cipherText;
 
+	struct iovec hexPubKey, hexPrivKey;
+
 	unsigned long long nowUsec = 0;
 	double interval = 0;
 
+	for( i = 0; i < length; i++ ) text[i] = value + i;
+
+	// 1. generate keys
 	RunTime( 0, &nowUsec );
 
 	ctx->mMethod.mGenKeys( ctx, keyBits );
@@ -51,7 +60,14 @@ void VN_Test( VNAsymCryptCtx_t * ctx, int keyBits, long length, int value, int e
 	interval = RunTime( nowUsec, &nowUsec );
 	printf( "GenKeys time %.6f\n", interval );
 
-	for( i = 0; i < length; i++ ) text[i] = value + i;
+	// 2. save pub/priv key, clear ctx
+	ctx->mMethod.mDumpPrivKey( ctx, &hexPubKey, &hexPrivKey );
+	ctx->mMethod.mClearKeys( ctx );
+
+	// 3. restore priv key, do PrivEncrypt
+	ctx->mMethod.mLoadPrivKey( ctx, &hexPubKey, &hexPrivKey );
+
+	PrintKey( ctx );
 
 	for( i = 0; i < encryptCount; i++ )
 	{
@@ -66,6 +82,13 @@ void VN_Test( VNAsymCryptCtx_t * ctx, int keyBits, long length, int value, int e
 		encryptCount, interval, (int)(encryptCount / interval ) );
 
 	printf( "Cipher Text length: %zd\n", cipherText.iov_len );
+
+	ctx->mMethod.mClearKeys( ctx );
+
+	// 4. restore pub key, do PubDecrypt
+	ctx->mMethod.mLoadPubKey( ctx, &hexPubKey );
+
+	PrintKey( ctx );
 
 	for( i = 0; i < decryptCount; i++ )
 	{
@@ -102,5 +125,8 @@ void VN_Test( VNAsymCryptCtx_t * ctx, int keyBits, long length, int value, int e
 
 	free( plainText.iov_base );
 	free( cipherText.iov_base );
+
+	free( hexPubKey.iov_base );
+	free( hexPrivKey.iov_base );
 }
 

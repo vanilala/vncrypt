@@ -23,6 +23,7 @@ VNAsymCryptCtx_t * VNRabin_BNCtx_New()
 	bnCtx->mCtx.mType = TYPE_VNRabin_BN;
 
 	bnCtx->mCtx.mMethod.mGenKeys = VNRabin_BN_GenKeys;
+	bnCtx->mCtx.mMethod.mClearKeys = VNRabin_BN_ClearKeys;
 	bnCtx->mCtx.mMethod.mDumpPubKey = VNRabin_BN_DumpPubKey;
 	bnCtx->mCtx.mMethod.mDumpPrivKey = VNRabin_BN_DumpPrivKey;
 	bnCtx->mCtx.mMethod.mLoadPubKey = VNRabin_BN_LoadPubKey;
@@ -41,7 +42,6 @@ VNAsymCryptCtx_t * VNRabin_BNCtx_New()
 void VNRabin_BNCtx_Free( VNAsymCryptCtx_t * ctx )
 {
 	VNRabin_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRabin_BNCtx_t, mCtx );
-
 	assert( TYPE_VNRabin_BN == ctx->mType );
 
 	BN_free( &( bnCtx->mN ) );
@@ -89,6 +89,15 @@ int VNRabin_BN_GenKeys( VNAsymCryptCtx_t * ctx, int keyBits )
 	BN_free( &zq );
 
 	return 0;
+}
+
+void VNRabin_BN_ClearKeys( VNAsymCryptCtx_t * ctx )
+{
+	VNRabin_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRabin_BNCtx_t, mCtx );
+	assert( TYPE_VNRabin_BN == ctx->mType );
+
+	BN_clear( &( bnCtx->mN ) );
+	BN_clear( &( bnCtx->mD ) );
 }
 
 int VNRabin_BN_DumpPubKey( const VNAsymCryptCtx_t * ctx,

@@ -9,6 +9,8 @@ void VNRabin_BNCtx_Free( VNAsymCryptCtx_t * ctx );
 
 int VNRabin_BN_GenKeys( VNAsymCryptCtx_t * ctx, int keyBits );
 
+void VNRabin_BN_ClearKeys( VNAsymCryptCtx_t * ctx );
+
 int VNRabin_BN_DumpPubKey( const VNAsymCryptCtx_t * ctx,
 	struct iovec * hexPubKey );
 

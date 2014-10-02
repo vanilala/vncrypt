@@ -1,12 +1,15 @@
 
-CFLAGS = -Wall -Werror
+CFLAGS = -Wall -Werror -g
 
-PROGS = testbn
+PROGS = testbn testgmp
 
 all: $(PROGS)
 
 testbn: testbn.o testcomm.o vnrabin_bn.o
-	gcc $(CFLAGS) -o $@ $^ -lm -lssl -lcrypto
+	gcc $(CFLAGS) -o $@ $^ -lcrypto
+
+testgmp: testgmp.o testcomm.o vnrabin_gmp.o
+	gcc $(CFLAGS) -o $@ $^ -lgmp
 
 %.o: %.c
 	gcc $(CFLAGS) -c -o $@ $<
