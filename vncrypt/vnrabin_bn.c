@@ -170,7 +170,7 @@ int VNRabin_BN_LoadPrivKey( VNAsymCryptCtx_t * ctx,
 }
 
 int VNRabin_BN_PrivEncrypt( const VNAsymCryptCtx_t * ctx,
-	unsigned char * plainText, int length,
+	const unsigned char * plainText, int length,
 	struct iovec * cipherText )
 {
 	int ret = 0, jacobi = 0;
@@ -208,7 +208,7 @@ int VNRabin_BN_PrivEncrypt( const VNAsymCryptCtx_t * ctx,
 }
 
 int VNRabin_BN_PubDecrypt( const VNAsymCryptCtx_t * ctx,
-	unsigned char * cipherText, int length,
+	const unsigned char * cipherText, int length,
 	struct iovec * plainText )
 {
 	int ret = 0, mod = 0;

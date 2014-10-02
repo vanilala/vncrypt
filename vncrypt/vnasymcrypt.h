@@ -21,11 +21,11 @@ typedef struct tagVNAsymCryptMethod {
 		struct iovec * hexPubKey, struct iovec * hexPrivKey );
 
 	int ( * mPrivEncrypt ) ( const VNAsymCryptCtx_t * ctx,
-		unsigned char * plainText, int length,
+		const unsigned char * plainText, int length,
 		struct iovec * cipherText );
 
 	int ( * mPubDecrypt ) ( const VNAsymCryptCtx_t * ctx,
-		unsigned char * cipherText, int length,
+		const unsigned char * cipherText, int length,
 		struct iovec * plainText );
 
 } VNAsymCryptMethod_t;
