@@ -40,7 +40,7 @@ void PrintKey( VNAsymCryptCtx_t * ctx )
 
 void VN_Test( VNAsymCryptCtx_t * ctx, int keyBits, long length, int value, int encryptCount, int decryptCount )
 {
-	int i = 0;
+	int i = 0, ret = 0;
 	unsigned char text[ 4096 ], tmp;
 	struct iovec plainText, cipherText;
 
@@ -69,13 +69,19 @@ void VN_Test( VNAsymCryptCtx_t * ctx, int keyBits, long length, int value, int e
 
 	PrintKey( ctx );
 
-	for( i = 0; i < encryptCount; i++ )
+	for( i = 0; i < encryptCount && 0 == ret; i++ )
 	{
-		ctx->mMethod.mPrivEncrypt( ctx, text, length, &cipherText );
+		ret = ctx->mMethod.mPrivEncrypt( ctx, text, length, &cipherText );
 		free( cipherText.iov_base );
+
+		if( 0 != ret )
+		{
+			printf( "PrivEncrypt Fail, ret %d\n", ret );
+			exit( -1 );
+		}
 	}
 
-	ctx->mMethod.mPrivEncrypt( ctx, text, length, &cipherText );
+	ret = ctx->mMethod.mPrivEncrypt( ctx, text, length, &cipherText );
 
 	interval = RunTime( nowUsec, &nowUsec );
 	printf( "PrivEncrypt %d, time %.6f, ops %d/s\n",

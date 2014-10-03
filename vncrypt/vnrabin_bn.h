@@ -18,10 +18,10 @@ int VNRabin_BN_DumpPrivKey( const VNAsymCryptCtx_t * ctx,
 	struct iovec * hexPubKey, struct iovec * hexPrivKey );
 
 int VNRabin_BN_LoadPubKey( VNAsymCryptCtx_t * ctx,
-	struct iovec * hexPubKey );
+	const struct iovec * hexPubKey );
 
 int VNRabin_BN_LoadPrivKey( VNAsymCryptCtx_t * ctx,
-	struct iovec * hexPubKey, struct iovec * hexPrivKey );
+	const struct iovec * hexPubKey, const struct iovec * hexPrivKey );
 
 int VNRabin_BN_PrivEncrypt( const VNAsymCryptCtx_t * ctx,
 	const unsigned char * plainText, int length,

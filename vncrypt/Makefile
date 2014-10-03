@@ -1,19 +1,21 @@
 
-CFLAGS = -Wall -Werror -g
+CFLAGS = -Wall -Werror -O4
 
-PROGS = testbn testgmp
+LDFLAGS = 
+
+PROGS = testbn testgc
 
 all: $(PROGS)
 
 testbn: testbn.o testcomm.o vnrabin_bn.o
-	gcc $(CFLAGS) -o $@ $^ -lcrypto
+	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lcrypto
 
-testgmp: testgmp.o testcomm.o vnrabin_gmp.o
-	gcc $(CFLAGS) -o $@ $^ -lgmp
+testgc: testgc.o testcomm.o vnrabin_gc.o
+	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lgcrypt -lgpg-error
 
 %.o: %.c
 	gcc $(CFLAGS) -c -o $@ $<
 
 clean:
-	rm -f *.o $(PROGS)
+	rm -f *.o $(PROGS) vgcore.*
 

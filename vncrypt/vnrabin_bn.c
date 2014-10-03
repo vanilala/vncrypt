@@ -20,7 +20,7 @@ VNAsymCryptCtx_t * VNRabin_BNCtx_New()
 {
 	VNRabin_BNCtx_t * bnCtx = (VNRabin_BNCtx_t *)calloc( sizeof( VNRabin_BNCtx_t ), 1 );
 
-	bnCtx->mCtx.mType = TYPE_VNRabin_BN;
+	bnCtx->mCtx.mType = VN_TYPE_VNRabin_BN;
 
 	bnCtx->mCtx.mMethod.mGenKeys = VNRabin_BN_GenKeys;
 	bnCtx->mCtx.mMethod.mClearKeys = VNRabin_BN_ClearKeys;
@@ -42,7 +42,7 @@ VNAsymCryptCtx_t * VNRabin_BNCtx_New()
 void VNRabin_BNCtx_Free( VNAsymCryptCtx_t * ctx )
 {
 	VNRabin_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRabin_BNCtx_t, mCtx );
-	assert( TYPE_VNRabin_BN == ctx->mType );
+	assert( VN_TYPE_VNRabin_BN == ctx->mType );
 
 	BN_free( &( bnCtx->mN ) );
 	BN_free( &( bnCtx->mD ) );
@@ -62,7 +62,7 @@ int VNRabin_BN_GenKeys( VNAsymCryptCtx_t * ctx, int keyBits )
 	BN_init( &zq );
 
 	VNRabin_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRabin_BNCtx_t, mCtx );
-	assert( TYPE_VNRabin_BN == ctx->mType );
+	assert( VN_TYPE_VNRabin_BN == ctx->mType );
 
 	/* choose a prime p such that p mod 8 == 3 */
 	do
@@ -94,7 +94,7 @@ int VNRabin_BN_GenKeys( VNAsymCryptCtx_t * ctx, int keyBits )
 void VNRabin_BN_ClearKeys( VNAsymCryptCtx_t * ctx )
 {
 	VNRabin_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRabin_BNCtx_t, mCtx );
-	assert( TYPE_VNRabin_BN == ctx->mType );
+	assert( VN_TYPE_VNRabin_BN == ctx->mType );
 
 	BN_clear( &( bnCtx->mN ) );
 	BN_clear( &( bnCtx->mD ) );
@@ -103,8 +103,8 @@ void VNRabin_BN_ClearKeys( VNAsymCryptCtx_t * ctx )
 int VNRabin_BN_DumpPubKey( const VNAsymCryptCtx_t * ctx,
 	struct iovec * hexPubKey )
 {
-	VNRabin_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRabin_BNCtx_t, mCtx );
-	assert( TYPE_VNRabin_BN == ctx->mType );
+	const VNRabin_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRabin_BNCtx_t, mCtx );
+	assert( VN_TYPE_VNRabin_BN == ctx->mType );
 
 	char * tmp = BN_bn2hex( &( bnCtx->mN ) );
 
@@ -119,8 +119,8 @@ int VNRabin_BN_DumpPubKey( const VNAsymCryptCtx_t * ctx,
 int VNRabin_BN_DumpPrivKey( const VNAsymCryptCtx_t * ctx,
 	struct iovec * hexPubKey, struct iovec * hexPrivKey )
 {
-	VNRabin_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRabin_BNCtx_t, mCtx );
-	assert( TYPE_VNRabin_BN == ctx->mType );
+	const VNRabin_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRabin_BNCtx_t, mCtx );
+	assert( VN_TYPE_VNRabin_BN == ctx->mType );
 
 	char * tmp = BN_bn2hex( &( bnCtx->mN ) );
 
@@ -140,10 +140,10 @@ int VNRabin_BN_DumpPrivKey( const VNAsymCryptCtx_t * ctx,
 }
 
 int VNRabin_BN_LoadPubKey( VNAsymCryptCtx_t * ctx,
-	struct iovec * hexPubKey )
+	const struct iovec * hexPubKey )
 {
 	VNRabin_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRabin_BNCtx_t, mCtx );
-	assert( TYPE_VNRabin_BN == ctx->mType );
+	assert( VN_TYPE_VNRabin_BN == ctx->mType );
 
 	BIGNUM * tmp = NULL;
 
@@ -156,10 +156,10 @@ int VNRabin_BN_LoadPubKey( VNAsymCryptCtx_t * ctx,
 }
 
 int VNRabin_BN_LoadPrivKey( VNAsymCryptCtx_t * ctx,
-	struct iovec * hexPubKey, struct iovec * hexPrivKey )
+	const struct iovec * hexPubKey, const struct iovec * hexPrivKey )
 {
 	VNRabin_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRabin_BNCtx_t, mCtx );
-	assert( TYPE_VNRabin_BN == ctx->mType );
+	assert( VN_TYPE_VNRabin_BN == ctx->mType );
 
 	BIGNUM * tmp = NULL;
 
@@ -185,13 +185,19 @@ int VNRabin_BN_PrivEncrypt( const VNAsymCryptCtx_t * ctx,
 	int ret = 0, jacobi = 0;
 	BIGNUM zm, zs;
 
-	VNRabin_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRabin_BNCtx_t, mCtx );
-	assert( TYPE_VNRabin_BN == ctx->mType );
+	const VNRabin_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRabin_BNCtx_t, mCtx );
+	assert( VN_TYPE_VNRabin_BN == ctx->mType );
 
 	BN_init( &zm );
-	BN_init( &zs );
-
 	BN_bin2bn( plainText, length, &zm );
+
+	if( BN_cmp( &zm, &( bnCtx->mN ) ) >= 0 )
+	{
+		BN_free( &zm );
+		return VN_ERR_PLAINTEXT_TOO_LONG;
+	}
+
+	BN_init( &zs );
 
 	BN_mul_word( &zm, 16 );
 	BN_add_word( &zm, 6 );
@@ -223,8 +229,8 @@ int VNRabin_BN_PubDecrypt( const VNAsymCryptCtx_t * ctx,
 	int ret = 0, mod = 0;
 	BIGNUM zm, zm1, zs;
 
-	VNRabin_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRabin_BNCtx_t, mCtx );
-	assert( TYPE_VNRabin_BN == ctx->mType );
+	const VNRabin_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRabin_BNCtx_t, mCtx );
+	assert( VN_TYPE_VNRabin_BN == ctx->mType );
 
 	BN_init( &zm );
 	BN_init( &zm1 );
@@ -288,7 +294,7 @@ int VN_BN_jacobi( const BIGNUM *za, const BIGNUM *zn, int *jacobi, BN_CTX *ctx )
 	{
 		if( ! BN_is_odd( &zn1 ) ) { ret = -1; break; }
 		if( BN_cmp( &zn1, &three ) < 0 ) { ret = -1; break; }
-		if( ( BN_cmp( &za1, &zn1 ) > 0 ) || ( BN_cmp( za, &zero ) < 0 ) ) { ret = -1; break; }
+		if( ( BN_cmp( &za1, &zn1 ) > 0 ) || ( BN_cmp( &za1, &zero ) < 0 ) ) { ret = -1; break; }
 
 		if( BN_is_zero( &za1 ) ) break;         // step1
 		if( BN_is_one( &za1 ) ) break;          // step2
@@ -297,7 +303,7 @@ int VN_BN_jacobi( const BIGNUM *za, const BIGNUM *zn, int *jacobi, BN_CTX *ctx )
 		{
 			if( BN_is_odd( &za1 ) ) break;
 			BN_rshift1( &za1, &za1 );
-		 }
+		}
 
 		if( 0 == ( e % 2 ) )                    // step4
 		{

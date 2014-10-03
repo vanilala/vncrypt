@@ -1,9 +1,10 @@
-
 #pragma once
 
 #include <sys/uio.h>
 
 typedef struct tagVNAsymCryptCtx VNAsymCryptCtx_t;
+
+enum { VN_ERR_PLAINTEXT_TOO_LONG = -101 };
 
 typedef struct tagVNAsymCryptMethod {
 	int ( * mGenKeys ) ( VNAsymCryptCtx_t * ctx, int keyBits );
@@ -17,10 +18,10 @@ typedef struct tagVNAsymCryptMethod {
 		struct iovec * hexPubKey, struct iovec * hexPrivKey );
 
 	int ( * mLoadPubKey ) ( VNAsymCryptCtx_t * ctx,
-		struct iovec * hexPubKey );
+		const struct iovec * hexPubKey );
 
 	int ( * mLoadPrivKey ) ( VNAsymCryptCtx_t * ctx,
-		struct iovec * hexPubKey, struct iovec * hexPrivKey );
+		const struct iovec * hexPubKey, const struct iovec * hexPrivKey );
 
 	int ( * mPrivEncrypt ) ( const VNAsymCryptCtx_t * ctx,
 		const unsigned char * plainText, int length,
@@ -32,7 +33,7 @@ typedef struct tagVNAsymCryptMethod {
 
 } VNAsymCryptMethod_t;
 
-enum { TYPE_VNRabin_BN = 1, TYPE_VNRabin_GMP = 2 };
+enum { VN_TYPE_VNRabin_BN = 1, VN_TYPE_VNRabin_GC = 2 };
 
 #define VN_CONTAINER_OF(addr,type,field) \
 	((type*)((unsigned char*)addr - (unsigned long)&((type*)0)->field))
