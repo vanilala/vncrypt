@@ -43,8 +43,10 @@ typedef struct tagVNAsymCryptMethod {
 enum {
 	VN_TYPE_VNRabin_BN = 1,
 	VN_TYPE_VNRabin_GC = 2,
+	VN_TYPE_VNRsa_BN = 3,
 
-	VN_TYPE_VNWilliamsPK_BN = 100
+	VN_TYPE_VNWilliamsPK_BN = 100,
+	VN_TYPE_VNRsaPK_BN = 101,
 };
 
 #define VN_CONTAINER_OF(addr,type,field) \

@@ -4,6 +4,7 @@ CFLAGS = -Wall -Werror -Wno-unused-result -O4
 LDFLAGS = 
 
 PROGS = testbn testgc \
+	testrsa_bn \
 	testpkbn
 
 all: $(PROGS)
@@ -12,6 +13,9 @@ testbn: testbn.o testcomm.o vncrypt_bn.o vnrabin_bn.o
 	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lcrypto
 
 testpkbn: testpkbn.o testcomm.o vncrypt_bn.o vnwilliamspk_bn.o
+	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lcrypto
+
+testrsa_bn: testrsa_bn.o testcomm.o vnrsa_bn.o vncrypt_bn.o
 	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lcrypto
 
 testgc: testgc.o testcomm.o vnrabin_gc.o
