@@ -1,5 +1,5 @@
 
-#include "vnwilliamspk_bn.h"
+#include "vnwilliams_bn.h"
 #include "testcomm.h"
 
 #include <stdio.h>
@@ -7,11 +7,11 @@
 
 void test( int keyBits, long length, int value, int encryptCount, int decryptCount )
 {
-	VNAsymCryptCtx_t * ctx = VNWilliamsPK_BNCtx_New();
+	VNAsymCryptCtx_t * ctx = VNWilliamsEnc_BNCtx_New();
 
 	VN_Test( ctx, keyBits, length, value, encryptCount, decryptCount );
 
-	VNWilliamsPK_BNCtx_Free( ctx );
+	VNWilliamsEnc_BNCtx_Free( ctx );
 }
 
 int main( int argc, const char * argv[] )

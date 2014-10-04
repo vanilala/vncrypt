@@ -3,9 +3,9 @@
 
 #include "vnasymcrypt.h"
 
-VNAsymCryptCtx_t * VNRsa_BNCtx_New( unsigned long e );
+VNAsymCryptCtx_t * VNRsaSign_BNCtx_New( unsigned long e );
 
-VNAsymCryptCtx_t * VNRsaPK_BNCtx_New( unsigned long e );
+VNAsymCryptCtx_t * VNRsaEnc_BNCtx_New( unsigned long e );
 
 void VNRsa_BNCtx_Free( VNAsymCryptCtx_t * ctx );
 

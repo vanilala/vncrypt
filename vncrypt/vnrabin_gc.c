@@ -65,7 +65,7 @@ VNAsymCryptCtx_t * VNRabin_GCCtx_New()
 
 	gcCtx = (VNRabin_GCCtx_t *)calloc( sizeof( VNRabin_GCCtx_t ), 1 );
 
-	gcCtx->mCtx.mType = VN_TYPE_VNRabin_GC;
+	gcCtx->mCtx.mType = VN_TYPE_VNRabinSign_GC;
 
 	gcCtx->mCtx.mMethod.mGenKeys = VNRabin_GC_GenKeys;
 	gcCtx->mCtx.mMethod.mClearKeys = VNRabin_GC_ClearKeys;
@@ -85,7 +85,7 @@ VNAsymCryptCtx_t * VNRabin_GCCtx_New()
 void VNRabin_GCCtx_Free( VNAsymCryptCtx_t * ctx )
 {
 	VNRabin_GCCtx_t * gcCtx = VN_CONTAINER_OF( ctx, VNRabin_GCCtx_t, mCtx );
-	assert( VN_TYPE_VNRabin_GC == ctx->mType );
+	assert( VN_TYPE_VNRabinSign_GC == ctx->mType );
 
 	gcry_mpi_release( gcCtx->mN );
 	gcry_mpi_release( gcCtx->mD );
@@ -103,7 +103,7 @@ int VNRabin_GC_GenKeys( VNAsymCryptCtx_t * ctx, int keyBits )
 	zq = gcry_mpi_new( keyBits * 2 );
 
 	VNRabin_GCCtx_t * gcCtx = VN_CONTAINER_OF( ctx, VNRabin_GCCtx_t, mCtx );
-	assert( VN_TYPE_VNRabin_GC == ctx->mType );
+	assert( VN_TYPE_VNRabinSign_GC == ctx->mType );
 
 	/* choose a prime p such that p mod 8 == 3 */
 	do {
@@ -137,7 +137,7 @@ int VNRabin_GC_GenKeys( VNAsymCryptCtx_t * ctx, int keyBits )
 void VNRabin_GC_ClearKeys( VNAsymCryptCtx_t * ctx )
 {
 	VNRabin_GCCtx_t * gcCtx = VN_CONTAINER_OF( ctx, VNRabin_GCCtx_t, mCtx );
-	assert( VN_TYPE_VNRabin_GC == ctx->mType );
+	assert( VN_TYPE_VNRabinSign_GC == ctx->mType );
 
 	gcry_mpi_release( gcCtx->mN );
 	gcry_mpi_release( gcCtx->mD );
@@ -150,7 +150,7 @@ int VNRabin_GC_DumpPubKey( const VNAsymCryptCtx_t * ctx,
 	struct iovec * hexPubKey )
 {
 	const VNRabin_GCCtx_t * gcCtx = VN_CONTAINER_OF( ctx, VNRabin_GCCtx_t, mCtx );
-	assert( VN_TYPE_VNRabin_GC == ctx->mType );
+	assert( VN_TYPE_VNRabinSign_GC == ctx->mType );
 
 	hexPubKey->iov_len = ( gcry_mpi_get_nbits( gcCtx->mN ) + 7 ) / 8 * 4;
 	hexPubKey->iov_base = calloc( 1, hexPubKey->iov_len + 1 );
@@ -167,7 +167,7 @@ int VNRabin_GC_DumpPrivKey( const VNAsymCryptCtx_t * ctx,
 	struct iovec * hexPubKey, struct iovec * hexPrivKey )
 {
 	const VNRabin_GCCtx_t * gcCtx = VN_CONTAINER_OF( ctx, VNRabin_GCCtx_t, mCtx );
-	assert( VN_TYPE_VNRabin_GC == ctx->mType );
+	assert( VN_TYPE_VNRabinSign_GC == ctx->mType );
 
 	hexPubKey->iov_len = ( gcry_mpi_get_nbits( gcCtx->mN ) + 7 ) / 8 * 4;
 	hexPubKey->iov_base = calloc( 1, hexPubKey->iov_len + 1 );
@@ -190,7 +190,7 @@ int VNRabin_GC_LoadPubKey( VNAsymCryptCtx_t * ctx,
 	const struct iovec * hexPubKey )
 {
 	VNRabin_GCCtx_t * gcCtx = VN_CONTAINER_OF( ctx, VNRabin_GCCtx_t, mCtx );
-	assert( VN_TYPE_VNRabin_GC == ctx->mType );
+	assert( VN_TYPE_VNRabinSign_GC == ctx->mType );
 
 	gcry_mpi_release( gcCtx->mN );
 
@@ -204,7 +204,7 @@ int VNRabin_GC_LoadPrivKey( VNAsymCryptCtx_t * ctx,
 	const struct iovec * hexPubKey, const struct iovec * hexPrivKey )
 {
 	VNRabin_GCCtx_t * gcCtx = VN_CONTAINER_OF( ctx, VNRabin_GCCtx_t, mCtx );
-	assert( VN_TYPE_VNRabin_GC == ctx->mType );
+	assert( VN_TYPE_VNRabinSign_GC == ctx->mType );
 
 	gcry_mpi_release( gcCtx->mN );
 
@@ -227,7 +227,7 @@ int VNRabin_GC_PrivEncrypt( const VNAsymCryptCtx_t * ctx,
 	gcry_mpi_t zm, zs;
 
 	const VNRabin_GCCtx_t * gcCtx = VN_CONTAINER_OF( ctx, VNRabin_GCCtx_t, mCtx );
-	assert( VN_TYPE_VNRabin_GC == ctx->mType );
+	assert( VN_TYPE_VNRabinSign_GC == ctx->mType );
 
 	gcry_mpi_scan( &zm, GCRYMPI_FMT_USG, plainText, length, NULL );
 
@@ -271,7 +271,7 @@ int VNRabin_GC_PubDecrypt( const VNAsymCryptCtx_t * ctx,
 	gcry_mpi_t zm, zm1, zs;
 
 	const VNRabin_GCCtx_t * gcCtx = VN_CONTAINER_OF( ctx, VNRabin_GCCtx_t, mCtx );
-	assert( VN_TYPE_VNRabin_GC == ctx->mType );
+	assert( VN_TYPE_VNRabinSign_GC == ctx->mType );
 
 	zm = gcry_mpi_new( length * 8 );
 	zm1 = gcry_mpi_new( length * 8 );

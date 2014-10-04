@@ -1,25 +1,25 @@
 
-CFLAGS = -Wall -Werror -Wno-unused-result -O4
+CFLAGS = -Wall -Werror -Wno-unused-result -g
 
 LDFLAGS = 
 
-PROGS = testbn testgc \
+PROGS = testrabin_bn testrabin_gc \
 	testrsa_bn \
-	testpkbn
+	testwilliams_bn
 
 all: $(PROGS)
 
-testbn: testbn.o testcomm.o vncrypt_bn.o vnrabin_bn.o
+testrabin_bn: testrabin_bn.o testcomm.o vncrypt_bn.o vnrabin_bn.o
 	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lcrypto
 
-testpkbn: testpkbn.o testcomm.o vncrypt_bn.o vnwilliamspk_bn.o
+testrabin_gc: testrabin_gc.o testcomm.o vnrabin_gc.o
+	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lgcrypt -lgpg-error
+
+testwilliams_bn: testwilliams_bn.o testcomm.o vncrypt_bn.o vnwilliams_bn.o
 	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lcrypto
 
 testrsa_bn: testrsa_bn.o testcomm.o vnrsa_bn.o vncrypt_bn.o
 	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lcrypto
-
-testgc: testgc.o testcomm.o vnrabin_gc.o
-	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lgcrypt -lgpg-error
 
 rabin: rabin.o
 	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lcrypto

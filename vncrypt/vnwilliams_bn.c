@@ -6,36 +6,36 @@
  *
  */
 
-#include "vnwilliamspk_bn.h"
+#include "vnwilliams_bn.h"
 #include "vncrypt_bn.h"
 
 #include <openssl/bn.h>
 #include <assert.h>
 #include <string.h>
 
-typedef struct tagVNWilliamsPK_BNCtx {
+typedef struct tagVNWilliamsEnc_BNCtx {
 	VNAsymCryptCtx_t mCtx;
 
 	BN_CTX * mBNCtx;
 
 	BIGNUM mN;
 	BIGNUM mD;
-} VNWilliamsPK_BNCtx_t;
+} VNWilliamsEnc_BNCtx_t;
 
-VNAsymCryptCtx_t * VNWilliamsPK_BNCtx_New()
+VNAsymCryptCtx_t * VNWilliamsEnc_BNCtx_New()
 {
-	VNWilliamsPK_BNCtx_t * bnCtx = (VNWilliamsPK_BNCtx_t *)calloc( sizeof( VNWilliamsPK_BNCtx_t ), 1 );
+	VNWilliamsEnc_BNCtx_t * bnCtx = (VNWilliamsEnc_BNCtx_t *)calloc( sizeof( VNWilliamsEnc_BNCtx_t ), 1 );
 
-	bnCtx->mCtx.mType = VN_TYPE_VNWilliamsPK_BN;
+	bnCtx->mCtx.mType = VN_TYPE_VNWilliamsEnc_BN;
 
-	bnCtx->mCtx.mMethod.mGenKeys = VNWilliamsPK_BN_GenKeys;
-	bnCtx->mCtx.mMethod.mClearKeys = VNWilliamsPK_BN_ClearKeys;
-	bnCtx->mCtx.mMethod.mDumpPubKey = VNWilliamsPK_BN_DumpPubKey;
-	bnCtx->mCtx.mMethod.mDumpPrivKey = VNWilliamsPK_BN_DumpPrivKey;
-	bnCtx->mCtx.mMethod.mLoadPubKey = VNWilliamsPK_BN_LoadPubKey;
-	bnCtx->mCtx.mMethod.mLoadPrivKey = VNWilliamsPK_BN_LoadPrivKey;
-	bnCtx->mCtx.mMethod.mPubEncrypt = VNWilliamsPK_BN_PubEncrypt;
-	bnCtx->mCtx.mMethod.mPrivDecrypt = VNWilliamsPK_BN_PrivDecrypt;
+	bnCtx->mCtx.mMethod.mGenKeys = VNWilliamsEnc_BN_GenKeys;
+	bnCtx->mCtx.mMethod.mClearKeys = VNWilliamsEnc_BN_ClearKeys;
+	bnCtx->mCtx.mMethod.mDumpPubKey = VNWilliamsEnc_BN_DumpPubKey;
+	bnCtx->mCtx.mMethod.mDumpPrivKey = VNWilliamsEnc_BN_DumpPrivKey;
+	bnCtx->mCtx.mMethod.mLoadPubKey = VNWilliamsEnc_BN_LoadPubKey;
+	bnCtx->mCtx.mMethod.mLoadPrivKey = VNWilliamsEnc_BN_LoadPrivKey;
+	bnCtx->mCtx.mMethod.mPubEncrypt = VNWilliamsEnc_BN_PubEncrypt;
+	bnCtx->mCtx.mMethod.mPrivDecrypt = VNWilliamsEnc_BN_PrivDecrypt;
 
 	bnCtx->mBNCtx = BN_CTX_new();
 
@@ -45,10 +45,10 @@ VNAsymCryptCtx_t * VNWilliamsPK_BNCtx_New()
 	return &( bnCtx->mCtx );
 }
 
-void VNWilliamsPK_BNCtx_Free( VNAsymCryptCtx_t * ctx )
+void VNWilliamsEnc_BNCtx_Free( VNAsymCryptCtx_t * ctx )
 {
-	VNWilliamsPK_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNWilliamsPK_BNCtx_t, mCtx );
-	assert( VN_TYPE_VNWilliamsPK_BN == ctx->mType );
+	VNWilliamsEnc_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNWilliamsEnc_BNCtx_t, mCtx );
+	assert( VN_TYPE_VNWilliamsEnc_BN == ctx->mType );
 
 	BN_free( &( bnCtx->mN ) );
 	BN_free( &( bnCtx->mD ) );
@@ -58,12 +58,12 @@ void VNWilliamsPK_BNCtx_Free( VNAsymCryptCtx_t * ctx )
 	free( bnCtx );
 }
 
-int VNWilliamsPK_BN_GenKeys( VNAsymCryptCtx_t * ctx, int keyBits )
+int VNWilliamsEnc_BN_GenKeys( VNAsymCryptCtx_t * ctx, int keyBits )
 {
 	BIGNUM zp, zq;
 
-	VNWilliamsPK_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNWilliamsPK_BNCtx_t, mCtx );
-	assert( VN_TYPE_VNWilliamsPK_BN == ctx->mType );
+	VNWilliamsEnc_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNWilliamsEnc_BNCtx_t, mCtx );
+	assert( VN_TYPE_VNWilliamsEnc_BN == ctx->mType );
 
 	BN_init( &zp );
 	BN_init( &zq );
@@ -95,31 +95,31 @@ int VNWilliamsPK_BN_GenKeys( VNAsymCryptCtx_t * ctx, int keyBits )
 	return 0;
 }
 
-void VNWilliamsPK_BN_ClearKeys( VNAsymCryptCtx_t * ctx )
+void VNWilliamsEnc_BN_ClearKeys( VNAsymCryptCtx_t * ctx )
 {
-	VNWilliamsPK_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNWilliamsPK_BNCtx_t, mCtx );
-	assert( VN_TYPE_VNWilliamsPK_BN == ctx->mType );
+	VNWilliamsEnc_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNWilliamsEnc_BNCtx_t, mCtx );
+	assert( VN_TYPE_VNWilliamsEnc_BN == ctx->mType );
 
 	BN_clear( &( bnCtx->mN ) );
 	BN_clear( &( bnCtx->mD ) );
 }
 
-int VNWilliamsPK_BN_DumpPubKey( const VNAsymCryptCtx_t * ctx,
+int VNWilliamsEnc_BN_DumpPubKey( const VNAsymCryptCtx_t * ctx,
 	struct iovec * hexPubKey )
 {
-	const VNWilliamsPK_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNWilliamsPK_BNCtx_t, mCtx );
-	assert( VN_TYPE_VNWilliamsPK_BN == ctx->mType );
+	const VNWilliamsEnc_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNWilliamsEnc_BNCtx_t, mCtx );
+	assert( VN_TYPE_VNWilliamsEnc_BN == ctx->mType );
 
 	VN_BN_dump_hex( &( bnCtx->mN ), hexPubKey );
 
 	return 0;
 }
 
-int VNWilliamsPK_BN_DumpPrivKey( const VNAsymCryptCtx_t * ctx,
+int VNWilliamsEnc_BN_DumpPrivKey( const VNAsymCryptCtx_t * ctx,
 	struct iovec * hexPubKey, struct iovec * hexPrivKey )
 {
-	const VNWilliamsPK_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNWilliamsPK_BNCtx_t, mCtx );
-	assert( VN_TYPE_VNWilliamsPK_BN == ctx->mType );
+	const VNWilliamsEnc_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNWilliamsEnc_BNCtx_t, mCtx );
+	assert( VN_TYPE_VNWilliamsEnc_BN == ctx->mType );
 
 	VN_BN_dump_hex( &( bnCtx->mN ), hexPubKey );
 	VN_BN_dump_hex( &( bnCtx->mD ), hexPrivKey );
@@ -127,22 +127,22 @@ int VNWilliamsPK_BN_DumpPrivKey( const VNAsymCryptCtx_t * ctx,
 	return 0;
 }
 
-int VNWilliamsPK_BN_LoadPubKey( VNAsymCryptCtx_t * ctx,
+int VNWilliamsEnc_BN_LoadPubKey( VNAsymCryptCtx_t * ctx,
 	const struct iovec * hexPubKey )
 {
-	VNWilliamsPK_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNWilliamsPK_BNCtx_t, mCtx );
-	assert( VN_TYPE_VNWilliamsPK_BN == ctx->mType );
+	VNWilliamsEnc_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNWilliamsEnc_BNCtx_t, mCtx );
+	assert( VN_TYPE_VNWilliamsEnc_BN == ctx->mType );
 
 	VN_BN_load_hex( hexPubKey, &( bnCtx->mN ) );
 
 	return 0;
 }
 
-int VNWilliamsPK_BN_LoadPrivKey( VNAsymCryptCtx_t * ctx,
+int VNWilliamsEnc_BN_LoadPrivKey( VNAsymCryptCtx_t * ctx,
 	const struct iovec * hexPubKey, const struct iovec * hexPrivKey )
 {
-	VNWilliamsPK_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNWilliamsPK_BNCtx_t, mCtx );
-	assert( VN_TYPE_VNWilliamsPK_BN == ctx->mType );
+	VNWilliamsEnc_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNWilliamsEnc_BNCtx_t, mCtx );
+	assert( VN_TYPE_VNWilliamsEnc_BN == ctx->mType );
 
 	VN_BN_load_hex( hexPubKey, &( bnCtx->mN ) );
 	VN_BN_load_hex( hexPrivKey, &( bnCtx->mD ) );
@@ -150,7 +150,7 @@ int VNWilliamsPK_BN_LoadPrivKey( VNAsymCryptCtx_t * ctx,
 	return 0;
 }
 
-int VNWilliamsPK_BN_PubEncrypt( const VNAsymCryptCtx_t * ctx,
+int VNWilliamsEnc_BN_PubEncrypt( const VNAsymCryptCtx_t * ctx,
 	const unsigned char * plainText, int length,
 	struct iovec * cipherText )
 {
@@ -158,8 +158,8 @@ int VNWilliamsPK_BN_PubEncrypt( const VNAsymCryptCtx_t * ctx,
 
 	BIGNUM zm, zc;
 
-	const VNWilliamsPK_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNWilliamsPK_BNCtx_t, mCtx );
-	assert( VN_TYPE_VNWilliamsPK_BN == ctx->mType );
+	const VNWilliamsEnc_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNWilliamsEnc_BNCtx_t, mCtx );
+	assert( VN_TYPE_VNWilliamsEnc_BN == ctx->mType );
 
 	BN_init( &zm );
 	BN_bin2bn( plainText, length, &zm );
@@ -199,15 +199,15 @@ int VNWilliamsPK_BN_PubEncrypt( const VNAsymCryptCtx_t * ctx,
 }
 
 
-int VNWilliamsPK_BN_PrivDecrypt( const VNAsymCryptCtx_t * ctx,
+int VNWilliamsEnc_BN_PrivDecrypt( const VNAsymCryptCtx_t * ctx,
 	const unsigned char * cipherText, int length,
 	struct iovec * plainText )
 {
 	BIGNUM zm, zc;
 	int mod = 0;
 
-	const VNWilliamsPK_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNWilliamsPK_BNCtx_t, mCtx );
-	assert( VN_TYPE_VNWilliamsPK_BN == ctx->mType );
+	const VNWilliamsEnc_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNWilliamsEnc_BNCtx_t, mCtx );
+	assert( VN_TYPE_VNWilliamsEnc_BN == ctx->mType );
 
 	BN_init( &zm );
 	BN_init( &zc );

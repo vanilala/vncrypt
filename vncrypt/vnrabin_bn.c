@@ -26,7 +26,7 @@ VNAsymCryptCtx_t * VNRabin_BNCtx_New()
 {
 	VNRabin_BNCtx_t * bnCtx = (VNRabin_BNCtx_t *)calloc( sizeof( VNRabin_BNCtx_t ), 1 );
 
-	bnCtx->mCtx.mType = VN_TYPE_VNRabin_BN;
+	bnCtx->mCtx.mType = VN_TYPE_VNRabinSign_BN;
 
 	bnCtx->mCtx.mMethod.mGenKeys = VNRabin_BN_GenKeys;
 	bnCtx->mCtx.mMethod.mClearKeys = VNRabin_BN_ClearKeys;
@@ -48,7 +48,7 @@ VNAsymCryptCtx_t * VNRabin_BNCtx_New()
 void VNRabin_BNCtx_Free( VNAsymCryptCtx_t * ctx )
 {
 	VNRabin_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRabin_BNCtx_t, mCtx );
-	assert( VN_TYPE_VNRabin_BN == ctx->mType );
+	assert( VN_TYPE_VNRabinSign_BN == ctx->mType );
 
 	BN_free( &( bnCtx->mN ) );
 	BN_free( &( bnCtx->mD ) );
@@ -68,7 +68,7 @@ int VNRabin_BN_GenKeys( VNAsymCryptCtx_t * ctx, int keyBits )
 	BN_init( &zq );
 
 	VNRabin_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRabin_BNCtx_t, mCtx );
-	assert( VN_TYPE_VNRabin_BN == ctx->mType );
+	assert( VN_TYPE_VNRabinSign_BN == ctx->mType );
 
 	/* choose a prime p such that p mod 8 == 3 */
 	do
@@ -100,7 +100,7 @@ int VNRabin_BN_GenKeys( VNAsymCryptCtx_t * ctx, int keyBits )
 void VNRabin_BN_ClearKeys( VNAsymCryptCtx_t * ctx )
 {
 	VNRabin_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRabin_BNCtx_t, mCtx );
-	assert( VN_TYPE_VNRabin_BN == ctx->mType );
+	assert( VN_TYPE_VNRabinSign_BN == ctx->mType );
 
 	BN_clear( &( bnCtx->mN ) );
 	BN_clear( &( bnCtx->mD ) );
@@ -110,7 +110,7 @@ int VNRabin_BN_DumpPubKey( const VNAsymCryptCtx_t * ctx,
 	struct iovec * hexPubKey )
 {
 	const VNRabin_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRabin_BNCtx_t, mCtx );
-	assert( VN_TYPE_VNRabin_BN == ctx->mType );
+	assert( VN_TYPE_VNRabinSign_BN == ctx->mType );
 
 	VN_BN_dump_hex( &( bnCtx->mN ), hexPubKey );
 
@@ -121,7 +121,7 @@ int VNRabin_BN_DumpPrivKey( const VNAsymCryptCtx_t * ctx,
 	struct iovec * hexPubKey, struct iovec * hexPrivKey )
 {
 	const VNRabin_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRabin_BNCtx_t, mCtx );
-	assert( VN_TYPE_VNRabin_BN == ctx->mType );
+	assert( VN_TYPE_VNRabinSign_BN == ctx->mType );
 
 	VN_BN_dump_hex( &( bnCtx->mN ), hexPubKey );
 	VN_BN_dump_hex( &( bnCtx->mD ), hexPrivKey );
@@ -133,7 +133,7 @@ int VNRabin_BN_LoadPubKey( VNAsymCryptCtx_t * ctx,
 	const struct iovec * hexPubKey )
 {
 	VNRabin_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRabin_BNCtx_t, mCtx );
-	assert( VN_TYPE_VNRabin_BN == ctx->mType );
+	assert( VN_TYPE_VNRabinSign_BN == ctx->mType );
 
 	VN_BN_load_hex( hexPubKey, &( bnCtx->mN ) );
 
@@ -144,7 +144,7 @@ int VNRabin_BN_LoadPrivKey( VNAsymCryptCtx_t * ctx,
 	const struct iovec * hexPubKey, const struct iovec * hexPrivKey )
 {
 	VNRabin_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRabin_BNCtx_t, mCtx );
-	assert( VN_TYPE_VNRabin_BN == ctx->mType );
+	assert( VN_TYPE_VNRabinSign_BN == ctx->mType );
 
 	VN_BN_load_hex( hexPubKey, &( bnCtx->mN ) );
 	VN_BN_load_hex( hexPrivKey, &( bnCtx->mD ) );
@@ -160,7 +160,7 @@ int VNRabin_BN_PrivEncrypt( const VNAsymCryptCtx_t * ctx,
 	BIGNUM zm, zs;
 
 	const VNRabin_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRabin_BNCtx_t, mCtx );
-	assert( VN_TYPE_VNRabin_BN == ctx->mType );
+	assert( VN_TYPE_VNRabinSign_BN == ctx->mType );
 
 	BN_init( &zm );
 	BN_bin2bn( plainText, length, &zm );
@@ -204,7 +204,7 @@ int VNRabin_BN_PubDecrypt( const VNAsymCryptCtx_t * ctx,
 	BIGNUM zm, zm1, zs;
 
 	const VNRabin_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRabin_BNCtx_t, mCtx );
-	assert( VN_TYPE_VNRabin_BN == ctx->mType );
+	assert( VN_TYPE_VNRabinSign_BN == ctx->mType );
 
 	BN_init( &zm );
 	BN_init( &zm1 );

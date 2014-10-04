@@ -8,15 +8,17 @@
 #include <assert.h>
 
 void VN_Test_Sign( VNAsymCryptCtx_t * ctx, int keyBits, long length, int value, int encryptCount, int decryptCount );
-void VN_Test_PK( VNAsymCryptCtx_t * ctx, int keyBits, long length, int value, int encryptCount, int decryptCount );
+void VN_Test_Enc( VNAsymCryptCtx_t * ctx, int keyBits, long length, int value, int encryptCount, int decryptCount );
 
 void VN_Test( VNAsymCryptCtx_t * ctx, int keyBits, long length, int value, int encryptCount, int decryptCount )
 {
 	if( ctx->mType < 100 )
 	{
+		printf( "\nStart to run signature scheme ......\n\n" );
 		VN_Test_Sign( ctx, keyBits, length, value, encryptCount, decryptCount );
 	} else {
-		VN_Test_PK( ctx, keyBits, length, value, encryptCount, decryptCount );
+		printf( "\nStart to run encryption scheme ......\n\n" );
+		VN_Test_Enc( ctx, keyBits, length, value, encryptCount, decryptCount );
 	}
 }
 
@@ -124,6 +126,10 @@ void VN_Test_Sign( VNAsymCryptCtx_t * ctx, int keyBits, long length, int value, 
 
 	ctx->mMethod.mPubDecrypt( ctx, (unsigned char*)cipherText.iov_base, cipherText.iov_len, &plainText );
 
+	assert( length >= plainText.iov_len );
+
+	printf( "Plain Text length: %zd\n", plainText.iov_len );
+
 	printf( "Verifing ......\n" );
 	for( i = 0; i < length - plainText.iov_len; i++ )
 	{
@@ -152,7 +158,7 @@ void VN_Test_Sign( VNAsymCryptCtx_t * ctx, int keyBits, long length, int value, 
 	free( hexPrivKey.iov_base );
 }
 
-void VN_Test_PK( VNAsymCryptCtx_t * ctx, int keyBits, long length, int value, int encryptCount, int decryptCount )
+void VN_Test_Enc( VNAsymCryptCtx_t * ctx, int keyBits, long length, int value, int encryptCount, int decryptCount )
 {
 	int i = 0, ret = 0;
 	unsigned char text[ 4096 ], tmp;

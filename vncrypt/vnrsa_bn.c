@@ -49,18 +49,18 @@ static VNAsymCryptCtx_t * VNRsa_BNCtx_New_Impl( unsigned long e )
 	return &( bnCtx->mCtx );
 }
 
-VNAsymCryptCtx_t * VNRsa_BNCtx_New( unsigned long e )
+VNAsymCryptCtx_t * VNRsaSign_BNCtx_New( unsigned long e )
 {
 	VNAsymCryptCtx_t * ctx = VNRsa_BNCtx_New_Impl( e );
-	ctx->mType = VN_TYPE_VNRsa_BN;
+	ctx->mType = VN_TYPE_VNRsaSign_BN;
 
 	return ctx;
 }
 
-VNAsymCryptCtx_t * VNRsaPK_BNCtx_New( unsigned long e )
+VNAsymCryptCtx_t * VNRsaEnc_BNCtx_New( unsigned long e )
 {
 	VNAsymCryptCtx_t * ctx = VNRsa_BNCtx_New_Impl( e );
-	ctx->mType = VN_TYPE_VNRsaPK_BN;
+	ctx->mType = VN_TYPE_VNRsaEnc_BN;
 
 	return ctx;
 }
@@ -68,7 +68,7 @@ VNAsymCryptCtx_t * VNRsaPK_BNCtx_New( unsigned long e )
 void VNRsa_BNCtx_Free( VNAsymCryptCtx_t * ctx )
 {
 	VNRsa_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRsa_BNCtx_t, mCtx );
-	assert( VN_TYPE_VNRsa_BN == ctx->mType || VN_TYPE_VNRsaPK_BN == ctx->mType );
+	assert( VN_TYPE_VNRsaSign_BN == ctx->mType || VN_TYPE_VNRsaEnc_BN == ctx->mType );
 
 	BN_free( &( bnCtx->mN ) );
 	BN_free( &( bnCtx->mE ) );
@@ -84,7 +84,7 @@ int VNRsa_BN_GenKeys( VNAsymCryptCtx_t * ctx, int keyBits )
 	BIGNUM zp, zq, zr;
 
 	VNRsa_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRsa_BNCtx_t, mCtx );
-	assert( VN_TYPE_VNRsa_BN == ctx->mType || VN_TYPE_VNRsaPK_BN == ctx->mType );
+	assert( VN_TYPE_VNRsaSign_BN == ctx->mType || VN_TYPE_VNRsaEnc_BN == ctx->mType );
 
 	BN_init( &zp );
 	BN_init( &zq );
@@ -120,7 +120,7 @@ int VNRsa_BN_GenKeys( VNAsymCryptCtx_t * ctx, int keyBits )
 void VNRsa_BN_ClearKeys( VNAsymCryptCtx_t * ctx )
 {
 	VNRsa_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRsa_BNCtx_t, mCtx );
-	assert( VN_TYPE_VNRsa_BN == ctx->mType || VN_TYPE_VNRsaPK_BN == ctx->mType );
+	assert( VN_TYPE_VNRsaSign_BN == ctx->mType || VN_TYPE_VNRsaEnc_BN == ctx->mType );
 
 	BN_clear( &( bnCtx->mN ) );
 	//BN_clear( &( bnCtx->mE ) );
@@ -131,7 +131,7 @@ int VNRsa_BN_DumpPubKey( const VNAsymCryptCtx_t * ctx,
 	struct iovec * hexPubKey )
 {
 	const VNRsa_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRsa_BNCtx_t, mCtx );
-	assert( VN_TYPE_VNRsa_BN == ctx->mType || VN_TYPE_VNRsaPK_BN == ctx->mType );
+	assert( VN_TYPE_VNRsaSign_BN == ctx->mType || VN_TYPE_VNRsaEnc_BN == ctx->mType );
 
 	VN_BN_dump_hex( &( bnCtx->mN ), hexPubKey );
 
@@ -142,7 +142,7 @@ int VNRsa_BN_DumpPrivKey( const VNAsymCryptCtx_t * ctx,
 	struct iovec * hexPubKey, struct iovec * hexPrivKey )
 {
 	const VNRsa_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRsa_BNCtx_t, mCtx );
-	assert( VN_TYPE_VNRsa_BN == ctx->mType || VN_TYPE_VNRsaPK_BN == ctx->mType );
+	assert( VN_TYPE_VNRsaSign_BN == ctx->mType || VN_TYPE_VNRsaEnc_BN == ctx->mType );
 
 	VN_BN_dump_hex( &( bnCtx->mN ), hexPubKey );
 	VN_BN_dump_hex( &( bnCtx->mD ), hexPrivKey );
@@ -154,7 +154,7 @@ int VNRsa_BN_LoadPubKey( VNAsymCryptCtx_t * ctx,
 	const struct iovec * hexPubKey )
 {
 	VNRsa_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRsa_BNCtx_t, mCtx );
-	assert( VN_TYPE_VNRsa_BN == ctx->mType || VN_TYPE_VNRsaPK_BN == ctx->mType );
+	assert( VN_TYPE_VNRsaSign_BN == ctx->mType || VN_TYPE_VNRsaEnc_BN == ctx->mType );
 
 	VN_BN_load_hex( hexPubKey, &( bnCtx->mN ) );
 
@@ -165,7 +165,7 @@ int VNRsa_BN_LoadPrivKey( VNAsymCryptCtx_t * ctx,
 	const struct iovec * hexPubKey, const struct iovec * hexPrivKey )
 {
 	VNRsa_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRsa_BNCtx_t, mCtx );
-	assert( VN_TYPE_VNRsa_BN == ctx->mType || VN_TYPE_VNRsaPK_BN == ctx->mType );
+	assert( VN_TYPE_VNRsaSign_BN == ctx->mType || VN_TYPE_VNRsaEnc_BN == ctx->mType );
 
 	VN_BN_load_hex( hexPubKey, &( bnCtx->mN ) );
 	VN_BN_load_hex( hexPrivKey, &( bnCtx->mD ) );
@@ -180,7 +180,7 @@ int VNRsa_BN_PrivProcess( const VNAsymCryptCtx_t * ctx,
 	BIGNUM zm, zs;
 
 	const VNRsa_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRsa_BNCtx_t, mCtx );
-	assert( VN_TYPE_VNRsa_BN == ctx->mType || VN_TYPE_VNRsaPK_BN == ctx->mType );
+	assert( VN_TYPE_VNRsaSign_BN == ctx->mType || VN_TYPE_VNRsaEnc_BN == ctx->mType );
 
 	BN_init( &zm );
 	BN_bin2bn( plainText, length, &zm );
@@ -212,7 +212,7 @@ int VNRsa_BN_PubProcess( const VNAsymCryptCtx_t * ctx,
 	BIGNUM zm, zs;
 
 	const VNRsa_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRsa_BNCtx_t, mCtx );
-	assert( VN_TYPE_VNRsa_BN == ctx->mType || VN_TYPE_VNRsaPK_BN == ctx->mType );
+	assert( VN_TYPE_VNRsaSign_BN == ctx->mType || VN_TYPE_VNRsaEnc_BN == ctx->mType );
 
 	BN_init( &zm );
 	BN_init( &zs );

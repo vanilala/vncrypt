@@ -7,13 +7,13 @@
 
 void test( int keyBits, long length, int value, int encryptCount, int decryptCount )
 {
-	VNAsymCryptCtx_t * ctx = VNRsa_BNCtx_New( 3 );
+	VNAsymCryptCtx_t * ctx = VNRsaSign_BNCtx_New( 3 );
 
 	VN_Test( ctx, keyBits, length, value, encryptCount, decryptCount );
 
 	VNRsa_BNCtx_Free( ctx );
 
-	ctx = VNRsaPK_BNCtx_New( 3 );
+	ctx = VNRsaEnc_BNCtx_New( 3 );
 
 	VN_Test( ctx, keyBits, length, value, encryptCount, decryptCount );
 
