@@ -1,11 +1,10 @@
-VNCrypt: An implementation of modified-rabin signature scheme
+VNCrypt: A library for asymmetric cryptography algorithm
 =======
 
-See "Handbook of Applied Cryptography" by Alfred J. Menezes et al pages 440 - 441.
-
-This library contains two implementations:
-  * 1) Based on OpenSSL's BIGNUM
-  * 2) Based on libgcrypt's MPI
+Currently include:
+  * 1) RSA signature/encryption scheme, it is the baseline for comparison purpose
+  * 2) Modified-Rabin signature scheme ( two version: OpenSSL's BIGNUM and libgcrypt's MPI )
+  * 3) H. C. Williams encryption scheme
 
 Licensing
 =========
