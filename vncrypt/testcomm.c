@@ -79,6 +79,7 @@ void VN_Test_Sign( VNAsymCryptCtx_t * ctx, int keyBits, long length, int value, 
 	ctx->mMethod.mClearKeys( ctx );
 
 	// 3. restore priv key, do PrivEncrypt
+	printf( "Load PrivKey ......\n" );
 	ctx->mMethod.mLoadPrivKey( ctx, &hexPubKey, &hexPrivKey );
 
 	PrintKey( ctx );
@@ -106,6 +107,7 @@ void VN_Test_Sign( VNAsymCryptCtx_t * ctx, int keyBits, long length, int value, 
 	ctx->mMethod.mClearKeys( ctx );
 
 	// 4. restore pub key, do PubDecrypt
+	printf( "Load PubKey ......\n" );
 	ctx->mMethod.mLoadPubKey( ctx, &hexPubKey );
 
 	PrintKey( ctx );
@@ -176,7 +178,8 @@ void VN_Test_PK( VNAsymCryptCtx_t * ctx, int keyBits, long length, int value, in
 	ctx->mMethod.mDumpPrivKey( ctx, &hexPubKey, &hexPrivKey );
 	ctx->mMethod.mClearKeys( ctx );
 
-	// 3. restore pub key, do PrivEncrypt
+	// 3. restore pub key, do PubEncrypt
+	printf( "Load PubKey ......\n" );
 	ctx->mMethod.mLoadPubKey( ctx, &hexPubKey );
 
 	PrintKey( ctx );
@@ -203,7 +206,8 @@ void VN_Test_PK( VNAsymCryptCtx_t * ctx, int keyBits, long length, int value, in
 
 	ctx->mMethod.mClearKeys( ctx );
 
-	// 4. restore priv key, do PubDecrypt
+	// 4. restore priv key, do PrivDecrypt
+	printf( "Load PrivKey ......\n" );
 	ctx->mMethod.mLoadPrivKey( ctx, &hexPubKey, &hexPrivKey );
 
 	PrintKey( ctx );

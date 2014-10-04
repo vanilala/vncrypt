@@ -1,6 +1,8 @@
 /**
- * Algorithm source: "A modification of the RSA Public-Key Encryption Procedure"
- * H. C. Williams
+ *
+ * Williams Encryption scheme
+ *
+ * See "A modification of the RSA Public-Key Encryption Procedure" by H. C. Williams
  *
  */
 

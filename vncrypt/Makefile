@@ -1,5 +1,5 @@
 
-CFLAGS = -Wall -Werror -Wno-unused-result -g
+CFLAGS = -Wall -Werror -Wno-unused-result -O4
 
 LDFLAGS = 
 

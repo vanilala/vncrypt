@@ -1,3 +1,10 @@
+/**
+ *
+ * Modified-Rabin signature scheme
+ *
+ * See "Handbook of Applied Cryptography" by Alfred J. Menezes et al pages 440 - 441.
+ *
+ */
 
 #include "vnrabin_bn.h"
 #include "vncrypt_bn.h"
