@@ -31,9 +31,21 @@ typedef struct tagVNAsymCryptMethod {
 		const unsigned char * cipherText, int length,
 		struct iovec * plainText );
 
+	int ( * mPubEncrypt ) ( const VNAsymCryptCtx_t * ctx,
+		const unsigned char * plainText, int length,
+		struct iovec * cipherText );
+
+	int ( * mPrivDecrypt ) ( const VNAsymCryptCtx_t * ctx,
+		const unsigned char * cipherText, int length,
+		struct iovec * plainText );
 } VNAsymCryptMethod_t;
 
-enum { VN_TYPE_VNRabin_BN = 1, VN_TYPE_VNRabin_GC = 2 };
+enum {
+	VN_TYPE_VNRabin_BN = 1,
+	VN_TYPE_VNRabin_GC = 2,
+
+	VN_TYPE_VNWilliamsPK_BN = 100
+};
 
 #define VN_CONTAINER_OF(addr,type,field) \
 	((type*)((unsigned char*)addr - (unsigned long)&((type*)0)->field))
