@@ -6,8 +6,8 @@ int main( int argc, const char * argv[] )
 {
 	VNTestEnv_t env = {
 		.mTestMain = NULL,
-		.mSignCtxNew = VNRabin_BNCtx_New,
-		.mSignCtxFree = VNRabin_BNCtx_Free,
+		.mSignCtxNew = VNRabin_BN_CtxNew,
+		.mSignCtxFree = VNRabin_BN_CtxFree,
 		.mEncCtxNew = NULL,
 		.mEncCtxFree = NULL
 	};

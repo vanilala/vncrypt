@@ -1,5 +1,5 @@
 
-#include "vnrabin_bn.h"
+#include "vncrypt_bn.h"
 
 #include <openssl/bn.h>
 
@@ -51,7 +51,7 @@ int VN_BN_jacobi( const BIGNUM *za, const BIGNUM *zn, int *jacobi, BN_CTX *ctx )
 		mod =  BN_mod_word( &zn1, 4 );
 		if( 3 == mod && 3 == amod ) s = - s;
 
-		BN_mod( &zn1, &zn1, &za1, ctx );    // step6
+		BN_mod( &zn1, &zn1, &za1, ctx );        // step6
 
 		*jacobi = ( *jacobi ) * s;              // step7
 
@@ -67,21 +67,21 @@ int VN_BN_jacobi( const BIGNUM *za, const BIGNUM *zn, int *jacobi, BN_CTX *ctx )
 	return ret;
 }
 
-void VN_BN_dump_hex( const BIGNUM * za, struct iovec * hex )
+void VN_BN_dump_hex( const BIGNUM * za, struct vn_iovec * hex )
 {
 	char * tmp = BN_bn2hex( za );
 
-	hex->iov_len = strlen( tmp );
-	hex->iov_base = strdup( tmp );
+	hex->i.iov_len = strlen( tmp );
+	hex->i.iov_base = strdup( tmp );
 
 	OPENSSL_free( tmp );
 }
 
-void VN_BN_load_hex( const struct iovec * hex, BIGNUM * za )
+void VN_BN_load_hex( const struct vn_iovec * hex, BIGNUM * za )
 {
 	BIGNUM * tmp = NULL;
 
-	BN_hex2bn( &tmp, hex->iov_base );
+	BN_hex2bn( &tmp, hex->i.iov_base );
 	BN_copy( za, tmp );
 
 	BN_free( tmp );

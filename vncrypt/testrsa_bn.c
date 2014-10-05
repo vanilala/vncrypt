@@ -4,17 +4,17 @@
 
 void test( VNTestArgs_t * args )
 {
-	VNAsymCryptCtx_t * ctx = VNRsaSign_BNCtx_New( 3 );
+	VNAsymCryptCtx_t * ctx = VNRsaSign_BN_CtxNew( 3 );
 
 	VN_Run( ctx, args );
 
-	VNRsa_BNCtx_Free( ctx );
+	VNRsa_BN_CtxFree( ctx );
 
-	ctx = VNRsaEnc_BNCtx_New( 3 );
+	ctx = VNRsaEnc_BN_CtxNew( 3 );
 
 	VN_Run( ctx, args );
 
-	VNRsa_BNCtx_Free( ctx );
+	VNRsa_BN_CtxFree( ctx );
 }
 
 int main( int argc, const char * argv[] )

@@ -7,9 +7,6 @@
 #include <string.h>
 #include <assert.h>
 
-static double RunTime( unsigned long long prevUsec, unsigned long long * nowUsec );
-static void PrintKey( VNAsymCryptCtx_t * ctx );
-
 void VN_Run( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args );
 static void VN_Run_Sign( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args );
 static void VN_Run_Enc( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args );
@@ -67,7 +64,7 @@ void VN_Run( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
 	}
 }
 
-static double RunTime( unsigned long long prevUsec, unsigned long long * nowUsec )
+double VN_RunTime( unsigned long long prevUsec, unsigned long long * nowUsec )
 {
 	struct timeval tv;
 
@@ -82,30 +79,37 @@ static double RunTime( unsigned long long prevUsec, unsigned long long * nowUsec
 	return prevUsec / 1000000.0;
 }
 
-static void PrintKey( VNAsymCryptCtx_t * ctx )
+void VN_PrintKey( VNAsymCryptCtx_t * ctx )
 {
-	struct iovec pubKey, privKey;
+	struct vn_iovec pubKey, privKey, * iter = NULL;
 
-	ctx->mMethod.mDumpPubKey( ctx, &pubKey );
-	printf( "PubKey: %zd, %s\n", pubKey.iov_len, (char*)pubKey.iov_base );
+	VNAsymCryptDumpPubKey( ctx, &pubKey );
 
-	free( pubKey.iov_base );
+	for( iter = &pubKey; NULL != iter; iter = iter->next )
+	{
+		printf( "PubKey : %4zd, %s\n", iter->i.iov_len, (char*)iter->i.iov_base );
+	}
 
-	ctx->mMethod.mDumpPrivKey( ctx, &pubKey, &privKey );
+	vn_iovec_free_buffer_and_tail( &pubKey );
 
-	printf( "PirvKey: %zd, %s\n", privKey.iov_len, (char*)privKey.iov_base );
+	VNAsymCryptDumpPrivKey( ctx, &pubKey, &privKey );
 
-	free( pubKey.iov_base );
-	free( privKey.iov_base );
+	for( iter = &privKey; NULL != iter; iter = iter->next )
+	{
+		printf( "PirvKey: %4zd, %s\n", iter->i.iov_len, (char*)iter->i.iov_base );
+	}
+
+	vn_iovec_free_buffer_and_tail( &pubKey );
+	vn_iovec_free_buffer_and_tail( &privKey );
 }
 
 void VN_Run_Sign( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
 {
 	int i = 0, ret = 0;
 	unsigned char text[ 4096 ], tmp;
-	struct iovec plainText, cipherText;
+	struct vn_iovec plainText, cipherText;
 
-	struct iovec hexPubKey, hexPrivKey;
+	struct vn_iovec hexPubKey, hexPrivKey;
 
 	unsigned long long nowUsec = 0;
 	double interval = 0;
@@ -113,28 +117,28 @@ void VN_Run_Sign( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
 	for( i = 0; i < args->mLength; i++ ) text[i] = args->mInitValue + i;
 
 	// 1. generate keys
-	RunTime( 0, &nowUsec );
+	VN_RunTime( 0, &nowUsec );
 
-	ctx->mMethod.mGenKeys( ctx, args->mKeyBits );
-	PrintKey( ctx );
+	VNAsymCryptGenKeys( ctx, args->mKeyBits );
+	VN_PrintKey( ctx );
 
-	interval = RunTime( nowUsec, &nowUsec );
+	interval = VN_RunTime( nowUsec, &nowUsec );
 	printf( "GenKeys time %.6f\n", interval );
 
 	// 2. save pub/priv key, clear ctx
-	ctx->mMethod.mDumpPrivKey( ctx, &hexPubKey, &hexPrivKey );
-	ctx->mMethod.mClearKeys( ctx );
+	VNAsymCryptDumpPrivKey( ctx, &hexPubKey, &hexPrivKey );
+	VNAsymCryptClearKeys( ctx );
 
 	// 3. restore priv key, do PrivEncrypt
 	printf( "Load PrivKey ......\n" );
-	ctx->mMethod.mLoadPrivKey( ctx, &hexPubKey, &hexPrivKey );
+	VNAsymCryptLoadPrivKey( ctx, &hexPubKey, &hexPrivKey );
 
-	PrintKey( ctx );
+	VN_PrintKey( ctx );
 
 	for( i = 0; i < args->mEncryptCount && 0 == ret; i++ )
 	{
-		ret = ctx->mMethod.mPrivEncrypt( ctx, text, args->mLength, &cipherText );
-		free( cipherText.iov_base );
+		ret = VNAsymCryptPrivEncrypt( ctx, text, args->mLength, &cipherText );
+		vn_iovec_free_buffer_and_tail( &cipherText );
 
 		if( 0 != ret )
 		{
@@ -143,27 +147,27 @@ void VN_Run_Sign( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
 		}
 	}
 
-	ret = ctx->mMethod.mPrivEncrypt( ctx, text, args->mLength, &cipherText );
+	ret = VNAsymCryptPrivEncrypt( ctx, text, args->mLength, &cipherText );
 
-	interval = RunTime( nowUsec, &nowUsec );
+	interval = VN_RunTime( nowUsec, &nowUsec );
 	printf( "PrivEncrypt %d, time %.6f, ops %d/s\n",
 		args->mEncryptCount, interval, (int)(args->mEncryptCount / interval ) );
 
-	printf( "Cipher Text length: %zd\n", cipherText.iov_len );
+	printf( "Cipher Text length: %zd\n", cipherText.i.iov_len );
 
-	ctx->mMethod.mClearKeys( ctx );
+	VNAsymCryptClearKeys( ctx );
 
 	// 4. restore pub key, do PubDecrypt
 	printf( "Load PubKey ......\n" );
-	ctx->mMethod.mLoadPubKey( ctx, &hexPubKey );
+	VNAsymCryptLoadPubKey( ctx, &hexPubKey );
 
-	PrintKey( ctx );
+	VN_PrintKey( ctx );
 
 	for( i = 0; i < args->mDecryptCount; i++ )
 	{
-		ret = ctx->mMethod.mPubDecrypt( ctx, (unsigned char*)cipherText.iov_base,
-			cipherText.iov_len, &plainText );
-		free( plainText.iov_base );
+		ret = VNAsymCryptPubDecrypt( ctx, (unsigned char*)cipherText.i.iov_base,
+			cipherText.i.iov_len, &plainText );
+		vn_iovec_free_buffer_and_tail( &plainText );
 
 		if( 0 != ret )
 		{
@@ -172,28 +176,33 @@ void VN_Run_Sign( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
 		}
 	}
 
-	interval = RunTime( nowUsec, &nowUsec );
+	interval = VN_RunTime( nowUsec, &nowUsec );
 	printf( "PubDecrypt %d, time %.6f, ops %d/s\n",
 		args->mDecryptCount, interval, (int)(args->mDecryptCount / interval ) );
 
-	ctx->mMethod.mPubDecrypt( ctx, (unsigned char*)cipherText.iov_base, cipherText.iov_len, &plainText );
+	VNAsymCryptPubDecrypt( ctx, (unsigned char*)cipherText.i.iov_base, cipherText.i.iov_len, &plainText );
 
-	printf( "Plain Text length: %zd\n", plainText.iov_len );
+	printf( "Plain Text length: %zd\n", plainText.i.iov_len );
 
-	assert( args->mLength >= plainText.iov_len );
+	if( args->mLength < plainText.i.iov_len )
+	{
+		vn_iovec_print( "Plain Text", &plainText );
+	}
+
+	assert( args->mLength >= plainText.i.iov_len );
 
 	printf( "Verifing ......\n" );
-	for( i = 0; i < args->mLength - plainText.iov_len; i++ )
+	for( i = 0; i < args->mLength - plainText.i.iov_len; i++ )
 	{
 		if( 0 != text[i] ) printf( "%d %d\n", i, text[i] );
 	}
 
-	if( 0 != memcmp( text + args->mLength - plainText.iov_len, plainText.iov_base, plainText.iov_len ) )
+	if( 0 != memcmp( text + args->mLength - plainText.i.iov_len, plainText.i.iov_base, plainText.i.iov_len ) )
 	{
 		printf( "FAIL\n" );
-		for( i = args->mLength - plainText.iov_len; i < args->mLength; i++ )
+		for( i = args->mLength - plainText.i.iov_len; i < args->mLength; i++ )
 		{
-			tmp = ((unsigned char*)plainText.iov_base)[ i - args->mLength + plainText.iov_len ];
+			tmp = ((unsigned char*)plainText.i.iov_base)[ i - args->mLength + plainText.i.iov_len ];
 			if( text[ i ] != tmp )
 			{
 				printf( "%d %d %d\n", i, text[ i ], tmp );
@@ -203,20 +212,19 @@ void VN_Run_Sign( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
 		printf( "OK\n" );
 	}
 
-	free( plainText.iov_base );
-	free( cipherText.iov_base );
-
-	free( hexPubKey.iov_base );
-	free( hexPrivKey.iov_base );
+	vn_iovec_free_buffer_and_tail( &plainText );
+	vn_iovec_free_buffer_and_tail( &cipherText );
+	vn_iovec_free_buffer_and_tail( &hexPubKey );
+	vn_iovec_free_buffer_and_tail( &hexPrivKey );
 }
 
 static void VN_Run_Enc( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
 {
 	int i = 0, ret = 0;
 	unsigned char text[ 4096 ], tmp;
-	struct iovec plainText, cipherText;
+	struct vn_iovec plainText, cipherText;
 
-	struct iovec hexPubKey, hexPrivKey;
+	struct vn_iovec hexPubKey, hexPrivKey;
 
 	unsigned long long nowUsec = 0;
 	double interval = 0;
@@ -224,28 +232,28 @@ static void VN_Run_Enc( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
 	for( i = 0; i < args->mLength; i++ ) text[i] = args->mInitValue + i;
 
 	// 1. generate keys
-	RunTime( 0, &nowUsec );
+	VN_RunTime( 0, &nowUsec );
 
-	ctx->mMethod.mGenKeys( ctx, args->mKeyBits );
-	PrintKey( ctx );
+	VNAsymCryptGenKeys( ctx, args->mKeyBits );
+	VN_PrintKey( ctx );
 
-	interval = RunTime( nowUsec, &nowUsec );
+	interval = VN_RunTime( nowUsec, &nowUsec );
 	printf( "GenKeys time %.6f\n", interval );
 
 	// 2. save pub/priv key, clear ctx
-	ctx->mMethod.mDumpPrivKey( ctx, &hexPubKey, &hexPrivKey );
-	ctx->mMethod.mClearKeys( ctx );
+	VNAsymCryptDumpPrivKey( ctx, &hexPubKey, &hexPrivKey );
+	VNAsymCryptClearKeys( ctx );
 
 	// 3. restore pub key, do PubEncrypt
 	printf( "Load PubKey ......\n" );
-	ctx->mMethod.mLoadPubKey( ctx, &hexPubKey );
+	VNAsymCryptLoadPubKey( ctx, &hexPubKey );
 
-	PrintKey( ctx );
+	VN_PrintKey( ctx );
 
 	for( i = 0; i < args->mEncryptCount && 0 == ret; i++ )
 	{
-		ret = ctx->mMethod.mPubEncrypt( ctx, text, args->mLength, &cipherText );
-		free( cipherText.iov_base );
+		ret = VNAsymCryptPubEncrypt( ctx, text, args->mLength, &cipherText );
+		vn_iovec_free_buffer_and_tail( &cipherText );
 
 		if( 0 != ret )
 		{
@@ -254,27 +262,27 @@ static void VN_Run_Enc( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
 		}
 	}
 
-	ret = ctx->mMethod.mPubEncrypt( ctx, text, args->mLength, &cipherText );
+	ret = VNAsymCryptPubEncrypt( ctx, text, args->mLength, &cipherText );
 
-	interval = RunTime( nowUsec, &nowUsec );
+	interval = VN_RunTime( nowUsec, &nowUsec );
 	printf( "PubEncrypt %d, time %.6f, ops %d/s\n",
 		args->mEncryptCount, interval, (int)(args->mEncryptCount / interval ) );
 
-	printf( "Cipher Text length: %zd\n", cipherText.iov_len );
+	printf( "Cipher Text length: %zd\n", cipherText.i.iov_len );
 
-	ctx->mMethod.mClearKeys( ctx );
+	VNAsymCryptClearKeys( ctx );
 
 	// 4. restore priv key, do PrivDecrypt
 	printf( "Load PrivKey ......\n" );
-	ctx->mMethod.mLoadPrivKey( ctx, &hexPubKey, &hexPrivKey );
+	VNAsymCryptLoadPrivKey( ctx, &hexPubKey, &hexPrivKey );
 
-	PrintKey( ctx );
+	VN_PrintKey( ctx );
 
 	for( i = 0; i < args->mDecryptCount; i++ )
 	{
-		ret = ctx->mMethod.mPrivDecrypt( ctx, (unsigned char*)cipherText.iov_base,
-			cipherText.iov_len, &plainText );
-		free( plainText.iov_base );
+		ret = VNAsymCryptPrivDecrypt( ctx, (unsigned char*)cipherText.i.iov_base,
+			cipherText.i.iov_len, &plainText );
+		vn_iovec_free_buffer_and_tail( &plainText );
 
 		if( 0 != ret )
 		{
@@ -283,28 +291,28 @@ static void VN_Run_Enc( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
 		}
 	}
 
-	interval = RunTime( nowUsec, &nowUsec );
+	interval = VN_RunTime( nowUsec, &nowUsec );
 	printf( "PrivDecrypt %d, time %.6f, ops %d/s\n",
 		args->mDecryptCount, interval, (int)(args->mDecryptCount / interval ) );
 
-	ctx->mMethod.mPrivDecrypt( ctx, (unsigned char*)cipherText.iov_base, cipherText.iov_len, &plainText );
+	VNAsymCryptPrivDecrypt( ctx, (unsigned char*)cipherText.i.iov_base, cipherText.i.iov_len, &plainText );
 
-	printf( "Plain Text length: %zd\n", plainText.iov_len );
+	printf( "Plain Text length: %zd\n", plainText.i.iov_len );
 
-	assert( args->mLength >= plainText.iov_len );
+	assert( args->mLength >= plainText.i.iov_len );
 
 	printf( "Verifing ......\n" );
-	for( i = 0; i < args->mLength - plainText.iov_len; i++ )
+	for( i = 0; i < args->mLength - plainText.i.iov_len; i++ )
 	{
 		if( 0 != text[i] ) printf( "%d %d\n", i, text[i] );
 	}
 
-	if( 0 != memcmp( text + args->mLength - plainText.iov_len, plainText.iov_base, plainText.iov_len ) )
+	if( 0 != memcmp( text + args->mLength - plainText.i.iov_len, plainText.i.iov_base, plainText.i.iov_len ) )
 	{
 		printf( "FAIL\n" );
-		for( i = args->mLength - plainText.iov_len; i < args->mLength; i++ )
+		for( i = args->mLength - plainText.i.iov_len; i < args->mLength; i++ )
 		{
-			tmp = ((unsigned char*)plainText.iov_base)[ i - args->mLength + plainText.iov_len ];
+			tmp = ((unsigned char*)plainText.i.iov_base)[ i - args->mLength + plainText.i.iov_len ];
 			if( text[ i ] != tmp )
 			{
 				printf( "%d %d %d\n", i, text[ i ], tmp );
@@ -314,10 +322,9 @@ static void VN_Run_Enc( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
 		printf( "OK\n" );
 	}
 
-	free( plainText.iov_base );
-	free( cipherText.iov_base );
-
-	free( hexPubKey.iov_base );
-	free( hexPrivKey.iov_base );
+	vn_iovec_free_buffer_and_tail( &plainText );
+	vn_iovec_free_buffer_and_tail( &cipherText );
+	vn_iovec_free_buffer_and_tail( &hexPubKey );
+	vn_iovec_free_buffer_and_tail( &hexPrivKey );
 }
 

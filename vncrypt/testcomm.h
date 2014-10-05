@@ -30,3 +30,7 @@ int VN_Test( int argc, const char * argv[], VNTestEnv_t * env );
 
 void VN_Run( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args );
 
+double VN_RunTime( unsigned long long prevUsec, unsigned long long * nowUsec );
+
+void VN_PrintKey( VNAsymCryptCtx_t * ctx );
+

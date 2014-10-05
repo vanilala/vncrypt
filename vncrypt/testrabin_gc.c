@@ -15,8 +15,8 @@ int main( int argc, const char * argv[] )
 
 	VNTestEnv_t env = {
 		.mTestMain = NULL,
-		.mSignCtxNew = VNRabin_GCCtx_New,
-		.mSignCtxFree = VNRabin_GCCtx_Free,
+		.mSignCtxNew = VNRabin_GC_CtxNew,
+		.mSignCtxFree = VNRabin_GC_CtxFree,
 		.mEncCtxNew = NULL,
 		.mEncCtxFree = NULL
 	};

@@ -13,17 +13,17 @@
 #include <assert.h>
 #include <string.h>
 
-typedef struct tagVNRsa_ORGCtx {
+typedef struct tagVNRsa_ORG_Ctx {
 	VNAsymCryptCtx_t mCtx;
 
 	unsigned long mE;
 
 	RSA * mRSA;
-} VNRsa_ORGCtx_t;
+} VNRsa_ORG_Ctx_t;
 
-static VNAsymCryptCtx_t * VNRsa_ORGCtx_New_Impl( unsigned long e )
+static VNAsymCryptCtx_t * VNRsa_ORG_CtxNewImpl( unsigned long e )
 {
-	VNRsa_ORGCtx_t * bnCtx = (VNRsa_ORGCtx_t *)calloc( sizeof( VNRsa_ORGCtx_t ), 1 );
+	VNRsa_ORG_Ctx_t * bnCtx = (VNRsa_ORG_Ctx_t *)calloc( sizeof( VNRsa_ORG_Ctx_t ), 1 );
 
 	bnCtx->mCtx.mMethod.mGenKeys = VNRsa_ORG_GenKeys;
 	bnCtx->mCtx.mMethod.mClearKeys = VNRsa_ORG_ClearKeys;
@@ -42,25 +42,25 @@ static VNAsymCryptCtx_t * VNRsa_ORGCtx_New_Impl( unsigned long e )
 	return &( bnCtx->mCtx );
 }
 
-VNAsymCryptCtx_t * VNRsaSign_ORGCtx_New( unsigned long e )
+VNAsymCryptCtx_t * VNRsaSign_ORG_CtxNew( unsigned long e )
 {
-	VNAsymCryptCtx_t * ctx = VNRsa_ORGCtx_New_Impl( e );
+	VNAsymCryptCtx_t * ctx = VNRsa_ORG_CtxNewImpl( e );
 	ctx->mType = VN_TYPE_VNRsaSign_ORG;
 
 	return ctx;
 }
 
-VNAsymCryptCtx_t * VNRsaEnc_ORGCtx_New( unsigned long e )
+VNAsymCryptCtx_t * VNRsaEnc_ORG_CtxNew( unsigned long e )
 {
-	VNAsymCryptCtx_t * ctx = VNRsa_ORGCtx_New_Impl( e );
+	VNAsymCryptCtx_t * ctx = VNRsa_ORG_CtxNewImpl( e );
 	ctx->mType = VN_TYPE_VNRsaEnc_ORG;
 
 	return ctx;
 }
 
-void VNRsa_ORGCtx_Free( VNAsymCryptCtx_t * ctx )
+void VNRsa_ORG_CtxFree( VNAsymCryptCtx_t * ctx )
 {
-	VNRsa_ORGCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRsa_ORGCtx_t, mCtx );
+	VNRsa_ORG_Ctx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRsa_ORG_Ctx_t, mCtx );
 	assert( VN_TYPE_VNRsaSign_ORG == ctx->mType || VN_TYPE_VNRsaEnc_ORG == ctx->mType );
 
 	if( NULL != bnCtx->mRSA ) RSA_free( bnCtx->mRSA );
@@ -72,7 +72,7 @@ int VNRsa_ORG_GenKeys( VNAsymCryptCtx_t * ctx, int keyBits )
 {
 	BIGNUM ze;
 
-	VNRsa_ORGCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRsa_ORGCtx_t, mCtx );
+	VNRsa_ORG_Ctx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRsa_ORG_Ctx_t, mCtx );
 	assert( VN_TYPE_VNRsaSign_ORG == ctx->mType || VN_TYPE_VNRsaEnc_ORG == ctx->mType );
 
 	BN_init( &ze );
@@ -87,54 +87,65 @@ int VNRsa_ORG_GenKeys( VNAsymCryptCtx_t * ctx, int keyBits )
 
 void VNRsa_ORG_ClearKeys( VNAsymCryptCtx_t * ctx )
 {
-	//VNRsa_ORGCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRsa_ORGCtx_t, mCtx );
-	//assert( VN_TYPE_VNRsaSign_ORG == ctx->mType || VN_TYPE_VNRsaEnc_ORG == ctx->mType );
+	VNRsa_ORG_Ctx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRsa_ORG_Ctx_t, mCtx );
+	assert( VN_TYPE_VNRsaSign_ORG == ctx->mType || VN_TYPE_VNRsaEnc_ORG == ctx->mType );
 
-	//BN_clear( bnCtx->mRSA->n );
-	//BN_clear( bnCtx->mRSA->d );
+	BN_clear( bnCtx->mRSA->n );
+	BN_clear( bnCtx->mRSA->e );
+	BN_clear( bnCtx->mRSA->d );
 }
 
 int VNRsa_ORG_DumpPubKey( const VNAsymCryptCtx_t * ctx,
-	struct iovec * hexPubKey )
+	struct vn_iovec * hexPubKey )
 {
-	const VNRsa_ORGCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRsa_ORGCtx_t, mCtx );
+	const VNRsa_ORG_Ctx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRsa_ORG_Ctx_t, mCtx );
 	assert( VN_TYPE_VNRsaSign_ORG == ctx->mType || VN_TYPE_VNRsaEnc_ORG == ctx->mType );
 
 	VN_BN_dump_hex( bnCtx->mRSA->n, hexPubKey );
+
+	hexPubKey->next = (struct vn_iovec*)calloc( sizeof( struct vn_iovec ), 1 );
+	VN_BN_dump_hex( bnCtx->mRSA->e, hexPubKey->next );
 
 	return 0;
 }
 
 int VNRsa_ORG_DumpPrivKey( const VNAsymCryptCtx_t * ctx,
-	struct iovec * hexPubKey, struct iovec * hexPrivKey )
+	struct vn_iovec * hexPubKey, struct vn_iovec * hexPrivKey )
 {
-	const VNRsa_ORGCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRsa_ORGCtx_t, mCtx );
+	const VNRsa_ORG_Ctx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRsa_ORG_Ctx_t, mCtx );
 	assert( VN_TYPE_VNRsaSign_ORG == ctx->mType || VN_TYPE_VNRsaEnc_ORG == ctx->mType );
 
 	VN_BN_dump_hex( bnCtx->mRSA->n, hexPubKey );
+
+	hexPubKey->next = (struct vn_iovec*)calloc( sizeof( struct vn_iovec ), 1 );
+	VN_BN_dump_hex( bnCtx->mRSA->e, hexPubKey->next );
+
 	VN_BN_dump_hex( bnCtx->mRSA->d, hexPrivKey );
 
 	return 0;
 }
 
 int VNRsa_ORG_LoadPubKey( VNAsymCryptCtx_t * ctx,
-	const struct iovec * hexPubKey )
+	const struct vn_iovec * hexPubKey )
 {
-	VNRsa_ORGCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRsa_ORGCtx_t, mCtx );
+	VNRsa_ORG_Ctx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRsa_ORG_Ctx_t, mCtx );
 	assert( VN_TYPE_VNRsaSign_ORG == ctx->mType || VN_TYPE_VNRsaEnc_ORG == ctx->mType );
 
 	VN_BN_load_hex( hexPubKey, bnCtx->mRSA->n );
+	VN_BN_load_hex( hexPubKey->next, bnCtx->mRSA->e );
 
 	return 0;
 }
 
 int VNRsa_ORG_LoadPrivKey( VNAsymCryptCtx_t * ctx,
-	const struct iovec * hexPubKey, const struct iovec * hexPrivKey )
+	const struct vn_iovec * hexPubKey, const struct vn_iovec * hexPrivKey )
 {
-	VNRsa_ORGCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRsa_ORGCtx_t, mCtx );
+	VNRsa_ORG_Ctx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRsa_ORG_Ctx_t, mCtx );
 	assert( VN_TYPE_VNRsaSign_ORG == ctx->mType || VN_TYPE_VNRsaEnc_ORG == ctx->mType );
 
 	VN_BN_load_hex( hexPubKey, bnCtx->mRSA->n );
+	VN_BN_load_hex( hexPubKey->next, bnCtx->mRSA->e );
+
 	VN_BN_load_hex( hexPrivKey, bnCtx->mRSA->d );
 
 	return 0;
@@ -142,29 +153,29 @@ int VNRsa_ORG_LoadPrivKey( VNAsymCryptCtx_t * ctx,
 
 int VNRsa_ORG_PrivEncrypt( const VNAsymCryptCtx_t * ctx,
 	const unsigned char * plainText, int length,
-	struct iovec * cipherText )
+	struct vn_iovec * cipherText )
 {
 	int ret = 0;
 
-	VNRsa_ORGCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRsa_ORGCtx_t, mCtx );
+	VNRsa_ORG_Ctx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRsa_ORG_Ctx_t, mCtx );
 	assert( VN_TYPE_VNRsaSign_ORG == ctx->mType || VN_TYPE_VNRsaEnc_ORG == ctx->mType );
 
-	cipherText->iov_len = RSA_size( bnCtx->mRSA );
-	cipherText->iov_base = calloc( 1, cipherText->iov_len + 1 );
+	cipherText->i.iov_len = RSA_size( bnCtx->mRSA );
+	cipherText->i.iov_base = calloc( 1, cipherText->i.iov_len + 1 );
 
-	if( length > cipherText->iov_len )
+	if( length > cipherText->i.iov_len )
 	{
 		return VN_ERR_PLAINTEXT_TOO_LONG;
 	}
 
-	memcpy( ((char*)cipherText->iov_base) + cipherText->iov_len - length, plainText, length );
+	memcpy( ((char*)cipherText->i.iov_base) + cipherText->i.iov_len - length, plainText, length );
 
-	ret = RSA_private_encrypt( cipherText->iov_len, (unsigned char*)cipherText->iov_base,
-		(unsigned char*)cipherText->iov_base, bnCtx->mRSA, RSA_NO_PADDING );
+	ret = RSA_private_encrypt( cipherText->i.iov_len, (unsigned char*)cipherText->i.iov_base,
+		(unsigned char*)cipherText->i.iov_base, bnCtx->mRSA, RSA_NO_PADDING );
 
 	if( ret >= 0 )
 	{
-		cipherText->iov_len = ret;
+		cipherText->i.iov_len = ret;
 		ret = 0;
 	}
 
@@ -173,31 +184,31 @@ int VNRsa_ORG_PrivEncrypt( const VNAsymCryptCtx_t * ctx,
 
 int VNRsa_ORG_PubDecrypt( const VNAsymCryptCtx_t * ctx,
 	const unsigned char * cipherText, int length,
-	struct iovec * plainText )
+	struct vn_iovec * plainText )
 {
 	int ret = 0;
 	unsigned char * pos = NULL;
 
-	VNRsa_ORGCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRsa_ORGCtx_t, mCtx );
+	VNRsa_ORG_Ctx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRsa_ORG_Ctx_t, mCtx );
 	assert( VN_TYPE_VNRsaSign_ORG == ctx->mType || VN_TYPE_VNRsaEnc_ORG == ctx->mType );
 
-	plainText->iov_len = RSA_size( bnCtx->mRSA );
-	plainText->iov_base = malloc( plainText->iov_len + 1 );
+	plainText->i.iov_len = RSA_size( bnCtx->mRSA );
+	plainText->i.iov_base = malloc( plainText->i.iov_len + 1 );
 
 	ret = RSA_public_decrypt( length, cipherText,
-		(unsigned char*)plainText->iov_base, bnCtx->mRSA, RSA_NO_PADDING );
+		(unsigned char*)plainText->i.iov_base, bnCtx->mRSA, RSA_NO_PADDING );
 
 	if( ret >= 0 )
 	{
-		plainText->iov_len = ret;
+		plainText->i.iov_len = ret;
 		ret = 0;
 
-		pos = (unsigned char *)plainText->iov_base;
+		pos = (unsigned char *)plainText->i.iov_base;
 		if( 0 == *pos )
 		{
 			for( ; 0 == *pos; )  pos++;
-			plainText->iov_len -= pos - ((unsigned char*)plainText->iov_base);
-			memmove( plainText->iov_base, pos, plainText->iov_len );
+			plainText->i.iov_len -= pos - ((unsigned char*)plainText->i.iov_base);
+			memmove( plainText->i.iov_base, pos, plainText->i.iov_len );
 		}
 	}
 
@@ -206,29 +217,29 @@ int VNRsa_ORG_PubDecrypt( const VNAsymCryptCtx_t * ctx,
 
 int VNRsa_ORG_PubEncrypt( const VNAsymCryptCtx_t * ctx,
 	const unsigned char * plainText, int length,
-	struct iovec * cipherText )
+	struct vn_iovec * cipherText )
 {
 	int ret = 0;
 
-	VNRsa_ORGCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRsa_ORGCtx_t, mCtx );
+	VNRsa_ORG_Ctx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRsa_ORG_Ctx_t, mCtx );
 	assert( VN_TYPE_VNRsaSign_ORG == ctx->mType || VN_TYPE_VNRsaEnc_ORG == ctx->mType );
 
-	cipherText->iov_len = RSA_size( bnCtx->mRSA );
-	cipherText->iov_base = calloc( 1, cipherText->iov_len + 1 );
+	cipherText->i.iov_len = RSA_size( bnCtx->mRSA );
+	cipherText->i.iov_base = calloc( 1, cipherText->i.iov_len + 1 );
 
-	if( length > cipherText->iov_len )
+	if( length > cipherText->i.iov_len )
 	{
 		return VN_ERR_PLAINTEXT_TOO_LONG;
 	}
 
-	memcpy( ((char*)cipherText->iov_base) + cipherText->iov_len - length, plainText, length );
+	memcpy( ((char*)cipherText->i.iov_base) + cipherText->i.iov_len - length, plainText, length );
 
-	ret = RSA_public_encrypt( cipherText->iov_len, (unsigned char*)cipherText->iov_base,
-		(unsigned char*)cipherText->iov_base, bnCtx->mRSA, RSA_NO_PADDING );
+	ret = RSA_public_encrypt( cipherText->i.iov_len, (unsigned char*)cipherText->i.iov_base,
+		(unsigned char*)cipherText->i.iov_base, bnCtx->mRSA, RSA_NO_PADDING );
 
 	if( ret >= 0 )
 	{
-		cipherText->iov_len = ret;
+		cipherText->i.iov_len = ret;
 		ret = 0;
 	}
 
@@ -237,31 +248,31 @@ int VNRsa_ORG_PubEncrypt( const VNAsymCryptCtx_t * ctx,
 
 int VNRsa_ORG_PrivDecrypt( const VNAsymCryptCtx_t * ctx,
 	const unsigned char * cipherText, int length,
-	struct iovec * plainText )
+	struct vn_iovec * plainText )
 {
 	int ret = 0;
 	unsigned char * pos = NULL;
 
-	VNRsa_ORGCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRsa_ORGCtx_t, mCtx );
+	VNRsa_ORG_Ctx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRsa_ORG_Ctx_t, mCtx );
 	assert( VN_TYPE_VNRsaSign_ORG == ctx->mType || VN_TYPE_VNRsaEnc_ORG == ctx->mType );
 
-	plainText->iov_len = RSA_size( bnCtx->mRSA );
-	plainText->iov_base = malloc( plainText->iov_len + 1 );
+	plainText->i.iov_len = RSA_size( bnCtx->mRSA );
+	plainText->i.iov_base = malloc( plainText->i.iov_len + 1 );
 
 	ret = RSA_private_decrypt( length, cipherText,
-		(unsigned char*)plainText->iov_base, bnCtx->mRSA, RSA_NO_PADDING );
+		(unsigned char*)plainText->i.iov_base, bnCtx->mRSA, RSA_NO_PADDING );
 
 	if( ret >= 0 )
 	{
-		plainText->iov_len = ret;
+		plainText->i.iov_len = ret;
 		ret = 0;
 
-		pos = (unsigned char *)plainText->iov_base;
+		pos = (unsigned char *)plainText->i.iov_base;
 		if( 0 == *pos )
 		{
 			for( ; 0 == *pos; )  pos++;
-			plainText->iov_len -= pos - ((unsigned char*)plainText->iov_base);
-			memmove( plainText->iov_base, pos, plainText->iov_len );
+			plainText->i.iov_len -= pos - ((unsigned char*)plainText->i.iov_base);
+			memmove( plainText->i.iov_base, pos, plainText->i.iov_len );
 		}
 	}
 

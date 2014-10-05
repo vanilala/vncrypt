@@ -1,61 +1,44 @@
 #pragma once
 
-#include <sys/uio.h>
+#include "vndefine.h"
 
-typedef struct tagVNAsymCryptCtx VNAsymCryptCtx_t;
+/* asymmetric cryptography */
 
-enum { VN_ERR_PLAINTEXT_TOO_LONG = -101 };
+int VNAsymCryptGenKeys( VNAsymCryptCtx_t * ctx, int keyBits );
 
-typedef struct tagVNAsymCryptMethod {
-	int ( * mGenKeys ) ( VNAsymCryptCtx_t * ctx, int keyBits );
+void VNAsymCryptClearKeys( VNAsymCryptCtx_t * ctx );
 
-	void ( * mClearKeys ) ( VNAsymCryptCtx_t * ctx );
+int VNAsymCryptDumpPubKey( const VNAsymCryptCtx_t * ctx,
+		struct vn_iovec * hexPubKey );
 
-	int ( * mDumpPubKey ) ( const VNAsymCryptCtx_t * ctx,
-		struct iovec * hexPubKey );
+int VNAsymCryptDumpPrivKey( const VNAsymCryptCtx_t * ctx,
+		struct vn_iovec * hexPubKey, struct vn_iovec * hexPrivKey );
 
-	int ( * mDumpPrivKey ) ( const VNAsymCryptCtx_t * ctx,
-		struct iovec * hexPubKey, struct iovec * hexPrivKey );
+int VNAsymCryptLoadPubKey( VNAsymCryptCtx_t * ctx,
+		const struct vn_iovec * hexPubKey );
 
-	int ( * mLoadPubKey ) ( VNAsymCryptCtx_t * ctx,
-		const struct iovec * hexPubKey );
+int VNAsymCryptLoadPrivKey( VNAsymCryptCtx_t * ctx,
+		const struct vn_iovec * hexPubKey, const struct vn_iovec * hexPrivKey );
 
-	int ( * mLoadPrivKey ) ( VNAsymCryptCtx_t * ctx,
-		const struct iovec * hexPubKey, const struct iovec * hexPrivKey );
-
-	int ( * mPrivEncrypt ) ( const VNAsymCryptCtx_t * ctx,
+int VNAsymCryptPrivEncrypt( const VNAsymCryptCtx_t * ctx,
 		const unsigned char * plainText, int length,
-		struct iovec * cipherText );
+		struct vn_iovec * cipherText );
 
-	int ( * mPubDecrypt ) ( const VNAsymCryptCtx_t * ctx,
+int VNAsymCryptPubDecrypt( const VNAsymCryptCtx_t * ctx,
 		const unsigned char * cipherText, int length,
-		struct iovec * plainText );
+		struct vn_iovec * plainText );
 
-	int ( * mPubEncrypt ) ( const VNAsymCryptCtx_t * ctx,
+int VNAsymCryptPubEncrypt( const VNAsymCryptCtx_t * ctx,
 		const unsigned char * plainText, int length,
-		struct iovec * cipherText );
+		struct vn_iovec * cipherText );
 
-	int ( * mPrivDecrypt ) ( const VNAsymCryptCtx_t * ctx,
+int VNAsymCryptPrivDecrypt( const VNAsymCryptCtx_t * ctx,
 		const unsigned char * cipherText, int length,
-		struct iovec * plainText );
-} VNAsymCryptMethod_t;
+		struct vn_iovec * plainText );
 
-enum {
-	VN_TYPE_VNRabinSign_BN = 1,
-	VN_TYPE_VNRabinSign_GC = 2,
-	VN_TYPE_VNRsaSign_BN = 3,
-	VN_TYPE_VNRsaSign_ORG = 4,
+/* helper function */
 
-	VN_TYPE_VNWilliamsEnc_BN = 100,
-	VN_TYPE_VNRsaEnc_BN = 101,
-	VN_TYPE_VNRsaEnc_ORG = 102,
-};
+void vn_iovec_print( const char * prompt, struct vn_iovec * head );
 
-#define VN_CONTAINER_OF(addr,type,field) \
-	((type*)((unsigned char*)addr - (unsigned long)&((type*)0)->field))
-
-typedef struct tagVNAsymCryptCtx {
-	int mType;
-	VNAsymCryptMethod_t mMethod;
-} VNAsymCryptCtx_t;
+void vn_iovec_free_buffer_and_tail( struct vn_iovec * head );
 
