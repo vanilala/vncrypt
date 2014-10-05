@@ -54,7 +54,7 @@ int VN_Test( int argc, const char * argv[], VNTestEnv_t * env )
 
 void VN_Run( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
 {
-	if( ctx->mType < 100 )
+	if( ctx->mType < VN_TYPE_VNMaxSign )
 	{
 		printf( "\nStart to run signature scheme ......\n\n" );
 		VN_Run_Sign( ctx, args );
@@ -186,7 +186,7 @@ void VN_Run_Sign( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
 
 	if( args->mLength < plainText.i.iov_len )
 	{
-		VNIovecPrint( "Plain Text", &plainText );
+		VNIovecPrint( "PlainText", &plainText );
 	}
 
 	assert( args->mLength >= plainText.i.iov_len );
@@ -222,7 +222,7 @@ static void VN_Run_Enc( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
 {
 	int i = 0, ret = 0;
 	unsigned char text[ 4096 ], tmp;
-	struct vn_iovec plainText, cipherText;
+	struct vn_iovec plainText, cipherText, * result = NULL;
 
 	struct vn_iovec hexPubKey, hexPrivKey;
 
@@ -297,22 +297,39 @@ static void VN_Run_Enc( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
 
 	VNAsymCryptPrivDecrypt( ctx, (unsigned char*)cipherText.i.iov_base, cipherText.i.iov_len, &plainText );
 
-	printf( "Plain Text length: %zd\n", plainText.i.iov_len );
+	result = &plainText;
 
-	assert( args->mLength >= plainText.i.iov_len );
+	if( NULL != result->next )
+	{
+		// rabin encryption scheme return 2 or 4 results, find the real result
+		VNIovecPrint( "PlainText", result );
+		for( ; NULL != result; result = result->next )
+		{
+			tmp = ((unsigned char*)result->i.iov_base)[ 0 ];
+			if( tmp == text[0] || tmp == text[1] )
+			{
+				break;
+			}
+		}
+		assert( NULL != result );
+	}
+
+	printf( "Plain Text length: %zd\n", result->i.iov_len );
+
+	assert( args->mLength >= result->i.iov_len );
 
 	printf( "Verifing ......\n" );
-	for( i = 0; i < args->mLength - plainText.i.iov_len; i++ )
+	for( i = 0; i < args->mLength - result->i.iov_len; i++ )
 	{
 		if( 0 != text[i] ) printf( "%d %d\n", i, text[i] );
 	}
 
-	if( 0 != memcmp( text + args->mLength - plainText.i.iov_len, plainText.i.iov_base, plainText.i.iov_len ) )
+	if( 0 != memcmp( text + args->mLength - result->i.iov_len, result->i.iov_base, result->i.iov_len ) )
 	{
 		printf( "FAIL\n" );
-		for( i = args->mLength - plainText.i.iov_len; i < args->mLength; i++ )
+		for( i = args->mLength - result->i.iov_len; i < args->mLength; i++ )
 		{
-			tmp = ((unsigned char*)plainText.i.iov_base)[ i - args->mLength + plainText.i.iov_len ];
+			tmp = ((unsigned char*)result->i.iov_base)[ i - args->mLength + result->i.iov_len ];
 			if( text[ i ] != tmp )
 			{
 				printf( "%d %d %d\n", i, text[ i ], tmp );

@@ -67,6 +67,81 @@ int VN_BN_jacobi( const BIGNUM *za, const BIGNUM *zn, int *jacobi, BN_CTX *ctx )
 	return ret;
 }
 
+/***********************************************************
+
+http://en.wikipedia.org/wiki/Extended_Euclidean_algorithm
+
+
+function extended_gcd(a, b)
+    s := 0;    old_s := 1
+    t := 1;    old_t := 0
+    r := b;    old_r := a
+    while r != 0
+        quotient := old_r div r
+        (old_r, r) := (r, old_r - quotient * r)
+        (old_s, s) := (s, old_s - quotient * s)
+        (old_t, t) := (t, old_t - quotient * t)       
+    output "BÃ©zout coefficients:", (old_s, old_t)
+    output "greatest common divisor:", old_r
+    output "quotients by the gcd:", (t, s)
+
+************************************************************/
+
+void VN_BN_gcdext( const BIGNUM * za, const BIGNUM * zb,
+	BIGNUM * zx, BIGNUM * zy, BIGNUM * gcd, BN_CTX * ctx )
+{
+	BIGNUM zs, old_s, zt, old_t, zr, old_r, quot, tmp;
+
+	BN_init( &zs );
+	BN_init( &old_s );
+	BN_init( &zt );
+	BN_init( &old_t );
+	BN_init( &zr );
+	BN_init( &old_r );
+	BN_init( &quot );
+	BN_init( &tmp );
+
+	BN_set_word( &zs, 0 );
+	BN_set_word( &old_s, 1 );
+	BN_set_word( &zt, 1 );
+	BN_set_word( &old_t, 0 );
+	BN_copy( &zr, zb );
+	BN_copy( &old_r, za );
+
+	while( ! BN_is_zero( &zr ) )
+	{
+		BN_div( &quot, &tmp, &old_r, &zr, ctx );
+
+		BN_mul( &tmp, &quot, &zr, ctx );
+		BN_sub( &tmp, &old_r, &tmp );
+		BN_copy( &old_r, &zr );
+		BN_copy( &zr, &tmp );
+
+		BN_mul( &tmp, &quot, &zs, ctx );
+		BN_sub( &tmp, &old_s, &tmp );
+		BN_copy( &old_s, &zs );
+		BN_copy( &zs, &tmp );
+
+		BN_mul( &tmp, &quot, &zt, ctx );
+		BN_sub( &tmp, &old_t, &tmp );
+		BN_copy( &old_t, &zt );
+		BN_copy( &zt, &tmp );
+	}
+
+	BN_copy( zx, &old_s );
+	BN_copy( zy, &old_t );
+	BN_copy( gcd, &old_r );
+
+	BN_free( &zs );
+	BN_free( &old_s );
+	BN_free( &zt );
+	BN_free( &old_t );
+	BN_free( &zr );
+	BN_free( &old_r );
+	BN_free( &quot );
+	BN_free( &tmp );
+}
+
 void VN_BN_dump_hex( const BIGNUM * za, struct vn_iovec * hex )
 {
 	char * tmp = BN_bn2hex( za );
@@ -85,5 +160,12 @@ void VN_BN_load_hex( const struct vn_iovec * hex, BIGNUM * za )
 	BN_copy( za, tmp );
 
 	BN_free( tmp );
+}
+
+void VN_BN_dump_bin( const BIGNUM * za, struct vn_iovec * bin )
+{
+	bin->i.iov_len = BN_num_bytes( za );
+	bin->i.iov_base = malloc( bin->i.iov_len + 1);
+	BN_bn2bin( za, bin->i.iov_base );
 }
 

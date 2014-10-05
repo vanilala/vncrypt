@@ -11,7 +11,7 @@ typedef struct tagVNTestArgs {
 
 	int mKeyBits;
 	int mLength;
-	int mInitValue;
+	unsigned char mInitValue;
 	int mEncryptCount;
 	int mDecryptCount;
 } VNTestArgs_t;
