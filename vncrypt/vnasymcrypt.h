@@ -44,9 +44,11 @@ enum {
 	VN_TYPE_VNRabinSign_BN = 1,
 	VN_TYPE_VNRabinSign_GC = 2,
 	VN_TYPE_VNRsaSign_BN = 3,
+	VN_TYPE_VNRsaSign_ORG = 4,
 
 	VN_TYPE_VNWilliamsEnc_BN = 100,
 	VN_TYPE_VNRsaEnc_BN = 101,
+	VN_TYPE_VNRsaEnc_ORG = 102,
 };
 
 #define VN_CONTAINER_OF(addr,type,field) \

@@ -1,20 +1,22 @@
 
-#include "vnrsa_bn.h"
+#include "vnrsa_org.h"
 #include "testcomm.h"
+
+#include <openssl/err.h>
 
 void test( VNTestArgs_t * args )
 {
-	VNAsymCryptCtx_t * ctx = VNRsaSign_BNCtx_New( 3 );
+	VNAsymCryptCtx_t * ctx = VNRsaSign_ORGCtx_New( 3 );
 
 	VN_Run( ctx, args );
 
-	VNRsa_BNCtx_Free( ctx );
+	VNRsa_ORGCtx_Free( ctx );
 
-	ctx = VNRsaEnc_BNCtx_New( 3 );
+	ctx = VNRsaEnc_ORGCtx_New( 3 );
 
 	VN_Run( ctx, args );
 
-	VNRsa_BNCtx_Free( ctx );
+	VNRsa_ORGCtx_Free( ctx );
 }
 
 int main( int argc, const char * argv[] )
@@ -27,7 +29,11 @@ int main( int argc, const char * argv[] )
 		.mEncCtxFree = NULL
 	};
 
+	ERR_load_crypto_strings();
+
 	VN_Test( argc, argv, &env );
+
+	ERR_free_strings();
 
 	return 0;
 }

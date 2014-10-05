@@ -103,11 +103,10 @@ int VNRsa_BN_GenKeys( VNAsymCryptCtx_t * ctx, int keyBits )
 	/* compute public key n */
 	BN_mul( &( bnCtx->mN ), &zp, &zq, bnCtx->mBNCtx );
 
+	/* compute private key ( e * d ) = 1 ( mod (p-1)(q-1) ) */
 	BN_sub_word( &zp, 1 );
 	BN_sub_word( &zq, 1 );
 	BN_mul( &zr, &zp, &zq, bnCtx->mBNCtx );
-
-	/* compute private key d */
 	BN_mod_inverse( &( bnCtx->mD ), &( bnCtx->mE ), &zr, bnCtx->mBNCtx );
 
 	BN_free( &zp );
@@ -193,7 +192,7 @@ int VNRsa_BN_PrivProcess( const VNAsymCryptCtx_t * ctx,
 
 	BN_init( &zs );
 
-	BN_mod_exp( &zs, &zm, &( bnCtx->mD ), &( bnCtx->mN ), bnCtx->mBNCtx );
+	BN_mod_exp_mont( &zs, &zm, &( bnCtx->mD ), &( bnCtx->mN ), bnCtx->mBNCtx, NULL );
 
 	cipherText->iov_len = BN_num_bytes( &zs );
 	cipherText->iov_base = malloc( cipherText->iov_len + 1);
@@ -219,7 +218,7 @@ int VNRsa_BN_PubProcess( const VNAsymCryptCtx_t * ctx,
 
 	BN_bin2bn( cipherText, length, &zs );
 
-	BN_mod_exp( &zm, &zs, &( bnCtx->mE ), &( bnCtx->mN ), bnCtx->mBNCtx );
+	BN_mod_exp_mont( &zm, &zs, &( bnCtx->mE ), &( bnCtx->mN ), bnCtx->mBNCtx, NULL );
 
 	plainText->iov_len = BN_num_bytes( &zm );
 	plainText->iov_base = malloc( plainText->iov_len + 1);
