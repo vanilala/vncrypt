@@ -38,7 +38,9 @@ int VNAsymCryptPrivDecrypt( const VNAsymCryptCtx_t * ctx,
 
 /* helper function */
 
-void vn_iovec_print( const char * prompt, struct vn_iovec * head );
+void VNIovecPrint( const char * prompt, struct vn_iovec * head );
 
-void vn_iovec_free_buffer_and_tail( struct vn_iovec * head );
+void VNIovecFreeBufferAndTail( struct vn_iovec * head );
+
+void VNIovecGetRandomBuffer( struct vn_iovec * head, int length );
 

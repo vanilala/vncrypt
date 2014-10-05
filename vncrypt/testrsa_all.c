@@ -46,9 +46,9 @@ void test( VNTestArgs_t * args )
 		ret = VNAsymCryptPrivEncrypt( gmpCtx, text, args->mLength, &gmpCipher );
 		printf( "GMP %d\n", ret );
 
-		vn_iovec_print( "ORG", &orgCipher );
-		vn_iovec_print( "BN ", &bnCipher );
-		vn_iovec_print( "GMP", &gmpCipher );
+		VNIovecPrint( "ORG", &orgCipher );
+		VNIovecPrint( "BN ", &bnCipher );
+		VNIovecPrint( "GMP", &gmpCipher );
 	}
 
 	printf( "###### Try PubDecrypt ######\n" );
@@ -62,17 +62,17 @@ void test( VNTestArgs_t * args )
 		ret = VNAsymCryptPubDecrypt( gmpCtx, gmpCipher.i.iov_base, gmpCipher.i.iov_len, &gmpPlain );
 		printf( "GMP %d\n", ret );
 
-		vn_iovec_print( "ORG", &orgPlain );
-		vn_iovec_print( "BN ", &bnPlain );
-		vn_iovec_print( "GMP", &gmpPlain );
+		VNIovecPrint( "ORG", &orgPlain );
+		VNIovecPrint( "BN ", &bnPlain );
+		VNIovecPrint( "GMP", &gmpPlain );
 	}
 
-	vn_iovec_free_buffer_and_tail( &orgPlain );
-	vn_iovec_free_buffer_and_tail( &orgCipher );
-	vn_iovec_free_buffer_and_tail( &gmpPlain );
-	vn_iovec_free_buffer_and_tail( &gmpCipher );
-	vn_iovec_free_buffer_and_tail( &bnPlain );
-	vn_iovec_free_buffer_and_tail( &bnCipher );
+	VNIovecFreeBufferAndTail( &orgPlain );
+	VNIovecFreeBufferAndTail( &orgCipher );
+	VNIovecFreeBufferAndTail( &gmpPlain );
+	VNIovecFreeBufferAndTail( &gmpCipher );
+	VNIovecFreeBufferAndTail( &bnPlain );
+	VNIovecFreeBufferAndTail( &bnCipher );
 
 	printf( "###### Try PubEncrypt ######\n" );
 	{
@@ -85,9 +85,9 @@ void test( VNTestArgs_t * args )
 		ret = VNAsymCryptPubEncrypt( gmpCtx, text, args->mLength, &gmpCipher );
 		printf( "GMP %d\n", ret );
 
-		vn_iovec_print( "ORG", &orgCipher );
-		vn_iovec_print( "BN ", &bnCipher );
-		vn_iovec_print( "GMP", &gmpCipher );
+		VNIovecPrint( "ORG", &orgCipher );
+		VNIovecPrint( "BN ", &bnCipher );
+		VNIovecPrint( "GMP", &gmpCipher );
 	}
 
 	printf( "###### Try PrivDecrypt ######\n" );
@@ -101,24 +101,24 @@ void test( VNTestArgs_t * args )
 		ret = VNAsymCryptPrivDecrypt( gmpCtx, gmpCipher.i.iov_base, gmpCipher.i.iov_len, &gmpPlain );
 		printf( "GMP %d\n", ret );
 
-		vn_iovec_print( "ORG", &orgPlain );
-		vn_iovec_print( "BN ", &bnPlain );
-		vn_iovec_print( "GMP", &gmpPlain );
+		VNIovecPrint( "ORG", &orgPlain );
+		VNIovecPrint( "BN ", &bnPlain );
+		VNIovecPrint( "GMP", &gmpPlain );
 	}
 
 	VNRsa_ORG_CtxFree( orgCtx );
 	VNRsa_BN_CtxFree( bnCtx );
 	VNRsa_GMP_CtxFree( gmpCtx );
 
-	vn_iovec_free_buffer_and_tail( &orgPlain );
-	vn_iovec_free_buffer_and_tail( &orgCipher );
-	vn_iovec_free_buffer_and_tail( &gmpPlain );
-	vn_iovec_free_buffer_and_tail( &gmpCipher );
-	vn_iovec_free_buffer_and_tail( &bnPlain );
-	vn_iovec_free_buffer_and_tail( &bnCipher );
+	VNIovecFreeBufferAndTail( &orgPlain );
+	VNIovecFreeBufferAndTail( &orgCipher );
+	VNIovecFreeBufferAndTail( &gmpPlain );
+	VNIovecFreeBufferAndTail( &gmpCipher );
+	VNIovecFreeBufferAndTail( &bnPlain );
+	VNIovecFreeBufferAndTail( &bnCipher );
 
-	vn_iovec_free_buffer_and_tail( &pubKey );
-	vn_iovec_free_buffer_and_tail( &privKey );
+	VNIovecFreeBufferAndTail( &pubKey );
+	VNIovecFreeBufferAndTail( &privKey );
 }
 
 int main( int argc, const char * argv[] )

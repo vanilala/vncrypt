@@ -80,6 +80,7 @@ int VNRsa_GMP_GenKeys( VNAsymCryptCtx_t * ctx, int keyBits )
 {
 	mpz_t zp, zq, zr, zrand;
 	gmp_randstate_t state;
+	struct vn_iovec seed;
 
 	VNRsa_GMP_Ctx_t * gmpCtx = VN_CONTAINER_OF( ctx, VNRsa_GMP_Ctx_t, mCtx );
 	assert( VN_TYPE_VNRsaSign_GMP == ctx->mType || VN_TYPE_VNRsaEnc_GMP == ctx->mType );
@@ -89,8 +90,11 @@ int VNRsa_GMP_GenKeys( VNAsymCryptCtx_t * ctx, int keyBits )
 	mpz_init( zr );
 	mpz_init( zrand );
 
+	VNIovecGetRandomBuffer( &seed, ( keyBits + 7 ) / 8 );
+	mpz_import( zrand, seed.i.iov_len, 1, 1, 0, 0, seed.i.iov_base );
+
 	gmp_randinit_default( state );
-	gmp_randseed_ui( state, time( NULL ) );
+	gmp_randseed( state, zrand );
 
 	do {
 		mpz_urandomb( zrand, state, keyBits );
@@ -125,6 +129,7 @@ int VNRsa_GMP_GenKeys( VNAsymCryptCtx_t * ctx, int keyBits )
 	mpz_clear( zrand );
 
 	gmp_randclear( state );
+	VNIovecFreeBufferAndTail( &seed );
 
 	return 0;
 }

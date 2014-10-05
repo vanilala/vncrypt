@@ -90,7 +90,7 @@ void VN_PrintKey( VNAsymCryptCtx_t * ctx )
 		printf( "PubKey : %4zd, %s\n", iter->i.iov_len, (char*)iter->i.iov_base );
 	}
 
-	vn_iovec_free_buffer_and_tail( &pubKey );
+	VNIovecFreeBufferAndTail( &pubKey );
 
 	VNAsymCryptDumpPrivKey( ctx, &pubKey, &privKey );
 
@@ -99,8 +99,8 @@ void VN_PrintKey( VNAsymCryptCtx_t * ctx )
 		printf( "PirvKey: %4zd, %s\n", iter->i.iov_len, (char*)iter->i.iov_base );
 	}
 
-	vn_iovec_free_buffer_and_tail( &pubKey );
-	vn_iovec_free_buffer_and_tail( &privKey );
+	VNIovecFreeBufferAndTail( &pubKey );
+	VNIovecFreeBufferAndTail( &privKey );
 }
 
 void VN_Run_Sign( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
@@ -138,7 +138,7 @@ void VN_Run_Sign( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
 	for( i = 0; i < args->mEncryptCount && 0 == ret; i++ )
 	{
 		ret = VNAsymCryptPrivEncrypt( ctx, text, args->mLength, &cipherText );
-		vn_iovec_free_buffer_and_tail( &cipherText );
+		VNIovecFreeBufferAndTail( &cipherText );
 
 		if( 0 != ret )
 		{
@@ -167,7 +167,7 @@ void VN_Run_Sign( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
 	{
 		ret = VNAsymCryptPubDecrypt( ctx, (unsigned char*)cipherText.i.iov_base,
 			cipherText.i.iov_len, &plainText );
-		vn_iovec_free_buffer_and_tail( &plainText );
+		VNIovecFreeBufferAndTail( &plainText );
 
 		if( 0 != ret )
 		{
@@ -186,7 +186,7 @@ void VN_Run_Sign( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
 
 	if( args->mLength < plainText.i.iov_len )
 	{
-		vn_iovec_print( "Plain Text", &plainText );
+		VNIovecPrint( "Plain Text", &plainText );
 	}
 
 	assert( args->mLength >= plainText.i.iov_len );
@@ -212,10 +212,10 @@ void VN_Run_Sign( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
 		printf( "OK\n" );
 	}
 
-	vn_iovec_free_buffer_and_tail( &plainText );
-	vn_iovec_free_buffer_and_tail( &cipherText );
-	vn_iovec_free_buffer_and_tail( &hexPubKey );
-	vn_iovec_free_buffer_and_tail( &hexPrivKey );
+	VNIovecFreeBufferAndTail( &plainText );
+	VNIovecFreeBufferAndTail( &cipherText );
+	VNIovecFreeBufferAndTail( &hexPubKey );
+	VNIovecFreeBufferAndTail( &hexPrivKey );
 }
 
 static void VN_Run_Enc( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
@@ -253,7 +253,7 @@ static void VN_Run_Enc( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
 	for( i = 0; i < args->mEncryptCount && 0 == ret; i++ )
 	{
 		ret = VNAsymCryptPubEncrypt( ctx, text, args->mLength, &cipherText );
-		vn_iovec_free_buffer_and_tail( &cipherText );
+		VNIovecFreeBufferAndTail( &cipherText );
 
 		if( 0 != ret )
 		{
@@ -282,7 +282,7 @@ static void VN_Run_Enc( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
 	{
 		ret = VNAsymCryptPrivDecrypt( ctx, (unsigned char*)cipherText.i.iov_base,
 			cipherText.i.iov_len, &plainText );
-		vn_iovec_free_buffer_and_tail( &plainText );
+		VNIovecFreeBufferAndTail( &plainText );
 
 		if( 0 != ret )
 		{
@@ -322,9 +322,9 @@ static void VN_Run_Enc( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
 		printf( "OK\n" );
 	}
 
-	vn_iovec_free_buffer_and_tail( &plainText );
-	vn_iovec_free_buffer_and_tail( &cipherText );
-	vn_iovec_free_buffer_and_tail( &hexPubKey );
-	vn_iovec_free_buffer_and_tail( &hexPrivKey );
+	VNIovecFreeBufferAndTail( &plainText );
+	VNIovecFreeBufferAndTail( &cipherText );
+	VNIovecFreeBufferAndTail( &hexPubKey );
+	VNIovecFreeBufferAndTail( &hexPrivKey );
 }
 

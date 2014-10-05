@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/time.h>
+#include <unistd.h>
 
 int VNAsymCryptGenKeys( VNAsymCryptCtx_t * ctx, int keyBits )
 {
@@ -85,7 +87,7 @@ int VNAsymCryptPrivDecrypt( const VNAsymCryptCtx_t * ctx,
 
 /* helper function */
 
-void vn_iovec_print( const char * prompt, struct vn_iovec * head )
+void VNIovecPrint( const char * prompt, struct vn_iovec * head )
 {
 	size_t i = 0;
 	struct vn_iovec * next = NULL;
@@ -103,7 +105,7 @@ void vn_iovec_print( const char * prompt, struct vn_iovec * head )
 	}
 }
 
-void vn_iovec_free_buffer_and_tail( struct vn_iovec * head )
+void VNIovecFreeBufferAndTail( struct vn_iovec * head )
 {
 	struct vn_iovec * next = NULL;
 
@@ -117,5 +119,51 @@ void vn_iovec_free_buffer_and_tail( struct vn_iovec * head )
 
 	free( head->i.iov_base );
 	memset( head, 0, sizeof( struct vn_iovec ) );
+}
+
+void VNIovecGetRandomBuffer( struct vn_iovec * head, int length )
+{
+	int i = 0;
+
+	memset( head, 0, sizeof( struct vn_iovec ) );
+
+	if( 0 == access( "/dev/urandom", F_OK ) )
+	{
+		FILE * fp = fopen( "/dev/urandom", "r" );
+		if( NULL != fp )
+		{
+			head->i.iov_base = calloc( 1, length + 1 );
+			head->i.iov_len = length;
+
+			fread( head->i.iov_base, 1, head->i.iov_len, fp );
+			fclose( fp );
+		}
+	}
+
+	if( NULL == head->i.iov_base )
+	{
+		head->i.iov_len = length;
+		head->i.iov_base = calloc( 1, length + 4 );
+
+		struct timeval tv;
+		gettimeofday(&tv, NULL);
+
+		unsigned int * pos = (unsigned int*)head->i.iov_base;
+
+		for( i = 0; i < ( length + 4 ) / 4; i++ )
+		{
+			if( 0 == ( i % 2 ) )
+			{
+				*pos = tv.tv_sec * tv.tv_usec;
+			} else {
+				*pos = tv.tv_sec | tv.tv_usec;
+			}
+
+			if( i > 0 )
+			{
+				*pos = ( *pos ) ^ ( *( pos - 1 ) );
+			}
+		}
+	}
 }
 
