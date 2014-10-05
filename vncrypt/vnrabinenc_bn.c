@@ -1,3 +1,10 @@
+/**
+ *
+ * Rabin public-key encryption
+ *
+ * See "Handbook of Applied Cryptography" by Alfred J. Menezes et al pages 292
+ *
+ */
 
 #include "vnrabinenc_bn.h"
 #include "vncrypt_bn.h"
