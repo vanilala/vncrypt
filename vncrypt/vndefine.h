@@ -77,6 +77,7 @@ enum {
 
 	/* rabin encryption */
 	VN_TYPE_VNRabinEnc_BN = 1000 + 11,
+	VN_TYPE_VNRabinEnc_GMP = 1000 + 12,
 
 	/* williams encryption */
 	VN_TYPE_VNWilliamsEnc_BN = 1000 + 21,

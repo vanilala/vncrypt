@@ -13,10 +13,10 @@
 #include <assert.h>
 #include <string.h>
 
-typedef struct tagVNRabinEnc_BNCtx {
+typedef struct tagVNRabinEnc_BN_Ctx {
 	VNAsymCryptCtx_t mCtx;
 
-	BN_CTX * mBNCtx;
+	BN_CTX * mBN_Ctx;
 
 	BIGNUM mN;
 
@@ -28,10 +28,9 @@ typedef struct tagVNRabinEnc_BNCtx {
 
 	BIGNUM mAP;
 	BIGNUM mBQ;
-} VNRabinEnc_BNCtx_t;
+} VNRabinEnc_BN_Ctx_t;
 
-
-static void VNRabinEnc_BN_CalcPrivAuxKey( VNRabinEnc_BNCtx_t * bnCtx )
+static void VNRabinEnc_BN_CalcPrivAuxKey( VNRabinEnc_BN_Ctx_t * bnCtx )
 {
 	BIGNUM za, zb, zd;
 
@@ -39,10 +38,10 @@ static void VNRabinEnc_BN_CalcPrivAuxKey( VNRabinEnc_BNCtx_t * bnCtx )
 	BN_init( &zb );
 	BN_init( &zd );
 
-	VN_BN_gcdext( &( bnCtx->mP ), &( bnCtx->mQ ), &za, &zb, &zd, bnCtx->mBNCtx );
+	VN_BN_gcdext( &( bnCtx->mP ), &( bnCtx->mQ ), &za, &zb, &zd, bnCtx->mBN_Ctx );
 
-	BN_mul( &( bnCtx->mAP ), &za, &( bnCtx->mP ), bnCtx->mBNCtx );
-	BN_mul( &( bnCtx->mBQ ), &zb, &( bnCtx->mQ ), bnCtx->mBNCtx );
+	BN_mul( &( bnCtx->mAP ), &za, &( bnCtx->mP ), bnCtx->mBN_Ctx );
+	BN_mul( &( bnCtx->mBQ ), &zb, &( bnCtx->mQ ), bnCtx->mBN_Ctx );
 
 	BN_copy( &bnCtx->mP14, &( bnCtx->mP ) );
 	BN_add_word( &bnCtx->mP14, 1 );
@@ -59,7 +58,7 @@ static void VNRabinEnc_BN_CalcPrivAuxKey( VNRabinEnc_BNCtx_t * bnCtx )
 
 VNAsymCryptCtx_t * VNRabinEnc_BN_CtxNew()
 {
-	VNRabinEnc_BNCtx_t * bnCtx = (VNRabinEnc_BNCtx_t *)calloc( sizeof( VNRabinEnc_BNCtx_t ), 1 );
+	VNRabinEnc_BN_Ctx_t * bnCtx = (VNRabinEnc_BN_Ctx_t *)calloc( sizeof( VNRabinEnc_BN_Ctx_t ), 1 );
 
 	bnCtx->mCtx.mType = VN_TYPE_VNRabinEnc_BN;
 
@@ -73,7 +72,7 @@ VNAsymCryptCtx_t * VNRabinEnc_BN_CtxNew()
 	bnCtx->mCtx.mMethod.mPubEncrypt = VNRabinEnc_BN_PubEncrypt;
 	bnCtx->mCtx.mMethod.mPrivDecrypt = VNRabinEnc_BN_PrivDecrypt;
 
-	bnCtx->mBNCtx = BN_CTX_new();
+	bnCtx->mBN_Ctx = BN_CTX_new();
 
 	BN_init( &( bnCtx->mN ) );
 	BN_init( &( bnCtx->mP ) );
@@ -89,7 +88,7 @@ VNAsymCryptCtx_t * VNRabinEnc_BN_CtxNew()
 
 void VNRabinEnc_BN_CtxFree( VNAsymCryptCtx_t * ctx )
 {
-	VNRabinEnc_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRabinEnc_BNCtx_t, mCtx );
+	VNRabinEnc_BN_Ctx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRabinEnc_BN_Ctx_t, mCtx );
 	assert( VN_TYPE_VNRabinEnc_BN == ctx->mType );
 
 	BN_free( &( bnCtx->mN ) );
@@ -101,14 +100,14 @@ void VNRabinEnc_BN_CtxFree( VNAsymCryptCtx_t * ctx )
 	BN_free( &( bnCtx->mAP ) );
 	BN_free( &( bnCtx->mBQ ) );
 
-	BN_CTX_free( bnCtx->mBNCtx );
+	BN_CTX_free( bnCtx->mBN_Ctx );
 
 	free( bnCtx );
 }
 
 int VNRabinEnc_BN_GenKeys( VNAsymCryptCtx_t * ctx, int keyBits )
 {
-	VNRabinEnc_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRabinEnc_BNCtx_t, mCtx );
+	VNRabinEnc_BN_Ctx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRabinEnc_BN_Ctx_t, mCtx );
 	assert( VN_TYPE_VNRabinEnc_BN == ctx->mType );
 
 	/* choose a prime p such that p mod 4 == 3 */
@@ -122,7 +121,7 @@ int VNRabinEnc_BN_GenKeys( VNAsymCryptCtx_t * ctx, int keyBits )
 	while ( BN_mod_word( &( bnCtx->mQ ), 4 ) != 3 );
 
 	/* compute public key n*/
-	BN_mul( &( bnCtx->mN ), &( bnCtx->mP ), &( bnCtx->mQ ), bnCtx->mBNCtx );
+	BN_mul( &( bnCtx->mN ), &( bnCtx->mP ), &( bnCtx->mQ ), bnCtx->mBN_Ctx );
 
 	VNRabinEnc_BN_CalcPrivAuxKey( bnCtx );
 
@@ -131,7 +130,7 @@ int VNRabinEnc_BN_GenKeys( VNAsymCryptCtx_t * ctx, int keyBits )
 
 void VNRabinEnc_BN_ClearKeys( VNAsymCryptCtx_t * ctx )
 {
-	VNRabinEnc_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRabinEnc_BNCtx_t, mCtx );
+	VNRabinEnc_BN_Ctx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRabinEnc_BN_Ctx_t, mCtx );
 	assert( VN_TYPE_VNRabinEnc_BN == ctx->mType );
 
 	BN_clear( &( bnCtx->mN ) );
@@ -147,7 +146,7 @@ void VNRabinEnc_BN_ClearKeys( VNAsymCryptCtx_t * ctx )
 int VNRabinEnc_BN_DumpPubKey( const VNAsymCryptCtx_t * ctx,
 	struct vn_iovec * hexPubKey )
 {
-	const VNRabinEnc_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRabinEnc_BNCtx_t, mCtx );
+	const VNRabinEnc_BN_Ctx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRabinEnc_BN_Ctx_t, mCtx );
 	assert( VN_TYPE_VNRabinEnc_BN == ctx->mType );
 
 	VN_BN_dump_hex( &( bnCtx->mN ), hexPubKey );
@@ -158,7 +157,7 @@ int VNRabinEnc_BN_DumpPubKey( const VNAsymCryptCtx_t * ctx,
 int VNRabinEnc_BN_DumpPrivKey( const VNAsymCryptCtx_t * ctx,
 	struct vn_iovec * hexPubKey, struct vn_iovec * hexPrivKey )
 {
-	const VNRabinEnc_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRabinEnc_BNCtx_t, mCtx );
+	const VNRabinEnc_BN_Ctx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRabinEnc_BN_Ctx_t, mCtx );
 	assert( VN_TYPE_VNRabinEnc_BN == ctx->mType );
 
 	VN_BN_dump_hex( &( bnCtx->mN ), hexPubKey );
@@ -173,7 +172,7 @@ int VNRabinEnc_BN_DumpPrivKey( const VNAsymCryptCtx_t * ctx,
 int VNRabinEnc_BN_LoadPubKey( VNAsymCryptCtx_t * ctx,
 	const struct vn_iovec * hexPubKey )
 {
-	VNRabinEnc_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRabinEnc_BNCtx_t, mCtx );
+	VNRabinEnc_BN_Ctx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRabinEnc_BN_Ctx_t, mCtx );
 	assert( VN_TYPE_VNRabinEnc_BN == ctx->mType );
 
 	VN_BN_load_hex( hexPubKey, &( bnCtx->mN ) );
@@ -184,7 +183,7 @@ int VNRabinEnc_BN_LoadPubKey( VNAsymCryptCtx_t * ctx,
 int VNRabinEnc_BN_LoadPrivKey( VNAsymCryptCtx_t * ctx,
 	const struct vn_iovec * hexPubKey, const struct vn_iovec * hexPrivKey )
 {
-	VNRabinEnc_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRabinEnc_BNCtx_t, mCtx );
+	VNRabinEnc_BN_Ctx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRabinEnc_BN_Ctx_t, mCtx );
 	assert( VN_TYPE_VNRabinEnc_BN == ctx->mType );
 
 	VN_BN_load_hex( hexPubKey, &( bnCtx->mN ) );
@@ -203,7 +202,7 @@ int VNRabinEnc_BN_PubEncrypt( const VNAsymCryptCtx_t * ctx,
 {
 	BIGNUM zm, zc;
 
-	const VNRabinEnc_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRabinEnc_BNCtx_t, mCtx );
+	const VNRabinEnc_BN_Ctx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRabinEnc_BN_Ctx_t, mCtx );
 	assert( VN_TYPE_VNRabinEnc_BN == ctx->mType );
 
 	BN_init( &zm );
@@ -217,7 +216,7 @@ int VNRabinEnc_BN_PubEncrypt( const VNAsymCryptCtx_t * ctx,
 
 	BN_init( &zc );
 
-	BN_mod_mul( &zc, &zm, &zm, &( bnCtx->mN ), bnCtx->mBNCtx );
+	BN_mod_mul( &zc, &zm, &zm, &( bnCtx->mN ), bnCtx->mBN_Ctx );
 
 	VN_BN_dump_bin( &zc, cipherText );
 
@@ -233,7 +232,7 @@ int VNRabinEnc_BN_PrivDecrypt( const VNAsymCryptCtx_t * ctx,
 {
 	BIGNUM zc, zr, zs, zm;
 
-	const VNRabinEnc_BNCtx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRabinEnc_BNCtx_t, mCtx );
+	const VNRabinEnc_BN_Ctx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRabinEnc_BN_Ctx_t, mCtx );
 	assert( VN_TYPE_VNRabinEnc_BN == ctx->mType );
 
 	BN_init( &zc );
@@ -243,15 +242,15 @@ int VNRabinEnc_BN_PrivDecrypt( const VNAsymCryptCtx_t * ctx,
 
 	BN_bin2bn( cipherText, length, &zc );
 
-	BN_mod_exp( &zr, &zc, &( bnCtx->mP14 ), &( bnCtx->mP ), bnCtx->mBNCtx );
+	BN_mod_exp( &zr, &zc, &( bnCtx->mP14 ), &( bnCtx->mP ), bnCtx->mBN_Ctx );
 
-	BN_mod_exp( &zs, &zc, &( bnCtx->mQ14 ), &( bnCtx->mQ ), bnCtx->mBNCtx );
+	BN_mod_exp( &zs, &zc, &( bnCtx->mQ14 ), &( bnCtx->mQ ), bnCtx->mBN_Ctx );
 
-	BN_mul( &zs, &( bnCtx->mAP ), &zs, bnCtx->mBNCtx );
+	BN_mul( &zs, &( bnCtx->mAP ), &zs, bnCtx->mBN_Ctx );
 
-	BN_mul( &zr, &( bnCtx->mBQ ), &zr, bnCtx->mBNCtx );
+	BN_mul( &zr, &( bnCtx->mBQ ), &zr, bnCtx->mBN_Ctx );
 
-	BN_mod_add( &zm, &zs, &zr, &( bnCtx->mN ), bnCtx->mBNCtx );
+	BN_mod_add( &zm, &zs, &zr, &( bnCtx->mN ), bnCtx->mBN_Ctx );
 	{
 		VN_BN_dump_bin( &zm, plainText );
 	}
@@ -263,7 +262,7 @@ int VNRabinEnc_BN_PrivDecrypt( const VNAsymCryptCtx_t * ctx,
 		VN_BN_dump_bin( &zm, plainText );
 	}
 
-	BN_mod_sub( &zm, &zs, &zr, &( bnCtx->mN ), bnCtx->mBNCtx );
+	BN_mod_sub( &zm, &zs, &zr, &( bnCtx->mN ), bnCtx->mBN_Ctx );
 	{
 		plainText->next = malloc( sizeof( struct vn_iovec ) );
 		plainText = plainText->next;

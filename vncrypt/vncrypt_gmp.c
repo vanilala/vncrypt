@@ -17,3 +17,11 @@ void VN_GMP_load_hex( const struct vn_iovec * hex, mpz_t za )
 	mpz_set_str( za, (char*)hex->i.iov_base, 16 );
 }
 
+void VN_GMP_dump_bin( const mpz_t za, struct vn_iovec * bin )
+{
+	bin->i.iov_len = ( mpz_sizeinbase( za, 2 ) + 7 ) / 8;
+	bin->i.iov_base = malloc( bin->i.iov_len + 1 );
+	((char*)bin->i.iov_base)[ bin->i.iov_len ] = '\0';
+	mpz_export( bin->i.iov_base, &bin->i.iov_len, 1, 1, 0, 0, za );
+}
+

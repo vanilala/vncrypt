@@ -221,10 +221,7 @@ int VNRsa_GMP_PrivProcess( const VNAsymCryptCtx_t * ctx,
 
 	mpz_powm( zs, zm, gmpCtx->mD, gmpCtx->mN );
 
-	cipherText->i.iov_len = ( mpz_sizeinbase( zs, 2 ) + 7 ) / 8;
-	cipherText->i.iov_base = malloc( cipherText->i.iov_len + 1 );
-	((char*)cipherText->i.iov_base)[ cipherText->i.iov_len ] = '\0';
-	mpz_export( cipherText->i.iov_base, &cipherText->i.iov_len, 1, 1, 0, 0, zs );
+	VN_GMP_dump_bin( zs, cipherText );
 
 	mpz_clear( zm );
 	mpz_clear( zs );
@@ -248,10 +245,7 @@ int VNRsa_GMP_PubProcess( const VNAsymCryptCtx_t * ctx,
 
 	mpz_powm( zm, zs, gmpCtx->mE, gmpCtx->mN );
 
-	plainText->i.iov_len = ( mpz_sizeinbase( zm, 2 ) + 7 ) / 8;
-	plainText->i.iov_base = malloc( plainText->i.iov_len + 1 );
-	((char*)plainText->i.iov_base)[ plainText->i.iov_len ] = '\0';
-	mpz_export( plainText->i.iov_base, &plainText->i.iov_len, 1, 1, 0, 0, zm );
+	VN_GMP_dump_bin( zm, plainText );
 
 	mpz_clear( zm );
 	mpz_clear( zs );
