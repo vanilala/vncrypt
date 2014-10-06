@@ -53,13 +53,16 @@ void test( VNTestArgs_t * args )
 
 	printf( "###### Try PubDecrypt ######\n" );
 	{
-		ret = VNAsymCryptPubDecrypt( orgCtx, orgCipher.i.iov_base, orgCipher.i.iov_len, &orgPlain );
+		ret = VNAsymCryptPubDecrypt( orgCtx, orgCipher.i.iov_base, orgCipher.i.iov_len,
+			&orgPlain, args->mLength );
 		printf( "ORG %d\n", ret );
 
-		ret = VNAsymCryptPubDecrypt( bnCtx, bnCipher.i.iov_base, bnCipher.i.iov_len, &bnPlain );
+		ret = VNAsymCryptPubDecrypt( bnCtx, bnCipher.i.iov_base, bnCipher.i.iov_len,
+			&bnPlain, args->mLength );
 		printf( "BN %d\n", ret );
 
-		ret = VNAsymCryptPubDecrypt( gmpCtx, gmpCipher.i.iov_base, gmpCipher.i.iov_len, &gmpPlain );
+		ret = VNAsymCryptPubDecrypt( gmpCtx, gmpCipher.i.iov_base, gmpCipher.i.iov_len,
+			&gmpPlain, args->mLength );
 		printf( "GMP %d\n", ret );
 
 		VNIovecPrint( "ORG", &orgPlain );
@@ -92,13 +95,16 @@ void test( VNTestArgs_t * args )
 
 	printf( "###### Try PrivDecrypt ######\n" );
 	{
-		ret = VNAsymCryptPrivDecrypt( orgCtx, orgCipher.i.iov_base, orgCipher.i.iov_len, &orgPlain );
+		ret = VNAsymCryptPrivDecrypt( orgCtx, orgCipher.i.iov_base, orgCipher.i.iov_len,
+			&orgPlain, args->mLength );
 		printf( "ORG %d\n", ret );
 
-		ret = VNAsymCryptPrivDecrypt( bnCtx, bnCipher.i.iov_base, bnCipher.i.iov_len, &bnPlain );
+		ret = VNAsymCryptPrivDecrypt( bnCtx, bnCipher.i.iov_base, bnCipher.i.iov_len,
+			&bnPlain, args->mLength );
 		printf( "BN %d\n", ret );
 
-		ret = VNAsymCryptPrivDecrypt( gmpCtx, gmpCipher.i.iov_base, gmpCipher.i.iov_len, &gmpPlain );
+		ret = VNAsymCryptPrivDecrypt( gmpCtx, gmpCipher.i.iov_base, gmpCipher.i.iov_len,
+			&gmpPlain, args->mLength );
 		printf( "GMP %d\n", ret );
 
 		VNIovecPrint( "ORG", &orgPlain );

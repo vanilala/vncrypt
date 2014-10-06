@@ -61,13 +61,34 @@ int VNAsymCryptPrivEncrypt( const VNAsymCryptCtx_t * ctx,
 }
 
 int VNAsymCryptPubDecrypt( const VNAsymCryptCtx_t * ctx,
-		const unsigned char * cipherText, int length,
-		struct vn_iovec * plainText )
+		const unsigned char * cipherText, const int length,
+		struct vn_iovec * plainText, const int fillUpLength )
 {
+	int ret = 0;
+	struct vn_iovec * iter = NULL;
+
 	plainText->next = NULL;
 	plainText->i.iov_base = NULL;
 
-	return ctx->mMethod.mPubDecrypt( ctx, cipherText, length, plainText );
+	ret = ctx->mMethod.mPubDecrypt( ctx, cipherText, length, plainText );
+
+	if( fillUpLength > 0 )
+	{
+		for( iter = plainText; NULL != iter; iter = iter->next )
+		{
+			if( fillUpLength > iter->i.iov_len )
+			{
+				iter->i.iov_base = realloc( iter->i.iov_base, fillUpLength );
+				memmove( ((char*)iter->i.iov_base) + fillUpLength - iter->i.iov_len,
+					iter->i.iov_base, iter->i.iov_len );
+				memset( iter->i.iov_base, 0, fillUpLength - iter->i.iov_len );
+
+				iter->i.iov_len = fillUpLength;
+			}
+		}
+	}
+
+	return ret;
 }
 
 int VNAsymCryptPubEncrypt( const VNAsymCryptCtx_t * ctx,
@@ -81,13 +102,34 @@ int VNAsymCryptPubEncrypt( const VNAsymCryptCtx_t * ctx,
 }
 
 int VNAsymCryptPrivDecrypt( const VNAsymCryptCtx_t * ctx,
-		const unsigned char * cipherText, int length,
-		struct vn_iovec * plainText )
+		const unsigned char * cipherText, const int length,
+		struct vn_iovec * plainText, const int fillUpLength )
 {
+	int ret = 0;
+	struct vn_iovec * iter = NULL;
+
 	plainText->next = NULL;
 	plainText->i.iov_base = NULL;
 
-	return ctx->mMethod.mPrivDecrypt( ctx, cipherText, length, plainText );
+	ret = ctx->mMethod.mPrivDecrypt( ctx, cipherText, length, plainText );
+
+	if( fillUpLength > 0 )
+	{
+		for( iter = plainText; NULL != iter; iter = iter->next )
+		{
+			if( fillUpLength > iter->i.iov_len )
+			{
+				iter->i.iov_base = realloc( iter->i.iov_base, fillUpLength );
+				memmove( ((char*)iter->i.iov_base) + fillUpLength - iter->i.iov_len,
+					iter->i.iov_base, iter->i.iov_len );
+				memset( iter->i.iov_base, 0, fillUpLength - iter->i.iov_len );
+
+				iter->i.iov_len = fillUpLength;
+			}
+		}
+	}
+
+	return ret;
 }
 
 /* helper function */

@@ -27,16 +27,16 @@ int VNAsymCryptPrivEncrypt( const VNAsymCryptCtx_t * ctx,
 		struct vn_iovec * cipherText );
 
 int VNAsymCryptPubDecrypt( const VNAsymCryptCtx_t * ctx,
-		const unsigned char * cipherText, int length,
-		struct vn_iovec * plainText );
+		const unsigned char * cipherText, const int length,
+		struct vn_iovec * plainText, const int fillUpLength );
 
 int VNAsymCryptPubEncrypt( const VNAsymCryptCtx_t * ctx,
 		const unsigned char * plainText, int length,
 		struct vn_iovec * cipherText );
 
 int VNAsymCryptPrivDecrypt( const VNAsymCryptCtx_t * ctx,
-		const unsigned char * cipherText, int length,
-		struct vn_iovec * plainText );
+		const unsigned char * cipherText, const int length,
+		struct vn_iovec * plainText, const int fillUpLength );
 
 /* helper function */
 

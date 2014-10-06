@@ -166,7 +166,7 @@ void VN_Run_Sign( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
 	for( i = 0; i < args->mDecryptCount; i++ )
 	{
 		ret = VNAsymCryptPubDecrypt( ctx, (unsigned char*)cipherText.i.iov_base,
-			cipherText.i.iov_len, &plainText );
+			cipherText.i.iov_len, &plainText, 0 );
 		VNIovecFreeBufferAndTail( &plainText );
 
 		if( 0 != ret )
@@ -180,29 +180,26 @@ void VN_Run_Sign( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
 	printf( "PubDecrypt %d, time %.6f, ops %d/s\n",
 		args->mDecryptCount, interval, (int)(args->mDecryptCount / interval ) );
 
-	VNAsymCryptPubDecrypt( ctx, (unsigned char*)cipherText.i.iov_base, cipherText.i.iov_len, &plainText );
+	VNAsymCryptPubDecrypt( ctx, (unsigned char*)cipherText.i.iov_base,
+		cipherText.i.iov_len, &plainText, args->mLength );
 
 	printf( "Plain Text length: %zd\n", plainText.i.iov_len );
 
-	if( args->mLength < plainText.i.iov_len )
+	if( args->mLength != plainText.i.iov_len )
 	{
 		VNIovecPrint( "PlainText", &plainText );
 	}
 
-	assert( args->mLength >= plainText.i.iov_len );
+	assert( args->mLength == plainText.i.iov_len );
 
 	printf( "Verifing ......\n" );
-	for( i = 0; i < args->mLength - plainText.i.iov_len; i++ )
-	{
-		if( 0 != text[i] ) printf( "%d %d\n", i, text[i] );
-	}
 
-	if( 0 != memcmp( text + args->mLength - plainText.i.iov_len, plainText.i.iov_base, plainText.i.iov_len ) )
+	if( 0 != memcmp( text, plainText.i.iov_base, args->mLength ) )
 	{
 		printf( "FAIL\n" );
-		for( i = args->mLength - plainText.i.iov_len; i < args->mLength; i++ )
+		for( i = 0; i < args->mLength; i++ )
 		{
-			tmp = ((unsigned char*)plainText.i.iov_base)[ i - args->mLength + plainText.i.iov_len ];
+			tmp = ((unsigned char*)plainText.i.iov_base)[ i ];
 			if( text[ i ] != tmp )
 			{
 				printf( "%d %d %d\n", i, text[ i ], tmp );
@@ -281,7 +278,7 @@ static void VN_Run_Enc( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
 	for( i = 0; i < args->mDecryptCount; i++ )
 	{
 		ret = VNAsymCryptPrivDecrypt( ctx, (unsigned char*)cipherText.i.iov_base,
-			cipherText.i.iov_len, &plainText );
+			cipherText.i.iov_len, &plainText, 0 );
 		VNIovecFreeBufferAndTail( &plainText );
 
 		if( 0 != ret )
@@ -295,18 +292,20 @@ static void VN_Run_Enc( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
 	printf( "PrivDecrypt %d, time %.6f, ops %d/s\n",
 		args->mDecryptCount, interval, (int)(args->mDecryptCount / interval ) );
 
-	VNAsymCryptPrivDecrypt( ctx, (unsigned char*)cipherText.i.iov_base, cipherText.i.iov_len, &plainText );
+	VNAsymCryptPrivDecrypt( ctx, (unsigned char*)cipherText.i.iov_base,
+		cipherText.i.iov_len, &plainText, args->mLength );
 
 	result = &plainText;
 
 	if( NULL != result->next )
 	{
-		// rabin encryption scheme return 2 or 4 results, find the real result
+		// rabin encryption scheme will return 4 results, find the real result
+		// here use a simple way, but should use a more trusty way in the real world
 		VNIovecPrint( "PlainText", result );
 		for( ; NULL != result; result = result->next )
 		{
-			tmp = ((unsigned char*)result->i.iov_base)[ 0 ];
-			if( tmp == text[0] || tmp == text[1] )
+			tmp = ((unsigned char*)result->i.iov_base)[ args->mLength - 1 ];
+			if( tmp == text[ args->mLength - 1 ] )
 			{
 				break;
 			}
@@ -316,20 +315,16 @@ static void VN_Run_Enc( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
 
 	printf( "Plain Text length: %zd\n", result->i.iov_len );
 
-	assert( args->mLength >= result->i.iov_len );
+	assert( args->mLength == result->i.iov_len );
 
 	printf( "Verifing ......\n" );
-	for( i = 0; i < args->mLength - result->i.iov_len; i++ )
-	{
-		if( 0 != text[i] ) printf( "%d %d\n", i, text[i] );
-	}
 
-	if( 0 != memcmp( text + args->mLength - result->i.iov_len, result->i.iov_base, result->i.iov_len ) )
+	if( 0 != memcmp( text, result->i.iov_base, args->mLength ) )
 	{
 		printf( "FAIL\n" );
-		for( i = args->mLength - result->i.iov_len; i < args->mLength; i++ )
+		for( i = 0; i < args->mLength; i++ )
 		{
-			tmp = ((unsigned char*)result->i.iov_base)[ i - args->mLength + result->i.iov_len ];
+			tmp = ((unsigned char*)result->i.iov_base)[ i ];
 			if( text[ i ] != tmp )
 			{
 				printf( "%d %d %d\n", i, text[ i ], tmp );
