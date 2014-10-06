@@ -10,13 +10,13 @@ void test( VNTestArgs_t * args )
 
 	VN_Run( ctx, args );
 
-	VNRsa_ORG_CtxFree( ctx );
+	VNAsymCryptCtxFree( ctx );
 
 	ctx = VNRsaEnc_ORG_CtxNew( 3 );
 
 	VN_Run( ctx, args );
 
-	VNRsa_ORG_CtxFree( ctx );
+	VNAsymCryptCtxFree( ctx );
 }
 
 int main( int argc, const char * argv[] )

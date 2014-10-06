@@ -8,13 +8,13 @@ void test( VNTestArgs_t * args )
 
 	VN_Run( ctx, args );
 
-	VNRsa_BN_CtxFree( ctx );
+	VNAsymCryptCtxFree( ctx );
 
 	ctx = VNRsaEnc_BN_CtxNew( 3 );
 
 	VN_Run( ctx, args );
 
-	VNRsa_BN_CtxFree( ctx );
+	VNAsymCryptCtxFree( ctx );
 }
 
 int main( int argc, const char * argv[] )
