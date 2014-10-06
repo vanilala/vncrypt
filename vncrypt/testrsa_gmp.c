@@ -22,9 +22,7 @@ int main( int argc, const char * argv[] )
 	VNTestEnv_t env = {
 		.mTestMain = test,
 		.mSignCtxNew = NULL,
-		.mSignCtxFree = NULL,
 		.mEncCtxNew = NULL,
-		.mEncCtxFree = NULL
 	};
 
 	VN_Test( argc, argv, &env );

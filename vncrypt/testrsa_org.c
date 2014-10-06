@@ -24,9 +24,7 @@ int main( int argc, const char * argv[] )
 	VNTestEnv_t env = {
 		.mTestMain = test,
 		.mSignCtxNew = NULL,
-		.mSignCtxFree = NULL,
 		.mEncCtxNew = NULL,
-		.mEncCtxFree = NULL
 	};
 
 	ERR_load_crypto_strings();

@@ -12,6 +12,8 @@ struct vn_iovec {
 };
 
 typedef struct tagVNAsymCryptMethod {
+	void ( * mCtxFree ) ( VNAsymCryptCtx_t * ctx );
+
 	int ( * mGenKeys ) ( VNAsymCryptCtx_t * ctx, int keyBits );
 
 	void ( * mClearKeys ) ( VNAsymCryptCtx_t * ctx );

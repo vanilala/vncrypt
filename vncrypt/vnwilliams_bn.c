@@ -28,6 +28,7 @@ VNAsymCryptCtx_t * VNWilliamsEnc_BN_CtxNew()
 
 	bnCtx->mCtx.mType = VN_TYPE_VNWilliamsEnc_BN;
 
+	bnCtx->mCtx.mMethod.mCtxFree = VNWilliamsEnc_BN_CtxFree;
 	bnCtx->mCtx.mMethod.mGenKeys = VNWilliamsEnc_BN_GenKeys;
 	bnCtx->mCtx.mMethod.mClearKeys = VNWilliamsEnc_BN_ClearKeys;
 	bnCtx->mCtx.mMethod.mDumpPubKey = VNWilliamsEnc_BN_DumpPubKey;

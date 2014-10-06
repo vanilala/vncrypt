@@ -63,6 +63,7 @@ VNAsymCryptCtx_t * VNRabinEnc_BN_CtxNew()
 
 	bnCtx->mCtx.mType = VN_TYPE_VNRabinEnc_BN;
 
+	bnCtx->mCtx.mMethod.mCtxFree = VNRabinEnc_BN_CtxFree;
 	bnCtx->mCtx.mMethod.mGenKeys = VNRabinEnc_BN_GenKeys;
 	bnCtx->mCtx.mMethod.mClearKeys = VNRabinEnc_BN_ClearKeys;
 	bnCtx->mCtx.mMethod.mDumpPubKey = VNRabinEnc_BN_DumpPubKey;

@@ -4,6 +4,8 @@
 
 /* asymmetric cryptography */
 
+void VNAsymCryptCtxFree( VNAsymCryptCtx_t * ctx );
+
 int VNAsymCryptGenKeys( VNAsymCryptCtx_t * ctx, int keyBits );
 
 void VNAsymCryptClearKeys( VNAsymCryptCtx_t * ctx );

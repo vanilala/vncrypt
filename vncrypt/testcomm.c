@@ -38,14 +38,14 @@ int VN_Test( int argc, const char * argv[], VNTestEnv_t * env )
 		{
 			VNAsymCryptCtx_t * ctx = env->mSignCtxNew();
 			VN_Run( ctx, &args );
-			env->mSignCtxFree( ctx );
+			VNAsymCryptCtxFree( ctx );
 		}
 
 		if( NULL != env->mEncCtxNew )
 		{
 			VNAsymCryptCtx_t * ctx = env->mEncCtxNew();
 			VN_Run( ctx, &args );
-			env->mEncCtxFree( ctx );
+			VNAsymCryptCtxFree( ctx );
 		}
 	}
 

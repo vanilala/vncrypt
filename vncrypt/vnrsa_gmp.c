@@ -28,6 +28,7 @@ static VNAsymCryptCtx_t * VNRsa_GMP_CtxNewImpl( unsigned long e )
 {
 	VNRsa_GMP_Ctx_t * gmpCtx = (VNRsa_GMP_Ctx_t *)calloc( sizeof( VNRsa_GMP_Ctx_t ), 1 );
 
+	gmpCtx->mCtx.mMethod.mCtxFree = VNRsa_GMP_CtxFree;
 	gmpCtx->mCtx.mMethod.mGenKeys = VNRsa_GMP_GenKeys;
 	gmpCtx->mCtx.mMethod.mClearKeys = VNRsa_GMP_ClearKeys;
 	gmpCtx->mCtx.mMethod.mDumpPubKey = VNRsa_GMP_DumpPubKey;

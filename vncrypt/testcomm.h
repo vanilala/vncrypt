@@ -20,10 +20,7 @@ typedef struct tagVNTestEnv {
 	void ( * mTestMain ) ( VNTestArgs_t * args );
 
 	VNAsymCryptCtx_t * ( * mSignCtxNew )();
-	void ( * mSignCtxFree )( VNAsymCryptCtx_t * ctx );
-
 	VNAsymCryptCtx_t * ( * mEncCtxNew )();
-	void ( * mEncCtxFree )( VNAsymCryptCtx_t * ctx );
 } VNTestEnv_t;
 
 int VN_Test( int argc, const char * argv[], VNTestEnv_t * env );

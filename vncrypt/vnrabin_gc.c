@@ -67,6 +67,7 @@ VNAsymCryptCtx_t * VNRabin_GC_CtxNew()
 
 	gcCtx->mCtx.mType = VN_TYPE_VNRabinSign_GC;
 
+	gcCtx->mCtx.mMethod.mCtxFree = VNRabin_GC_CtxFree;
 	gcCtx->mCtx.mMethod.mGenKeys = VNRabin_GC_GenKeys;
 	gcCtx->mCtx.mMethod.mClearKeys = VNRabin_GC_ClearKeys;
 	gcCtx->mCtx.mMethod.mDumpPubKey = VNRabin_GC_DumpPubKey;

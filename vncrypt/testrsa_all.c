@@ -106,9 +106,9 @@ void test( VNTestArgs_t * args )
 		VNIovecPrint( "GMP", &gmpPlain );
 	}
 
-	VNRsa_ORG_CtxFree( orgCtx );
-	VNRsa_BN_CtxFree( bnCtx );
-	VNRsa_GMP_CtxFree( gmpCtx );
+	VNAsymCryptCtxFree( orgCtx );
+	VNAsymCryptCtxFree( bnCtx );
+	VNAsymCryptCtxFree( gmpCtx );
 
 	VNIovecFreeBufferAndTail( &orgPlain );
 	VNIovecFreeBufferAndTail( &orgCipher );
@@ -126,9 +126,7 @@ int main( int argc, const char * argv[] )
 	VNTestEnv_t env = {
 		.mTestMain = test,
 		.mSignCtxNew = NULL,
-		.mSignCtxFree = NULL,
 		.mEncCtxNew = NULL,
-		.mEncCtxFree = NULL
 	};
 
 	VN_Test( argc, argv, &env );

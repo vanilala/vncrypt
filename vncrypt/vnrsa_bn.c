@@ -27,6 +27,7 @@ static VNAsymCryptCtx_t * VNRsa_BN_CtxNewImpl( unsigned long e )
 {
 	VNRsa_BN_Ctx_t * bnCtx = (VNRsa_BN_Ctx_t *)calloc( sizeof( VNRsa_BN_Ctx_t ), 1 );
 
+	bnCtx->mCtx.mMethod.mCtxFree = VNRsa_BN_CtxFree;
 	bnCtx->mCtx.mMethod.mGenKeys = VNRsa_BN_GenKeys;
 	bnCtx->mCtx.mMethod.mClearKeys = VNRsa_BN_ClearKeys;
 	bnCtx->mCtx.mMethod.mDumpPubKey = VNRsa_BN_DumpPubKey;

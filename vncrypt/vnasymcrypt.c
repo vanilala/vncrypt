@@ -7,6 +7,11 @@
 #include <sys/time.h>
 #include <unistd.h>
 
+void VNAsymCryptCtxFree( VNAsymCryptCtx_t * ctx )
+{
+	ctx->mMethod.mCtxFree( ctx );
+}
+
 int VNAsymCryptGenKeys( VNAsymCryptCtx_t * ctx, int keyBits )
 {
 	return ctx->mMethod.mGenKeys( ctx, keyBits );
