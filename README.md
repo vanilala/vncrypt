@@ -4,12 +4,12 @@ VNCrypt: A library for asymmetric cryptography algorithm
 Currently include:
   1. RSA signature/encryption scheme, three version
      * OpenSSL's origin RSA
-     * OopenSSL's BIGNUM
+     * OpenSSL's BIGNUM
      * GMP
   2. Modified-Rabin signature scheme, three version
      * OpenSSL's BIGNUM
      * libgcrypt's MPI
-     * lip
+     * FreeLIP
   3. Rabin encryption scheme, tow version
      * OpenSSL's BIGNUM
      * GMP
