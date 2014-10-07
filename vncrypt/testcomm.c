@@ -58,8 +58,9 @@ int VN_Test( int argc, const char * argv[], VNTestEnv_t * env )
 		if( 0 == strcmp( argv[ i ], "-s" ) ) args.mSilent = atoi( argv[ i + 1 ] );
 	}
 
-	printf( "\ncmd: %s -k %d -l %d -i %d -r %d -s %d\n\n", argv[0], args.mKeyBits,
+	printf( "\ncmd: %s -k %d -l %d -i %d -r %d -s %d\n", argv[0], args.mKeyBits,
 		args.mLength, args.mInitValue, args.mRunSeconds, args.mSilent );
+	printf( "run [%s -v] to see detail usage\n", argv[0] );
 
 	if( NULL != env->mTestMain )
 	{
