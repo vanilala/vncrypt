@@ -12,7 +12,7 @@ typedef struct tagVNTestArgs {
 	int mSilent;
 	int mKeyBits;
 	int mLength;
-	unsigned char mInitValue;
+	int mSrcType;
 	int mRunSeconds;
 } VNTestArgs_t;
 

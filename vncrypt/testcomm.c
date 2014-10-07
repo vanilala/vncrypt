@@ -22,10 +22,14 @@ void sigHandle( int sig )
 static void VN_Usage( const char * program )
 {
 	printf( "\n" );
-	printf( "Usage: %s [-k <key bits>] [-l <plain length>] [-i <init value>]\n"
+	printf( "Usage: %s [-k <key bits>] [-l <src length>] [-t <src type>]\n"
 			"\t\t[-r <run seconds>] [-s <silent>]\n", program );
 	printf( "\n" );
-	printf( "\tdefault: %s -k 64 -l 15 -i 1 -r 1 -s 1\n", program );
+	printf( "\t-k default 64, key bits for p/q, half of the total key bits\n" );
+	printf( "\t-l default 15, [-l <src length>] should less than ( 1/4 * [-k <key bits>] )\n" );
+	printf( "\t-t default 1, use simple plain text for debug; set 2 to use random plain text\n" );
+	printf( "\t-r default 1, run 1 second for encrypt/decrypt\n" );
+	printf( "\t-s default 1, don't show debug message; set 0 to show debug message\n" );
 	printf( "\n" );
 
 	exit( 0 );
@@ -41,7 +45,7 @@ int VN_Test( int argc, const char * argv[], VNTestEnv_t * env )
 		.mSilent = 1,
 		.mKeyBits = 64,
 		.mLength = 15,
-		.mInitValue = 1,
+		.mSrcType = 1,
 		.mRunSeconds = 1,
 	};
 
@@ -53,14 +57,16 @@ int VN_Test( int argc, const char * argv[], VNTestEnv_t * env )
 
 		if( 0 == strcmp( argv[ i ], "-k" ) ) args.mKeyBits = atoi( argv[ i + 1 ] );
 		if( 0 == strcmp( argv[ i ], "-l" ) ) args.mLength = atoi( argv[ i + 1 ] );
-		if( 0 == strcmp( argv[ i ], "-i" ) ) args.mInitValue = atoi( argv[ i + 1 ] );
+		if( 0 == strcmp( argv[ i ], "-t" ) ) args.mSrcType = atoi( argv[ i + 1 ] );
 		if( 0 == strcmp( argv[ i ], "-r" ) ) args.mRunSeconds = atoi( argv[ i + 1 ] );
 		if( 0 == strcmp( argv[ i ], "-s" ) ) args.mSilent = atoi( argv[ i + 1 ] );
 	}
 
-	printf( "\ncmd: %s -k %d -l %d -i %d -r %d -s %d\n", argv[0], args.mKeyBits,
-		args.mLength, args.mInitValue, args.mRunSeconds, args.mSilent );
+	printf( "\ncmd: %s -k %d -l %d -t %d -r %d -s %d\n", argv[0], args.mKeyBits,
+		args.mLength, args.mSrcType, args.mRunSeconds, args.mSilent );
 	printf( "run [%s -v] to see detail usage\n", argv[0] );
+
+	if( args.mLength >= ( args.mKeyBits / 8 * 2 ) ) VN_Usage( argv[0] );
 
 	if( NULL != env->mTestMain )
 	{
@@ -139,14 +145,14 @@ void VN_GenSrc( VNTestArgs_t * args, struct vn_iovec * src )
 {
 	int i = 0;
 
-	if( args->mInitValue <= 128 )
+	if( 1 == args->mSrcType )
 	{
 		src->i.iov_len = args->mLength;
 		src->i.iov_base = calloc( 1, args->mLength + 1 );
 		src->next = NULL;
 		for( i = 0; i < args->mLength; i++ )
 		{
-			((unsigned char*)src->i.iov_base)[i] = args->mInitValue + i;
+			((unsigned char*)src->i.iov_base)[i] = i + 1;
 		}
 	} else {
 		VNIovecGetRandomBuffer( src, args->mLength );
