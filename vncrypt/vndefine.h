@@ -58,11 +58,10 @@ enum {
 
 	VN_TYPE_VNRsaSign_ORG = 10,
 
-	/* rabin signature */
-	VN_TYPE_VNRabinSign_BN = 11,
-	VN_TYPE_VNRabinSign_GMP = 12,
-	VN_TYPE_VNRabinSign_GC = 13,
-	VN_TYPE_VNRabinSign_LIP = 14,
+	/* modified rabin signature */
+	VN_TYPE_VNModRabinSign_BN = 11,
+	VN_TYPE_VNModRabinSign_GC = 13,
+	VN_TYPE_VNModRabinSign_LIP = 14,
 
 	VN_TYPE_VNMaxSign = 1000,
 

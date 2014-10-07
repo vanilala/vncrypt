@@ -6,38 +6,36 @@
  *
  */
 
+#include "vnmodrabin_lip.h"
 #include "vncrypt_lip.h"
-#include "vnrabin_lip.h"
 
-#include "lip/lip.h"
+#include "lip.h"
 
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
 
-typedef struct tagVNRabin_LIP_Ctx {
+typedef struct tagVNModRabin_LIP_Ctx {
 	VNAsymCryptCtx_t mCtx;
 
 	verylong mN;
 	verylong mD;
-} VNRabin_LIP_Ctx_t;
+} VNModRabin_LIP_Ctx_t;
 
-VNAsymCryptCtx_t * VNRabin_LIP_CtxNew()
+VNAsymCryptCtx_t * VNModRabin_LIP_CtxNewImpl()
 {
-	VNRabin_LIP_Ctx_t * lipCtx = (VNRabin_LIP_Ctx_t *)calloc( sizeof( VNRabin_LIP_Ctx_t ), 1 );
+	VNModRabin_LIP_Ctx_t * lipCtx = (VNModRabin_LIP_Ctx_t *)calloc( sizeof( VNModRabin_LIP_Ctx_t ), 1 );
 
-	lipCtx->mCtx.mType = VN_TYPE_VNRabinSign_LIP;
-
-	lipCtx->mCtx.mMethod.mCtxFree = VNRabin_LIP_CtxFree;
-	lipCtx->mCtx.mMethod.mGenKeys = VNRabin_LIP_GenKeys;
-	lipCtx->mCtx.mMethod.mClearKeys = VNRabin_LIP_ClearKeys;
-	lipCtx->mCtx.mMethod.mDumpPubKey = VNRabin_LIP_DumpPubKey;
-	lipCtx->mCtx.mMethod.mDumpPrivKey = VNRabin_LIP_DumpPrivKey;
-	lipCtx->mCtx.mMethod.mLoadPubKey = VNRabin_LIP_LoadPubKey;
-	lipCtx->mCtx.mMethod.mLoadPrivKey = VNRabin_LIP_LoadPrivKey;
-	lipCtx->mCtx.mMethod.mPrivEncrypt = VNRabin_LIP_PrivEncrypt;
-	lipCtx->mCtx.mMethod.mPubDecrypt = VNRabin_LIP_PubDecrypt;
+	lipCtx->mCtx.mMethod.mCtxFree = VNModRabin_LIP_CtxFree;
+	lipCtx->mCtx.mMethod.mGenKeys = VNModRabin_LIP_GenKeys;
+	lipCtx->mCtx.mMethod.mClearKeys = VNModRabin_LIP_ClearKeys;
+	lipCtx->mCtx.mMethod.mDumpPubKey = VNModRabin_LIP_DumpPubKey;
+	lipCtx->mCtx.mMethod.mDumpPrivKey = VNModRabin_LIP_DumpPrivKey;
+	lipCtx->mCtx.mMethod.mLoadPubKey = VNModRabin_LIP_LoadPubKey;
+	lipCtx->mCtx.mMethod.mLoadPrivKey = VNModRabin_LIP_LoadPrivKey;
+	lipCtx->mCtx.mMethod.mPrivEncrypt = VNModRabin_LIP_PrivEncrypt;
+	lipCtx->mCtx.mMethod.mPubDecrypt = VNModRabin_LIP_PubDecrypt;
 
 	zzero( &( lipCtx->mN ) );
 	zzero( &( lipCtx->mD ) );
@@ -45,10 +43,19 @@ VNAsymCryptCtx_t * VNRabin_LIP_CtxNew()
 	return &( lipCtx->mCtx );
 }
 
-void VNRabin_LIP_CtxFree( VNAsymCryptCtx_t * ctx )
+VNAsymCryptCtx_t * VNModRabinSign_LIP_CtxNew()
 {
-	VNRabin_LIP_Ctx_t * lipCtx = VN_CONTAINER_OF( ctx, VNRabin_LIP_Ctx_t, mCtx );
-	assert( VN_TYPE_VNRabinSign_LIP == ctx->mType );
+	VNAsymCryptCtx_t * ctx = VNModRabin_LIP_CtxNewImpl();
+
+	ctx->mType = VN_TYPE_VNModRabinSign_LIP;
+
+	return ctx;
+}
+
+void VNModRabin_LIP_CtxFree( VNAsymCryptCtx_t * ctx )
+{
+	VNModRabin_LIP_Ctx_t * lipCtx = VN_CONTAINER_OF( ctx, VNModRabin_LIP_Ctx_t, mCtx );
+	assert( VN_TYPE_VNModRabinSign_LIP == ctx->mType );
 
 	zfree( &( lipCtx->mN ) );
 	zfree( &( lipCtx->mD ) );
@@ -56,12 +63,12 @@ void VNRabin_LIP_CtxFree( VNAsymCryptCtx_t * ctx )
 	free( lipCtx );
 }
 
-int VNRabin_LIP_GenKeys( VNAsymCryptCtx_t * ctx, int keyBits )
+int VNModRabin_LIP_GenKeys( VNAsymCryptCtx_t * ctx, int keyBits )
 {
 	verylong za = 0, zp = 0, zq = 0;
 
-	VNRabin_LIP_Ctx_t * lipCtx = VN_CONTAINER_OF( ctx, VNRabin_LIP_Ctx_t, mCtx );
-	assert( VN_TYPE_VNRabinSign_LIP == ctx->mType );
+	VNModRabin_LIP_Ctx_t * lipCtx = VN_CONTAINER_OF( ctx, VNModRabin_LIP_Ctx_t, mCtx );
+	assert( VN_TYPE_VNModRabinSign_LIP == ctx->mType );
 
 	zzero( &za );
 	zzero( &zp );
@@ -95,31 +102,31 @@ int VNRabin_LIP_GenKeys( VNAsymCryptCtx_t * ctx, int keyBits )
 	return 0;
 }
 
-void VNRabin_LIP_ClearKeys( VNAsymCryptCtx_t * ctx )
+void VNModRabin_LIP_ClearKeys( VNAsymCryptCtx_t * ctx )
 {
-	VNRabin_LIP_Ctx_t * lipCtx = VN_CONTAINER_OF( ctx, VNRabin_LIP_Ctx_t, mCtx );
-	assert( VN_TYPE_VNRabinSign_LIP == ctx->mType );
+	VNModRabin_LIP_Ctx_t * lipCtx = VN_CONTAINER_OF( ctx, VNModRabin_LIP_Ctx_t, mCtx );
+	assert( VN_TYPE_VNModRabinSign_LIP == ctx->mType );
 
 	zzero( &( lipCtx->mN ) );
 	zzero( &( lipCtx->mD ) );
 }
 
-int VNRabin_LIP_DumpPubKey( const VNAsymCryptCtx_t * ctx,
+int VNModRabin_LIP_DumpPubKey( const VNAsymCryptCtx_t * ctx,
 	struct vn_iovec * hexPubKey )
 {
-	const VNRabin_LIP_Ctx_t * lipCtx = VN_CONTAINER_OF( ctx, VNRabin_LIP_Ctx_t, mCtx );
-	assert( VN_TYPE_VNRabinSign_LIP == ctx->mType );
+	const VNModRabin_LIP_Ctx_t * lipCtx = VN_CONTAINER_OF( ctx, VNModRabin_LIP_Ctx_t, mCtx );
+	assert( VN_TYPE_VNModRabinSign_LIP == ctx->mType );
 
 	VN_LIP_dump_hex( lipCtx->mN, hexPubKey );
 
 	return 0;
 }
 
-int VNRabin_LIP_DumpPrivKey( const VNAsymCryptCtx_t * ctx,
+int VNModRabin_LIP_DumpPrivKey( const VNAsymCryptCtx_t * ctx,
 	struct vn_iovec * hexPubKey, struct vn_iovec * hexPrivKey )
 {
-	const VNRabin_LIP_Ctx_t * lipCtx = VN_CONTAINER_OF( ctx, VNRabin_LIP_Ctx_t, mCtx );
-	assert( VN_TYPE_VNRabinSign_LIP == ctx->mType );
+	const VNModRabin_LIP_Ctx_t * lipCtx = VN_CONTAINER_OF( ctx, VNModRabin_LIP_Ctx_t, mCtx );
+	assert( VN_TYPE_VNModRabinSign_LIP == ctx->mType );
 
 	VN_LIP_dump_hex( lipCtx->mN, hexPubKey );
 	VN_LIP_dump_hex( lipCtx->mD, hexPrivKey );
@@ -127,22 +134,22 @@ int VNRabin_LIP_DumpPrivKey( const VNAsymCryptCtx_t * ctx,
 	return 0;
 }
 
-int VNRabin_LIP_LoadPubKey( VNAsymCryptCtx_t * ctx,
+int VNModRabin_LIP_LoadPubKey( VNAsymCryptCtx_t * ctx,
 	const struct vn_iovec * hexPubKey )
 {
-	VNRabin_LIP_Ctx_t * lipCtx = VN_CONTAINER_OF( ctx, VNRabin_LIP_Ctx_t, mCtx );
-	assert( VN_TYPE_VNRabinSign_LIP == ctx->mType );
+	VNModRabin_LIP_Ctx_t * lipCtx = VN_CONTAINER_OF( ctx, VNModRabin_LIP_Ctx_t, mCtx );
+	assert( VN_TYPE_VNModRabinSign_LIP == ctx->mType );
 
 	VN_LIP_load_hex( hexPubKey, &( lipCtx->mN ) );
 
 	return 0;
 }
 
-int VNRabin_LIP_LoadPrivKey( VNAsymCryptCtx_t * ctx,
+int VNModRabin_LIP_LoadPrivKey( VNAsymCryptCtx_t * ctx,
 	const struct vn_iovec * hexPubKey, const struct vn_iovec * hexPrivKey )
 {
-	VNRabin_LIP_Ctx_t * lipCtx = VN_CONTAINER_OF( ctx, VNRabin_LIP_Ctx_t, mCtx );
-	assert( VN_TYPE_VNRabinSign_LIP == ctx->mType );
+	VNModRabin_LIP_Ctx_t * lipCtx = VN_CONTAINER_OF( ctx, VNModRabin_LIP_Ctx_t, mCtx );
+	assert( VN_TYPE_VNModRabinSign_LIP == ctx->mType );
 
 	VN_LIP_load_hex( hexPubKey, &( lipCtx->mN ) );
 	VN_LIP_load_hex( hexPrivKey, &( lipCtx->mD ) );
@@ -150,15 +157,15 @@ int VNRabin_LIP_LoadPrivKey( VNAsymCryptCtx_t * ctx,
 	return 0;
 }
 
-int VNRabin_LIP_PrivEncrypt( const VNAsymCryptCtx_t * ctx,
+int VNModRabin_LIP_PrivEncrypt( const VNAsymCryptCtx_t * ctx,
 	const unsigned char * plainText, int length,
 	struct vn_iovec * cipherText )
 {
 	int ret = 0, jacobi = 0;
 	verylong zm = 0, zs = 0;
 
-	const VNRabin_LIP_Ctx_t * lipCtx = VN_CONTAINER_OF( ctx, VNRabin_LIP_Ctx_t, mCtx );
-	assert( VN_TYPE_VNRabinSign_LIP == ctx->mType );
+	const VNModRabin_LIP_Ctx_t * lipCtx = VN_CONTAINER_OF( ctx, VNModRabin_LIP_Ctx_t, mCtx );
+	assert( VN_TYPE_VNModRabinSign_LIP == ctx->mType );
 
 	zzero( &zm );
 
@@ -195,15 +202,15 @@ int VNRabin_LIP_PrivEncrypt( const VNAsymCryptCtx_t * ctx,
 	return ret;
 }
 
-int VNRabin_LIP_PubDecrypt( const VNAsymCryptCtx_t * ctx,
+int VNModRabin_LIP_PubDecrypt( const VNAsymCryptCtx_t * ctx,
 	const unsigned char * cipherText, int length,
 	struct vn_iovec * plainText )
 {
 	int ret = 0, mod = 0;
 	verylong zm = 0, zm1 = 0, zs = 0;
 
-	const VNRabin_LIP_Ctx_t * lipCtx = VN_CONTAINER_OF( ctx, VNRabin_LIP_Ctx_t, mCtx );
-	assert( VN_TYPE_VNRabinSign_LIP == ctx->mType );
+	const VNModRabin_LIP_Ctx_t * lipCtx = VN_CONTAINER_OF( ctx, VNModRabin_LIP_Ctx_t, mCtx );
+	assert( VN_TYPE_VNModRabinSign_LIP == ctx->mType );
 
 	zzero( &zm );
 	zzero( &zm1 );

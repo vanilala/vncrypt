@@ -1,12 +1,12 @@
 
-#include "vnrabin_lip.h"
+#include "vnmodrabin_lip.h"
 #include "testcomm.h"
 
 int main( int argc, const char * argv[] )
 {
 	VNTestEnv_t env = {
 		.mTestMain = NULL,
-		.mSignCtxNew = VNRabin_LIP_CtxNew,
+		.mSignCtxNew = VNModRabinSign_LIP_CtxNew,
 		.mEncCtxNew = NULL,
 	};
 

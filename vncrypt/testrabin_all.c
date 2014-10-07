@@ -1,9 +1,10 @@
 
-#include "vnrabin_bn.h"
+#include "vnmodrabin_bn.h"
+#include "vnmodrabin_gc.h"
+#include "vnmodrabin_lip.h"
+
 #include "vnrabinenc_bn.h"
 #include "vnrabinenc_gmp.h"
-#include "vnrabin_gc.h"
-#include "vnrabin_lip.h"
 
 #include "vnasymcrypt.h"
 
@@ -21,9 +22,9 @@ void TestSign( VNTestArgs_t * args )
 
 	for( i = 0; i < args->mLength; i++ ) text[i] = args->mInitValue + i;
 
-	VNAsymCryptCtx_t * bnCtx = VNRabin_BN_CtxNew();
-	VNAsymCryptCtx_t * gcCtx = VNRabin_GC_CtxNew();
-	VNAsymCryptCtx_t * lipCtx = VNRabin_LIP_CtxNew();
+	VNAsymCryptCtx_t * bnCtx = VNModRabinSign_BN_CtxNew();
+	VNAsymCryptCtx_t * gcCtx = VNModRabinSign_GC_CtxNew();
+	VNAsymCryptCtx_t * lipCtx = VNModRabinSign_LIP_CtxNew();
 
 	printf( "###### GenKeys from BN ######\n" );
 	VNAsymCryptGenKeys( bnCtx, args->mKeyBits );

@@ -1,5 +1,5 @@
 
-#include "vnrabin_gc.h"
+#include "vnmodrabin_gc.h"
 #include "testcomm.h"
 
 #include <gcrypt.h>
@@ -15,7 +15,7 @@ int main( int argc, const char * argv[] )
 
 	VNTestEnv_t env = {
 		.mTestMain = NULL,
-		.mSignCtxNew = VNRabin_GC_CtxNew,
+		.mSignCtxNew = VNModRabinSign_GC_CtxNew,
 		.mEncCtxNew = NULL,
 	};
 
