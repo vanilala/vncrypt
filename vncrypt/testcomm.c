@@ -135,22 +135,35 @@ void VN_PrintKey( VNAsymCryptCtx_t * ctx )
 	VNIovecFreeBufferAndTail( &privKey );
 }
 
+void VN_GenSrc( VNTestArgs_t * args, struct vn_iovec * src )
+{
+	int i = 0;
+
+	if( args->mInitValue <= 128 )
+	{
+		src->i.iov_len = args->mLength;
+		src->i.iov_base = calloc( 1, args->mLength + 1 );
+		src->next = NULL;
+		for( i = 0; i < args->mLength; i++ )
+		{
+			((unsigned char*)src->i.iov_base)[i] = args->mInitValue + i;
+		}
+	} else {
+		VNIovecGetRandomBuffer( src, args->mLength );
+	}
+}
+
 void VN_Run_Sign( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
 {
-	int i = 0, ret = 0;
-	unsigned char text[ 4096 ], tmp;
-	struct vn_iovec srcText, plainText, cipherText;
+	int i = 0, ret = 0, opCount = 0;
+	unsigned char tmp = 0, tmp1 = 0;
 
 	struct vn_iovec hexPubKey, hexPrivKey;
-
-	int opCount = 0;
+	struct vn_iovec srcText, plainText, cipherText;
 
 	signal( SIGALRM, sigHandle );
 
-	for( i = 0; i < args->mLength; i++ ) text[i] = args->mInitValue + i;
-	srcText.i.iov_len = args->mLength;
-	srcText.i.iov_base = text;
-	srcText.next = NULL;
+	VN_GenSrc( args, &srcText );
 
 	if( ! args->mSilent ) VNIovecPrint( "SrcText", &srcText );
 
@@ -173,7 +186,7 @@ void VN_Run_Sign( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
 	alarm( args->mRunSeconds );
 	for( opCount = 0, gRunning = 1; 1 == gRunning; ++opCount )
 	{
-		ret = VNAsymCryptPrivEncrypt( ctx, text, args->mLength, &cipherText );
+		ret = VNAsymCryptPrivEncrypt( ctx, srcText.i.iov_base, args->mLength, &cipherText );
 		VNIovecFreeBufferAndTail( &cipherText );
 
 		if( 0 != ret )
@@ -183,7 +196,7 @@ void VN_Run_Sign( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
 		}
 	}
 
-	ret = VNAsymCryptPrivEncrypt( ctx, text, args->mLength, &cipherText );
+	ret = VNAsymCryptPrivEncrypt( ctx, srcText.i.iov_base, args->mLength, &cipherText );
 
 	printf( "PrivEncrypt %d, ops %d/s\n", opCount, opCount / args->mRunSeconds );
 
@@ -222,21 +235,20 @@ void VN_Run_Sign( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
 
 	printf( "Verifing ...... " );
 
-	if( 0 != memcmp( text, plainText.i.iov_base, args->mLength ) )
+	if( 0 != memcmp( srcText.i.iov_base, plainText.i.iov_base, args->mLength ) )
 	{
 		printf( "FAIL\n" );
 		for( i = 0; i < args->mLength; i++ )
 		{
-			tmp = ((unsigned char*)plainText.i.iov_base)[ i ];
-			if( text[ i ] != tmp )
-			{
-				printf( "%d %d %d\n", i, text[ i ], tmp );
-			}
+			tmp = ((unsigned char*)srcText.i.iov_base)[ i ];
+			tmp1 = ((unsigned char*)plainText.i.iov_base)[ i ];
+			if( tmp != tmp1 ) printf( "%d %d %d\n", i, tmp, tmp1 );
 		}
 	} else {
 		printf( "OK\n" );
 	}
 
+	VNIovecFreeBufferAndTail( &srcText );
 	VNIovecFreeBufferAndTail( &plainText );
 	VNIovecFreeBufferAndTail( &cipherText );
 	VNIovecFreeBufferAndTail( &hexPubKey );
@@ -245,20 +257,15 @@ void VN_Run_Sign( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
 
 void VN_Run_Enc( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
 {
-	int i = 0, ret = 0;
-	unsigned char text[ 4096 ], tmp;
+	int i = 0, ret = 0, opCount = 0;
+	unsigned char tmp = 0, tmp1 = 0;
+
 	struct vn_iovec srcText, plainText, cipherText, * result = NULL;
 	struct vn_iovec hexPubKey, hexPrivKey;
 
-	int opCount = 0;
-
 	signal( SIGALRM, sigHandle );
 
-	for( i = 0; i < args->mLength; i++ ) text[i] = args->mInitValue + i;
-	srcText.i.iov_len = args->mLength;
-	srcText.i.iov_base = text;
-	srcText.next = NULL;
-
+	VN_GenSrc( args, &srcText );
 	if( ! args->mSilent ) VNIovecPrint( "SrcText", &srcText );
 
 	// 1. generate keys
@@ -280,7 +287,7 @@ void VN_Run_Enc( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
 	alarm( args->mRunSeconds );
 	for( opCount = 0, gRunning = 1; 1 == gRunning; opCount++ )
 	{
-		ret = VNAsymCryptPubEncrypt( ctx, text, args->mLength, &cipherText );
+		ret = VNAsymCryptPubEncrypt( ctx, srcText.i.iov_base, args->mLength, &cipherText );
 		VNIovecFreeBufferAndTail( &cipherText );
 
 		if( 0 != ret )
@@ -290,7 +297,7 @@ void VN_Run_Enc( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
 		}
 	}
 
-	ret = VNAsymCryptPubEncrypt( ctx, text, args->mLength, &cipherText );
+	ret = VNAsymCryptPubEncrypt( ctx, srcText.i.iov_base, args->mLength, &cipherText );
 
 	printf( "PubEncrypt  %d, ops %d/s\n", opCount, opCount / args->mRunSeconds );
 
@@ -334,10 +341,9 @@ void VN_Run_Enc( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
 		for( ; NULL != result; result = result->next )
 		{
 			tmp = ((unsigned char*)result->i.iov_base)[ args->mLength - 1 ];
-			if( tmp == text[ args->mLength - 1 ] )
-			{
-				break;
-			}
+			tmp1 = ((unsigned char*)srcText.i.iov_base)[ args->mLength - 1 ];
+
+			if( tmp == tmp1 ) break;
 		}
 		assert( NULL != result );
 	}
@@ -346,21 +352,21 @@ void VN_Run_Enc( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
 
 	printf( "Verifing ...... " );
 
-	if( 0 != memcmp( text, result->i.iov_base, args->mLength ) )
+	if( 0 != memcmp( srcText.i.iov_base, result->i.iov_base, args->mLength ) )
 	{
 		printf( "FAIL\n" );
 		for( i = 0; i < args->mLength; i++ )
 		{
 			tmp = ((unsigned char*)result->i.iov_base)[ i ];
-			if( text[ i ] != tmp )
-			{
-				printf( "%d %d %d\n", i, text[ i ], tmp );
-			}
+			tmp1 = ((unsigned char*)srcText.i.iov_base)[ i ];
+
+			if( tmp != tmp1 ) printf( "%d %d %d\n", i, tmp, tmp1 );
 		}
 	} else {
 		printf( "OK\n" );
 	}
 
+	VNIovecFreeBufferAndTail( &srcText );
 	VNIovecFreeBufferAndTail( &plainText );
 	VNIovecFreeBufferAndTail( &cipherText );
 	VNIovecFreeBufferAndTail( &hexPubKey );
