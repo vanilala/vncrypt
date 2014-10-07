@@ -9,11 +9,11 @@ typedef struct tagVNTestArgs {
         int mArgc;
         const char ** mArgv;
 
+	int mSilent;
 	int mKeyBits;
 	int mLength;
 	unsigned char mInitValue;
-	int mEncryptCount;
-	int mDecryptCount;
+	int mRunSeconds;
 } VNTestArgs_t;
 
 typedef struct tagVNTestEnv {
@@ -26,6 +26,8 @@ typedef struct tagVNTestEnv {
 int VN_Test( int argc, const char * argv[], VNTestEnv_t * env );
 
 void VN_Run( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args );
+void VN_Run_Sign( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args );
+void VN_Run_Enc( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args );
 
 double VN_RunTime( unsigned long long prevUsec, unsigned long long * nowUsec );
 
