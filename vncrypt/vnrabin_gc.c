@@ -35,8 +35,6 @@ inline unsigned long VN_gcry_mpi_mod_ui( const gcry_mpi_t za, unsigned long m )
 
 		gcry_mpi_mod( r, za, d );
 
-		//memcpy( &ret, gcry_mpi_get_opaque( r, NULL ), sizeof( ret ) );
-		//gcry_mpi_get_ui( r, &ret );
 		gcry_mpi_print( GCRYMPI_FMT_USG, (unsigned char*)&ret, sizeof( ret ), NULL, r );
 
 		gcry_mpi_release( r );
@@ -140,11 +138,8 @@ void VNRabin_GC_ClearKeys( VNAsymCryptCtx_t * ctx )
 	VNRabin_GC_Ctx_t * gcCtx = VN_CONTAINER_OF( ctx, VNRabin_GC_Ctx_t, mCtx );
 	assert( VN_TYPE_VNRabinSign_GC == ctx->mType );
 
-	gcry_mpi_release( gcCtx->mN );
-	gcry_mpi_release( gcCtx->mD );
-
-	gcCtx->mN = gcry_mpi_new(128);
-	gcCtx->mD = gcry_mpi_new(128);
+	gcry_mpi_set_ui( gcCtx->mN, 0 );
+	gcry_mpi_set_ui( gcCtx->mD, 0 );
 }
 
 int VNRabin_GC_DumpPubKey( const VNAsymCryptCtx_t * ctx,
@@ -153,7 +148,7 @@ int VNRabin_GC_DumpPubKey( const VNAsymCryptCtx_t * ctx,
 	const VNRabin_GC_Ctx_t * gcCtx = VN_CONTAINER_OF( ctx, VNRabin_GC_Ctx_t, mCtx );
 	assert( VN_TYPE_VNRabinSign_GC == ctx->mType );
 
-	hexPubKey->i.iov_len = ( gcry_mpi_get_nbits( gcCtx->mN ) + 7 ) / 8 * 4;
+	hexPubKey->i.iov_len = ( gcry_mpi_get_nbits( gcCtx->mN ) / 8 + 1 ) * 4;
 	hexPubKey->i.iov_base = calloc( 1, hexPubKey->i.iov_len + 1 );
 
 	gcry_mpi_print( GCRYMPI_FMT_HEX, (unsigned char*)hexPubKey->i.iov_base,
@@ -170,14 +165,14 @@ int VNRabin_GC_DumpPrivKey( const VNAsymCryptCtx_t * ctx,
 	const VNRabin_GC_Ctx_t * gcCtx = VN_CONTAINER_OF( ctx, VNRabin_GC_Ctx_t, mCtx );
 	assert( VN_TYPE_VNRabinSign_GC == ctx->mType );
 
-	hexPubKey->i.iov_len = ( gcry_mpi_get_nbits( gcCtx->mN ) + 7 ) / 8 * 4;
+	hexPubKey->i.iov_len = ( gcry_mpi_get_nbits( gcCtx->mN ) / 8 + 1 ) * 4;
 	hexPubKey->i.iov_base = calloc( 1, hexPubKey->i.iov_len + 1 );
 
 	gcry_mpi_print( GCRYMPI_FMT_HEX, (unsigned char*)hexPubKey->i.iov_base,
 		hexPubKey->i.iov_len, &( hexPubKey->i.iov_len ), gcCtx->mN );
 	if( hexPubKey->i.iov_len > 0 ) hexPubKey->i.iov_len--;
 
-	hexPrivKey->i.iov_len = ( gcry_mpi_get_nbits( gcCtx->mD ) + 7 ) / 8 * 4;
+	hexPrivKey->i.iov_len = ( gcry_mpi_get_nbits( gcCtx->mD ) / 8  + 1 ) * 4;
 	hexPrivKey->i.iov_base = calloc( 1, hexPrivKey->i.iov_len + 1 );
 
 	gcry_mpi_print( GCRYMPI_FMT_HEX, (unsigned char*)hexPrivKey->i.iov_base,
@@ -253,7 +248,7 @@ int VNRabin_GC_PrivEncrypt( const VNAsymCryptCtx_t * ctx,
 		gcry_mpi_powm( zs, zm, gcCtx->mD, gcCtx->mN );
 	}
 
-	cipherText->i.iov_len = gcry_mpi_get_nbits( zs ) / 8 * 2;
+	cipherText->i.iov_len = gcry_mpi_get_nbits( zs ) / 8 + 1;
 	cipherText->i.iov_base = malloc( cipherText->i.iov_len );
 	gcry_mpi_print( GCRYMPI_FMT_USG, (unsigned char*)cipherText->i.iov_base,
 		cipherText->i.iov_len, &( cipherText->i.iov_len ), zs );
@@ -300,7 +295,7 @@ int VNRabin_GC_PubDecrypt( const VNAsymCryptCtx_t * ctx,
 		gcry_mpi_sub_ui( zm, zm, 6 );
 		gcry_mpi_rshift( zm, zm, 4 );
 
-		plainText->i.iov_len = gcry_mpi_get_nbits( zm ) / 8 * 2;
+		plainText->i.iov_len = gcry_mpi_get_nbits( zm ) / 8 + 1;
 		plainText->i.iov_base = malloc( plainText->i.iov_len );
 
 		gcry_mpi_print( GCRYMPI_FMT_USG, (unsigned char*)plainText->i.iov_base,

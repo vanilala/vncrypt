@@ -1,9 +1,8 @@
 #pragma once
 
-#include "vnasymcrypt.h"
+#include "vndefine.h"
 
 #include <openssl/bn.h>
-#include <sys/uio.h>
 
 int VN_BN_jacobi( const BIGNUM *za, const BIGNUM *zn, int *jacobi, BN_CTX *ctx );
 void VN_BN_gcdext( const BIGNUM * za, const BIGNUM * zb,

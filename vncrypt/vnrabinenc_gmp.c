@@ -111,7 +111,7 @@ int VNRabinEnc_GMP_GenKeys( VNAsymCryptCtx_t * ctx, int keyBits )
 
 	mpz_init( zrand );
 
-	VNIovecGetRandomBuffer( &seed, ( keyBits + 7 ) / 8 );
+	VNIovecGetRandomBuffer( &seed, ( keyBits / 8 + 1 ) );
 	mpz_import( zrand, seed.i.iov_len, 1, 1, 0, 0, seed.i.iov_base );
 
 	gmp_randinit_default( state );

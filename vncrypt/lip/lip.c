@@ -9560,7 +9560,10 @@ zrandomprime(
 		while (zcompare(*a, bnd) < 0)
 		{
 			if (zprobprime(*a, nbtests))
+			{
+				FREE2SPACE(t,bnd);
 				return (1);
+			}
 			zsadd(*a, adder, a);
 		}
 	}

@@ -3,6 +3,7 @@
 #include "vnrabinenc_bn.h"
 #include "vnrabinenc_gmp.h"
 #include "vnrabin_gc.h"
+#include "vnrabin_lip.h"
 
 #include "vnasymcrypt.h"
 
@@ -16,12 +17,13 @@ void TestSign( VNTestArgs_t * args )
 	unsigned char text[ 4096 ];
 
 	struct vn_iovec pubKey, privKey;
-	struct vn_iovec gcPlain, gcCipher, bnPlain, bnCipher;
+	struct vn_iovec gcPlain, gcCipher, bnPlain, bnCipher, lipPlain, lipCipher;
 
 	for( i = 0; i < args->mLength; i++ ) text[i] = args->mInitValue + i;
 
 	VNAsymCryptCtx_t * bnCtx = VNRabin_BN_CtxNew();
 	VNAsymCryptCtx_t * gcCtx = VNRabin_GC_CtxNew();
+	VNAsymCryptCtx_t * lipCtx = VNRabin_LIP_CtxNew();
 
 	printf( "###### GenKeys from BN ######\n" );
 	VNAsymCryptGenKeys( bnCtx, args->mKeyBits );
@@ -33,39 +35,55 @@ void TestSign( VNTestArgs_t * args )
 	VNAsymCryptLoadPrivKey( gcCtx, &pubKey, &privKey );
 	VN_PrintKey( gcCtx );
 
+	printf( "###### LoadKeys to LIP ######\n" );
+	VNAsymCryptLoadPrivKey( lipCtx, &pubKey, &privKey );
+	VN_PrintKey( lipCtx );
+
 	printf( "###### Try PrivEncrypt ######\n" );
 	{
-		ret = VNAsymCryptPrivEncrypt( gcCtx, text, args->mLength, &gcCipher );
-		printf( "GC %d\n", ret );
-
 		ret = VNAsymCryptPrivEncrypt( bnCtx, text, args->mLength, &bnCipher );
 		printf( "BN %d\n", ret );
 
-		VNIovecPrint( "GC", &gcCipher );
+		ret = VNAsymCryptPrivEncrypt( gcCtx, text, args->mLength, &gcCipher );
+		printf( "GC %d\n", ret );
+
+		ret = VNAsymCryptPrivEncrypt( lipCtx, text, args->mLength, &lipCipher );
+		printf( "LIP %d\n", ret );
+
 		VNIovecPrint( "BN ", &bnCipher );
+		VNIovecPrint( "GC", &gcCipher );
+		VNIovecPrint( "LIP ", &lipCipher );
 	}
 
 	printf( "###### Try PubDecrypt ######\n" );
 	{
-		ret = VNAsymCryptPubDecrypt( gcCtx, gcCipher.i.iov_base, gcCipher.i.iov_len,
-			&gcPlain, args->mLength );
-		printf( "GC %d\n", ret );
-
 		ret = VNAsymCryptPubDecrypt( bnCtx, bnCipher.i.iov_base, bnCipher.i.iov_len,
 			&bnPlain, args->mLength );
 		printf( "BN %d\n", ret );
 
-		VNIovecPrint( "GC", &gcPlain );
+		ret = VNAsymCryptPubDecrypt( gcCtx, gcCipher.i.iov_base, gcCipher.i.iov_len,
+			&gcPlain, args->mLength );
+		printf( "GC %d\n", ret );
+
+		ret = VNAsymCryptPubDecrypt( lipCtx, lipCipher.i.iov_base, lipCipher.i.iov_len,
+			&lipPlain, args->mLength );
+		printf( "LIP %d\n", ret );
+
 		VNIovecPrint( "BN ", &bnPlain );
+		VNIovecPrint( "GC", &gcPlain );
+		VNIovecPrint( "LIP", &lipPlain );
 	}
 
-	VNIovecFreeBufferAndTail( &gcPlain );
-	VNIovecFreeBufferAndTail( &gcCipher );
 	VNIovecFreeBufferAndTail( &bnPlain );
 	VNIovecFreeBufferAndTail( &bnCipher );
+	VNIovecFreeBufferAndTail( &gcPlain );
+	VNIovecFreeBufferAndTail( &gcCipher );
+	VNIovecFreeBufferAndTail( &lipPlain );
+	VNIovecFreeBufferAndTail( &lipCipher );
 
-	VNAsymCryptCtxFree( gcCtx );
 	VNAsymCryptCtxFree( bnCtx );
+	VNAsymCryptCtxFree( gcCtx );
+	VNAsymCryptCtxFree( lipCtx );
 
 	VNIovecFreeBufferAndTail( &pubKey );
 	VNIovecFreeBufferAndTail( &privKey );
