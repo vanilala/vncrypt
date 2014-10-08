@@ -14,13 +14,14 @@
 
 void TestSign( VNTestArgs_t * args )
 {
-	int i = 0, ret = 0;
-	unsigned char text[ 4096 ];
+	int ret = 0;
 
 	struct vn_iovec pubKey, privKey;
-	struct vn_iovec gcPlain, gcCipher, bnPlain, bnCipher, lipPlain, lipCipher;
+	struct vn_iovec srcPlain, gcPlain, gcCipher, bnPlain, bnCipher, lipPlain, lipCipher;
 
-	for( i = 0; i < args->mLength; i++ ) text[i] = args->mInitValue + i;
+	VN_GenSrc( args, &srcPlain );
+
+	VNIovecPrint( "SrcText ", &srcPlain );
 
 	VNAsymCryptCtx_t * bnCtx = VNModRabinSign_BN_CtxNew();
 	VNAsymCryptCtx_t * gcCtx = VNModRabinSign_GC_CtxNew();
@@ -42,13 +43,13 @@ void TestSign( VNTestArgs_t * args )
 
 	printf( "###### Try PrivEncrypt ######\n" );
 	{
-		ret = VNAsymCryptPrivEncrypt( bnCtx, text, args->mLength, &bnCipher );
+		ret = VNAsymCryptPrivEncrypt( bnCtx, srcPlain.i.iov_base, args->mLength, &bnCipher );
 		printf( "BN %d\n", ret );
 
-		ret = VNAsymCryptPrivEncrypt( gcCtx, text, args->mLength, &gcCipher );
+		ret = VNAsymCryptPrivEncrypt( gcCtx, srcPlain.i.iov_base, args->mLength, &gcCipher );
 		printf( "GC %d\n", ret );
 
-		ret = VNAsymCryptPrivEncrypt( lipCtx, text, args->mLength, &lipCipher );
+		ret = VNAsymCryptPrivEncrypt( lipCtx, srcPlain.i.iov_base, args->mLength, &lipCipher );
 		printf( "LIP %d\n", ret );
 
 		VNIovecPrint( "BN ", &bnCipher );
@@ -75,6 +76,7 @@ void TestSign( VNTestArgs_t * args )
 		VNIovecPrint( "LIP", &lipPlain );
 	}
 
+	VNIovecFreeBufferAndTail( &srcPlain );
 	VNIovecFreeBufferAndTail( &bnPlain );
 	VNIovecFreeBufferAndTail( &bnCipher );
 	VNIovecFreeBufferAndTail( &gcPlain );
@@ -92,13 +94,14 @@ void TestSign( VNTestArgs_t * args )
 
 void TestEnc( VNTestArgs_t * args )
 {
-	int i = 0, ret = 0;
-	unsigned char text[ 4096 ];
+	int ret = 0;
 
 	struct vn_iovec pubKey, privKey;
-	struct vn_iovec bnPlain, bnCipher, gmpPlain, gmpCipher;
+	struct vn_iovec srcPlain, bnPlain, bnCipher, gmpPlain, gmpCipher;
 
-	for( i = 0; i < args->mLength; i++ ) text[i] = args->mInitValue + i;
+	VN_GenSrc( args, &srcPlain );
+
+	VNIovecPrint( "SrcText ", &srcPlain );
 
 	VNAsymCryptCtx_t * bnCtx = VNRabinEnc_BN_CtxNew();
 	VNAsymCryptCtx_t * gmpCtx = VNRabinEnc_GMP_CtxNew();
@@ -115,10 +118,10 @@ void TestEnc( VNTestArgs_t * args )
 
 	printf( "###### Try PubEncrypt ######\n" );
 	{
-		ret = VNAsymCryptPubEncrypt( bnCtx, text, args->mLength, &bnCipher );
+		ret = VNAsymCryptPubEncrypt( bnCtx, srcPlain.i.iov_base, args->mLength, &bnCipher );
 		printf( "BN %d\n", ret );
 
-		ret = VNAsymCryptPubEncrypt( gmpCtx, text, args->mLength, &gmpCipher );
+		ret = VNAsymCryptPubEncrypt( gmpCtx, srcPlain.i.iov_base, args->mLength, &gmpCipher );
 		printf( "GMP %d\n", ret );
 
 		VNIovecPrint( "BN ", &bnCipher );
@@ -142,6 +145,7 @@ void TestEnc( VNTestArgs_t * args )
 	VNAsymCryptCtxFree( bnCtx );
 	VNAsymCryptCtxFree( gmpCtx );
 
+	VNIovecFreeBufferAndTail( &srcPlain );
 	VNIovecFreeBufferAndTail( &gmpPlain );
 	VNIovecFreeBufferAndTail( &gmpCipher );
 	VNIovecFreeBufferAndTail( &bnPlain );
@@ -161,6 +165,8 @@ void test( VNTestArgs_t * args )
 	gcry_control (GCRYCTL_INITIALIZATION_FINISHED, 0);
 
 	TestSign( args );
+
+	printf( "\n" );
 
 	TestEnc( args );
 }

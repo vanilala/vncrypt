@@ -65,6 +65,7 @@ int VN_Test( int argc, const char * argv[], VNTestEnv_t * env )
 	printf( "\ncmd: %s -k %d -l %d -t %d -r %d -s %d\n", argv[0], args.mKeyBits,
 		args.mLength, args.mSrcType, args.mRunSeconds, args.mSilent );
 	printf( "run [%s -v] to see detail usage\n", argv[0] );
+	printf( "\n" );
 
 	if( args.mLength >= ( args.mKeyBits / 8 * 2 ) ) VN_Usage( argv[0] );
 

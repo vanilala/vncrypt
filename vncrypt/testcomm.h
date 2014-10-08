@@ -29,6 +29,8 @@ void VN_Run( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args );
 void VN_Run_Sign( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args );
 void VN_Run_Enc( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args );
 
+void VN_GenSrc( VNTestArgs_t * args, struct vn_iovec * src );
+
 double VN_RunTime( unsigned long long prevUsec, unsigned long long * nowUsec );
 
 void VN_PrintKey( VNAsymCryptCtx_t * ctx );

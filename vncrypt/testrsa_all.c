@@ -9,13 +9,14 @@
 
 void test( VNTestArgs_t * args )
 {
-	int i = 0, ret = 0;
-	unsigned char text[ 4096 ];
+	int ret = 0;
 
 	struct vn_iovec pubKey, privKey;
-	struct vn_iovec orgPlain, orgCipher, bnPlain, bnCipher, gmpPlain, gmpCipher;
+	struct vn_iovec srcPlain, orgPlain, orgCipher, bnPlain, bnCipher, gmpPlain, gmpCipher;
 
-	for( i = 0; i < args->mLength; i++ ) text[i] = args->mInitValue + i;
+	VN_GenSrc( args, &srcPlain );
+
+	VNIovecPrint( "SrcText ", &srcPlain );
 
 	VNAsymCryptCtx_t * orgCtx = VNRsaSign_ORG_CtxNew( 3 );
 	VNAsymCryptCtx_t * bnCtx = VNRsaSign_BN_CtxNew( 3 );
@@ -37,13 +38,13 @@ void test( VNTestArgs_t * args )
 
 	printf( "###### Try PrivEncrypt ######\n" );
 	{
-		ret = VNAsymCryptPrivEncrypt( orgCtx, text, args->mLength, &orgCipher );
+		ret = VNAsymCryptPrivEncrypt( orgCtx, srcPlain.i.iov_base, args->mLength, &orgCipher );
 		printf( "ORG %d\n", ret );
 
-		ret = VNAsymCryptPrivEncrypt( bnCtx, text, args->mLength, &bnCipher );
+		ret = VNAsymCryptPrivEncrypt( bnCtx, srcPlain.i.iov_base, args->mLength, &bnCipher );
 		printf( "BN %d\n", ret );
 
-		ret = VNAsymCryptPrivEncrypt( gmpCtx, text, args->mLength, &gmpCipher );
+		ret = VNAsymCryptPrivEncrypt( gmpCtx, srcPlain.i.iov_base, args->mLength, &gmpCipher );
 		printf( "GMP %d\n", ret );
 
 		VNIovecPrint( "ORG", &orgCipher );
@@ -79,13 +80,13 @@ void test( VNTestArgs_t * args )
 
 	printf( "###### Try PubEncrypt ######\n" );
 	{
-		ret = VNAsymCryptPubEncrypt( orgCtx, text, args->mLength, &orgCipher );
+		ret = VNAsymCryptPubEncrypt( orgCtx, srcPlain.i.iov_base, args->mLength, &orgCipher );
 		printf( "ORG %d\n", ret );
 
-		ret = VNAsymCryptPubEncrypt( bnCtx, text, args->mLength, &bnCipher );
+		ret = VNAsymCryptPubEncrypt( bnCtx, srcPlain.i.iov_base, args->mLength, &bnCipher );
 		printf( "BN %d\n", ret );
 
-		ret = VNAsymCryptPubEncrypt( gmpCtx, text, args->mLength, &gmpCipher );
+		ret = VNAsymCryptPubEncrypt( gmpCtx, srcPlain.i.iov_base, args->mLength, &gmpCipher );
 		printf( "GMP %d\n", ret );
 
 		VNIovecPrint( "ORG", &orgCipher );
@@ -116,6 +117,7 @@ void test( VNTestArgs_t * args )
 	VNAsymCryptCtxFree( bnCtx );
 	VNAsymCryptCtxFree( gmpCtx );
 
+	VNIovecFreeBufferAndTail( &srcPlain );
 	VNIovecFreeBufferAndTail( &orgPlain );
 	VNIovecFreeBufferAndTail( &orgCipher );
 	VNIovecFreeBufferAndTail( &gmpPlain );
