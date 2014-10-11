@@ -1,5 +1,6 @@
 
-CFLAGS = -Wall -Werror -Wno-unused-result -g
+CFLAGS = -Wall -Werror -g
+#-Wno-unused-result
 
 LDFLAGS = 
 
@@ -28,11 +29,12 @@ testrsa_org: $(COMM_OBJS) testrsa_org.o vnrsa_org.o vncrypt_bn.o
 testrsa_gmp: $(COMM_OBJS) testrsa_gmp.o vnrsa_gmp.o vncrypt_gmp.o
 	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lgmp
 
-testrabin_all: $(COMM_OBJS) $(LIP_OBJS) \
+testrabin_all: $(COMM_OBJS) \
 		vncrypt_bn.o vncrypt_gmp.o vncrypt_gc.o vncrypt_lip.o \
 		testrabin_all.o \
 		vnmodrabin_bn.o vnmodrabin_gc.o vnmodrabin_lip.o \
-		vnrabinenc_bn.o vnrabinenc_gmp.o
+		vnrabinenc_bn.o vnrabinenc_gmp.o \
+		$(LIP_OBJS)
 	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lcrypto -lgmp -lgcrypt -lgpg-error -lm
 
 testmodrabin_bn: $(COMM_OBJS) vncrypt_bn.o testmodrabin_bn.o vnmodrabin_bn.o
@@ -41,10 +43,11 @@ testmodrabin_bn: $(COMM_OBJS) vncrypt_bn.o testmodrabin_bn.o vnmodrabin_bn.o
 testmodrabin_gc: $(COMM_OBJS) vncrypt_gc.o testmodrabin_gc.o vnmodrabin_gc.o
 	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lgcrypt -lgpg-error
 
-testmodrabin_lip: $(COMM_OBJS) $(LIP_OBJS) vncrypt_lip.o testmodrabin_lip.o vnmodrabin_lip.o
+testmodrabin_lip: $(COMM_OBJS) vncrypt_lip.o testmodrabin_lip.o vnmodrabin_lip.o \
+	$(LIP_OBJS)
 	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lm
 
-$(LIP_OBJS): CFLAGS = -Ilip -g -DSIZEOFLONG=__SIZEOF_LONG__
+$(LIP_OBJS): CFLAGS = -Ilip -g
 vnmodrabin_lip.o: CFLAGS += -Ilip -Wno-unused-function
 vncrypt_lip.o: CFLAGS += -Ilip -Wno-unused-function
 testmodrabin_lip.o: CFLAGS += -Ilip -Wno-unused-function

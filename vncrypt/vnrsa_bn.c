@@ -10,8 +10,10 @@
 #include "vncrypt_bn.h"
 
 #include <openssl/bn.h>
+
 #include <assert.h>
 #include <string.h>
+#include <stdlib.h>
 
 typedef struct tagVNRsa_BN_Ctx {
 	VNAsymCryptCtx_t mCtx;

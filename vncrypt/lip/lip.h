@@ -485,6 +485,7 @@ Before you compile
 }
 #endif
 
+#pragma once
 
 
 #include <stdio.h>
@@ -534,7 +535,11 @@ typedef long * verylong;
 #endif
 
 #ifndef SIZEOFLONG
-# define SIZEOFLONG      4      /* set this to sizeof(long) */
+#  ifdef __LP64__
+#    define SIZEOFLONG      8      /* set this to sizeof(long) */
+#  else
+#    define SIZEOFLONG      4      /* set this to sizeof(long) */
+#  endif
 #endif
 
 #define BITSOFLONG      (CHARL*SIZEOFLONG)
