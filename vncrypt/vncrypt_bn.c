@@ -170,3 +170,33 @@ void VN_BN_dump_bin( const BIGNUM * za, struct vn_iovec * bin )
 	BN_bn2bin( za, bin->i.iov_base );
 }
 
+void VN_BN_bin2hex( const unsigned char * bin, int length, struct vn_iovec * hex )
+{
+	BIGNUM tmp;
+
+	BN_init( &tmp );
+
+	BN_bin2bn( bin, length, &tmp );
+
+	VN_BN_dump_hex( &tmp, hex );
+
+	BN_free( &tmp );
+}
+
+void VN_BN_hex2bin( const unsigned char * hex, int length, struct vn_iovec * bin )
+{
+	BIGNUM tmp;
+	struct vn_iovec tmpHex;
+
+	BN_init( &tmp );
+
+	tmpHex.i.iov_base = (unsigned char*)hex;
+	tmpHex.i.iov_len = length;
+
+	VN_BN_load_hex( &tmpHex, &tmp );
+
+	VN_BN_dump_bin( &tmp, bin );
+
+	BN_free( &tmp );
+}
+

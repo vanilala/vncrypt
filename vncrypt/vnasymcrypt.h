@@ -48,7 +48,7 @@ int VNAsymCryptVerify( const VNAsymCryptCtx_t * ctx,
 
 /* helper function */
 
-void VNIovecPrint( const char * prompt, const struct vn_iovec * head );
+void VNIovecPrint( const char * prompt, const struct vn_iovec * head, int toHex );
 
 void VNIovecFreeBufferAndTail( struct vn_iovec * head );
 

@@ -62,7 +62,7 @@ testrabin_gmp: $(COMM_OBJS) testrabin_gmp.o vnrabinenc_gmp.o vncrypt_gmp.o
 testwilliams_bn: $(COMM_OBJS) testwilliams_bn.o vncrypt_bn.o vnwilliams_bn.o
 	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lcrypto
 
-testdsa_org: $(COMM_OBJS) testdsa_org.o vndsa_org.o
+testdsa_org: $(COMM_OBJS) testdsa_org.o vndsa_org.o vncrypt_bn.o
 	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lcrypto
 
 test: $(PROGS)

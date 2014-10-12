@@ -12,3 +12,7 @@ void VN_BN_dump_hex( const BIGNUM * za, struct vn_iovec * hex );
 void VN_BN_load_hex( const struct vn_iovec * hex, BIGNUM * za );
 
 void VN_BN_dump_bin( const BIGNUM * za, struct vn_iovec * bin );
+
+void VN_BN_bin2hex( const unsigned char * bin, int length, struct vn_iovec * hex );
+void VN_BN_hex2bin( const unsigned char * hex, int length, struct vn_iovec * bin );
+

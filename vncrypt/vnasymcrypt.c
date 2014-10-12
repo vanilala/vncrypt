@@ -151,7 +151,7 @@ int VNAsymCryptVerify( const VNAsymCryptCtx_t * ctx,
 
 /* helper function */
 
-void VNIovecPrint( const char * prompt, const struct vn_iovec * head )
+void VNIovecPrint( const char * prompt, const struct vn_iovec * head, int toHex )
 {
 	size_t i = 0;
 	const struct vn_iovec * next = NULL;
@@ -160,9 +160,14 @@ void VNIovecPrint( const char * prompt, const struct vn_iovec * head )
 	{
 		printf( "%s: %zd, ", prompt, next->i.iov_len );
 
-		for( i = 0; i < next->i.iov_len; i++ )
+		if( toHex )
 		{
-			printf( "%02x", ((unsigned char*)next->i.iov_base)[i] );
+			for( i = 0; i < next->i.iov_len; i++ )
+			{
+				printf( "%02x", ((unsigned char*)next->i.iov_base)[i] );
+			}
+		} else {
+			printf( "%s", (char*)next->i.iov_base );
 		}
 
 		printf( "\n" );

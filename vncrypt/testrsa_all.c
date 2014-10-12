@@ -16,7 +16,7 @@ void test( VNTestArgs_t * args )
 
 	VN_GenSrc( args, &srcPlain );
 
-	VNIovecPrint( "SrcText ", &srcPlain );
+	VNIovecPrint( "SrcText ", &srcPlain, 1 );
 
 	VNAsymCryptCtx_t * orgCtx = VNRsaSign_ORG_CtxNew( 3 );
 	VNAsymCryptCtx_t * bnCtx = VNRsaSign_BN_CtxNew( 3 );
@@ -47,9 +47,9 @@ void test( VNTestArgs_t * args )
 		ret = VNAsymCryptPrivEncrypt( gmpCtx, srcPlain.i.iov_base, args->mLength, &gmpCipher );
 		printf( "GMP %d\n", ret );
 
-		VNIovecPrint( "ORG", &orgCipher );
-		VNIovecPrint( "BN ", &bnCipher );
-		VNIovecPrint( "GMP", &gmpCipher );
+		VNIovecPrint( "ORG", &orgCipher, 1 );
+		VNIovecPrint( "BN ", &bnCipher, 1 );
+		VNIovecPrint( "GMP", &gmpCipher, 1 );
 	}
 
 	printf( "###### Try PubDecrypt ######\n" );
@@ -66,9 +66,9 @@ void test( VNTestArgs_t * args )
 			&gmpPlain, args->mLength );
 		printf( "GMP %d\n", ret );
 
-		VNIovecPrint( "ORG", &orgPlain );
-		VNIovecPrint( "BN ", &bnPlain );
-		VNIovecPrint( "GMP", &gmpPlain );
+		VNIovecPrint( "ORG", &orgPlain, 1 );
+		VNIovecPrint( "BN ", &bnPlain, 1 );
+		VNIovecPrint( "GMP", &gmpPlain, 1 );
 	}
 
 	VNIovecFreeBufferAndTail( &orgPlain );
@@ -89,9 +89,9 @@ void test( VNTestArgs_t * args )
 		ret = VNAsymCryptPubEncrypt( gmpCtx, srcPlain.i.iov_base, args->mLength, &gmpCipher );
 		printf( "GMP %d\n", ret );
 
-		VNIovecPrint( "ORG", &orgCipher );
-		VNIovecPrint( "BN ", &bnCipher );
-		VNIovecPrint( "GMP", &gmpCipher );
+		VNIovecPrint( "ORG", &orgCipher, 1 );
+		VNIovecPrint( "BN ", &bnCipher, 1 );
+		VNIovecPrint( "GMP", &gmpCipher, 1 );
 	}
 
 	printf( "###### Try PrivDecrypt ######\n" );
@@ -108,9 +108,9 @@ void test( VNTestArgs_t * args )
 			&gmpPlain, args->mLength );
 		printf( "GMP %d\n", ret );
 
-		VNIovecPrint( "ORG", &orgPlain );
-		VNIovecPrint( "BN ", &bnPlain );
-		VNIovecPrint( "GMP", &gmpPlain );
+		VNIovecPrint( "ORG", &orgPlain, 1 );
+		VNIovecPrint( "BN ", &bnPlain, 1 );
+		VNIovecPrint( "GMP", &gmpPlain, 1 );
 	}
 
 	VNAsymCryptCtxFree( orgCtx );

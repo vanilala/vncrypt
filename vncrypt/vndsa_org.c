@@ -5,6 +5,7 @@
  */
 
 #include "vndsa_org.h"
+#include "vncrypt_bn.h"
 
 #include <openssl/bn.h>
 #include <openssl/dsa.h>
@@ -103,11 +104,15 @@ void VNDsa_ORG_ClearKeys( VNAsymCryptCtx_t * ctx )
 int VNDsa_ORG_DumpPubKey( const VNAsymCryptCtx_t * ctx,
 	struct vn_iovec * hexPubKey )
 {
+	unsigned char * tmp = NULL;
+	int len = 0;
+
 	const VNDsa_ORG_Ctx_t * orgCtx = VN_CONTAINER_OF( ctx, VNDsa_ORG_Ctx_t, mCtx );
 	assert( VN_TYPE_VNDsaSign_ORG == ctx->mType );
 
-	hexPubKey->i.iov_len = i2d_DSAPublicKey( orgCtx->mDSA,
-		(unsigned char**)&( hexPubKey->i.iov_base ));
+	len = i2d_DSAPublicKey( orgCtx->mDSA, &tmp );
+	VN_BN_bin2hex( tmp, len, hexPubKey );
+	free( tmp );
 
 	return 0;
 }
@@ -115,14 +120,20 @@ int VNDsa_ORG_DumpPubKey( const VNAsymCryptCtx_t * ctx,
 int VNDsa_ORG_DumpPrivKey( const VNAsymCryptCtx_t * ctx,
 	struct vn_iovec * hexPubKey, struct vn_iovec * hexPrivKey )
 {
+	unsigned char * tmp = NULL;
+	int len = 0;
+
 	const VNDsa_ORG_Ctx_t * orgCtx = VN_CONTAINER_OF( ctx, VNDsa_ORG_Ctx_t, mCtx );
 	assert( VN_TYPE_VNDsaSign_ORG == ctx->mType );
 
-	hexPubKey->i.iov_len = i2d_DSAPublicKey( orgCtx->mDSA,
-		(unsigned char**)&( hexPubKey->i.iov_base ));
+	len = i2d_DSAPublicKey( orgCtx->mDSA, &tmp );
+	VN_BN_bin2hex( tmp, len, hexPubKey );
+	free( tmp );
+	tmp = NULL;
 
-	hexPrivKey->i.iov_len = i2d_DSAPrivateKey( orgCtx->mDSA,
-		(unsigned char**)&( hexPrivKey->i.iov_base ));
+	len = i2d_DSAPrivateKey( orgCtx->mDSA, &tmp );
+	VN_BN_bin2hex( tmp, len, hexPrivKey );
+	free( tmp );
 
 	return 0;
 }
@@ -130,12 +141,16 @@ int VNDsa_ORG_DumpPrivKey( const VNAsymCryptCtx_t * ctx,
 int VNDsa_ORG_LoadPubKey( VNAsymCryptCtx_t * ctx,
 	const struct vn_iovec * hexPubKey )
 {
+	struct vn_iovec tmp;
+	const unsigned char * pos = NULL;
+
 	VNDsa_ORG_Ctx_t * orgCtx = VN_CONTAINER_OF( ctx, VNDsa_ORG_Ctx_t, mCtx );
 	assert( VN_TYPE_VNDsaSign_ORG == ctx->mType );
 
-	const unsigned char * tmp = (const unsigned char*)( hexPubKey->i.iov_base );
-
-	d2i_DSAPublicKey( &( orgCtx->mDSA ), &tmp, hexPubKey->i.iov_len );
+	VN_BN_hex2bin( (const unsigned char *)hexPubKey->i.iov_base, hexPubKey->i.iov_len, &tmp );
+	pos = (const unsigned char*)( tmp.i.iov_base );
+	d2i_DSAPublicKey( &( orgCtx->mDSA ), &pos, tmp.i.iov_len );
+	free( tmp.i.iov_base );
 
 	return 0;
 }
@@ -143,12 +158,16 @@ int VNDsa_ORG_LoadPubKey( VNAsymCryptCtx_t * ctx,
 int VNDsa_ORG_LoadPrivKey( VNAsymCryptCtx_t * ctx,
 	const struct vn_iovec * hexPubKey, const struct vn_iovec * hexPrivKey )
 {
+	struct vn_iovec tmp;
+	const unsigned char * pos = NULL;
+
 	VNDsa_ORG_Ctx_t * orgCtx = VN_CONTAINER_OF( ctx, VNDsa_ORG_Ctx_t, mCtx );
 	assert( VN_TYPE_VNDsaSign_ORG == ctx->mType );
 
-	const unsigned char * tmp = (const unsigned char*)( hexPrivKey->i.iov_base );
-
-	d2i_DSAPrivateKey( &( orgCtx->mDSA ), &tmp, hexPrivKey->i.iov_len );
+	VN_BN_hex2bin( (const unsigned char *)hexPrivKey->i.iov_base, hexPrivKey->i.iov_len, &tmp );
+	pos = (const unsigned char*)( tmp.i.iov_base );
+	d2i_DSAPrivateKey( &( orgCtx->mDSA ), &pos, tmp.i.iov_len );
+	free( tmp.i.iov_base );
 
 	return 0;
 }
@@ -187,15 +206,6 @@ int VNDsa_ORG_Verify( const VNAsymCryptCtx_t * ctx,
 
 	ret = DSA_verify( 0, plainText->i.iov_base, plainText->i.iov_len,
 			signText, length, orgCtx->mDSA );
-
-	if( 1 != ret )
-	{
-		char buff[ 1024 ] = { 0 };
-		printf( "Verify %p, %zd, %d, %s\n", plainText->i.iov_base, plainText->i.iov_len,
-			ret, ERR_error_string( ERR_get_error(), buff ) );
-
-		ERR_print_errors_fp( stdout );
-	}
 
 	return 1 == ret ? 0 : -1;
 }

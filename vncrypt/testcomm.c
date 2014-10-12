@@ -23,13 +23,13 @@ static void VN_Usage( const char * program )
 {
 	printf( "\n" );
 	printf( "Usage: %s [-k <key bits>] [-l <src length>] [-t <src type>]\n"
-			"\t\t[-r <run seconds>] [-s <silent>]\n", program );
+			"\t\t[-r <run seconds>] [-d <debug>]\n", program );
 	printf( "\n" );
 	printf( "\t-k default 64, key bits for p/q, half of the total key bits\n" );
 	printf( "\t-l default 15, [-l <src length>] should less than ( 1/4 * [-k <key bits>] )\n" );
 	printf( "\t-t default 1, use simple plain text for debug; set 2 to use random plain text\n" );
 	printf( "\t-r default 1, run 1 second for encrypt/decrypt\n" );
-	printf( "\t-s default 1, don't show debug message; set 0 to show debug message\n" );
+	printf( "\t-d default 0, don't show debug message; set 1 to show debug message\n" );
 	printf( "\n" );
 
 	exit( 0 );
@@ -42,7 +42,7 @@ int VN_Test( int argc, const char * argv[], VNTestEnv_t * env )
 	VNTestArgs_t args = {
 		.mArgc = argc,
 		.mArgv = argv,
-		.mSilent = 1,
+		.mDebug = 0,
 		.mKeyBits = 64,
 		.mLength = 15,
 		.mSrcType = 1,
@@ -59,11 +59,11 @@ int VN_Test( int argc, const char * argv[], VNTestEnv_t * env )
 		if( 0 == strcmp( argv[ i ], "-l" ) ) args.mLength = atoi( argv[ i + 1 ] );
 		if( 0 == strcmp( argv[ i ], "-t" ) ) args.mSrcType = atoi( argv[ i + 1 ] );
 		if( 0 == strcmp( argv[ i ], "-r" ) ) args.mRunSeconds = atoi( argv[ i + 1 ] );
-		if( 0 == strcmp( argv[ i ], "-s" ) ) args.mSilent = atoi( argv[ i + 1 ] );
+		if( 0 == strcmp( argv[ i ], "-d" ) ) args.mDebug = atoi( argv[ i + 1 ] );
 	}
 
-	printf( "\ncmd: %s -k %d -l %d -t %d -r %d -s %d\n", argv[0], args.mKeyBits,
-		args.mLength, args.mSrcType, args.mRunSeconds, args.mSilent );
+	printf( "\ncmd: %s -k %d -l %d -t %d -r %d -d %d\n", argv[0], args.mKeyBits,
+		args.mLength, args.mSrcType, args.mRunSeconds, args.mDebug );
 	printf( "run [%s -v] to see detail usage\n", argv[0] );
 	printf( "\n" );
 
@@ -146,13 +146,13 @@ void VN_PrintKey( VNAsymCryptCtx_t * ctx )
 
 	VNAsymCryptDumpPubKey( ctx, &pubKey );
 
-	VNIovecPrint( "PubKey", &pubKey );
+	VNIovecPrint( "PubKey", &pubKey, 0 );
 
 	VNIovecFreeBufferAndTail( &pubKey );
 
 	VNAsymCryptDumpPrivKey( ctx, &pubKey, &privKey );
 
-	VNIovecPrint( "PrivKey", &privKey );
+	VNIovecPrint( "PrivKey", &privKey, 0 );
 
 	VNIovecFreeBufferAndTail( &pubKey );
 	VNIovecFreeBufferAndTail( &privKey );
@@ -197,14 +197,14 @@ void VN_Run_Impl( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args, VNTestFunc_t * fu
 	VN_GenSrc( args, &srcText );
 	if( NULL != func->mVerify ) vn_iovec_copy( &srcText, &plainText );
 
-	if( ! args->mSilent ) VNIovecPrint( "SrcText", &srcText );
+	if( args->mDebug ) VNIovecPrint( "SrcText", &srcText, 1 );
 
 	// 1. generate keys
-	if( ! args->mSilent ) printf( "GenKeys ......\n" );
+	if( args->mDebug ) printf( "GenKeys ......\n" );
 
 	VNAsymCryptGenKeys( ctx, args->mKeyBits );
 
-	if( ! args->mSilent ) VN_PrintKey( ctx );
+	if( args->mDebug ) VN_PrintKey( ctx );
 
 	// 2. save pub/priv key, clear ctx
 	VNAsymCryptDumpPrivKey( ctx, &hexPubKey, &hexPrivKey );
@@ -213,16 +213,16 @@ void VN_Run_Impl( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args, VNTestFunc_t * fu
 	// 3. restore pub key, do PubEncrypt
 	if( func->mIsSign )
 	{
-		if( ! args->mSilent ) printf( "Load PrivKey ......\n" );
+		if( args->mDebug ) printf( "Load PrivKey ......\n" );
 		VNAsymCryptLoadPrivKey( ctx, &hexPubKey, &hexPrivKey );
 	} else {
-		if( ! args->mSilent ) printf( "Load PubKey ......\n" );
+		if( args->mDebug ) printf( "Load PubKey ......\n" );
 		VNAsymCryptLoadPubKey( ctx, &hexPubKey );
 	}
-	if( ! args->mSilent ) VN_PrintKey( ctx );
+	if( args->mDebug ) VN_PrintKey( ctx );
 
 	alarm( args->mRunSeconds );
-	for( opCount = 0, gRunning = 1; args->mSilent && ( 1 == gRunning ); opCount++ )
+	for( opCount = 0, gRunning = 1; ( ! args->mDebug ) && ( 1 == gRunning ); opCount++ )
 	{
 		ret = func->mEncrypt( ctx, srcText.i.iov_base, args->mLength, &cipherText );
 		VNIovecFreeBufferAndTail( &cipherText );
@@ -238,23 +238,23 @@ void VN_Run_Impl( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args, VNTestFunc_t * fu
 
 	printf( "%s %d, ops %d/s\n", func->mEncryptName, opCount, opCount / args->mRunSeconds );
 
-	if( ! args->mSilent ) VNIovecPrint( "CipherText", &cipherText );
+	if( args->mDebug ) VNIovecPrint( "CipherText", &cipherText, 1 );
 
 	VNAsymCryptClearKeys( ctx );
 
 	// 4. restore priv key, do PrivDecrypt
 	if( func->mIsSign )
 	{
-		if( ! args->mSilent ) printf( "Load PubKey ......\n" );
+		if( args->mDebug ) printf( "Load PubKey ......\n" );
 		VNAsymCryptLoadPubKey( ctx, &hexPubKey );
 	} else {
-		if( ! args->mSilent ) printf( "Load PrivKey ......\n" );
+		if( args->mDebug ) printf( "Load PrivKey ......\n" );
 		VNAsymCryptLoadPrivKey( ctx, &hexPubKey, &hexPrivKey );
 	}
-	if( ! args->mSilent ) VN_PrintKey( ctx );
+	if( args->mDebug ) VN_PrintKey( ctx );
 
 	alarm( args->mRunSeconds );
-	for( opCount = 0, gRunning = 1; args->mSilent && ( 1 == gRunning ); opCount++ )
+	for( opCount = 0, gRunning = 1; ( ! args->mDebug ) && ( 1 == gRunning ); opCount++ )
 	{
 		if( NULL != func->mDecrypt )
 		{
@@ -279,42 +279,42 @@ void VN_Run_Impl( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args, VNTestFunc_t * fu
 	{
 		func->mDecrypt( ctx, (unsigned char*)cipherText.i.iov_base,
 				cipherText.i.iov_len, &plainText, args->mLength );
-	}
 
-	result = &plainText;
+		result = &plainText;
 
-	if( ! args->mSilent ) VNIovecPrint( "PlainText", result );
+		if( args->mDebug ) VNIovecPrint( "PlainText", result, 1 );
 
-	if( NULL != result->next )
-	{
-		// rabin encryption scheme will return 4 results, find the real result
-		// here use a simple way, but should use a more trusty way in the real world
-		for( ; NULL != result; result = result->next )
+		if( NULL != result->next )
 		{
-			tmp = ((unsigned char*)result->i.iov_base)[ args->mLength - 1 ];
-			tmp1 = ((unsigned char*)srcText.i.iov_base)[ args->mLength - 1 ];
+			// rabin encryption scheme will return 4 results, find the real result
+			// here use a simple way, but should use a more trusty way in the real world
+			for( ; NULL != result; result = result->next )
+			{
+				tmp = ((unsigned char*)result->i.iov_base)[ args->mLength - 1 ];
+				tmp1 = ((unsigned char*)srcText.i.iov_base)[ args->mLength - 1 ];
 
-			if( tmp == tmp1 ) break;
+				if( tmp == tmp1 ) break;
+			}
+			assert( NULL != result );
 		}
-		assert( NULL != result );
-	}
 
-	assert( args->mLength == result->i.iov_len );
+		assert( args->mLength == result->i.iov_len );
 
-	printf( "Verifing ...... " );
+		printf( "Verifing ...... " );
 
-	if( 0 != memcmp( srcText.i.iov_base, result->i.iov_base, args->mLength ) )
-	{
-		printf( "FAIL\n" );
-		for( i = 0; i < args->mLength; i++ )
+		if( 0 != memcmp( srcText.i.iov_base, result->i.iov_base, args->mLength ) )
 		{
-			tmp = ((unsigned char*)result->i.iov_base)[ i ];
-			tmp1 = ((unsigned char*)srcText.i.iov_base)[ i ];
+			printf( "FAIL\n" );
+			for( i = 0; i < args->mLength; i++ )
+			{
+				tmp = ((unsigned char*)result->i.iov_base)[ i ];
+				tmp1 = ((unsigned char*)srcText.i.iov_base)[ i ];
 
-			if( tmp != tmp1 ) printf( "%d %d %d\n", i, tmp, tmp1 );
+				if( tmp != tmp1 ) printf( "%d %d %d\n", i, tmp, tmp1 );
+			}
+		} else {
+			printf( "OK\n" );
 		}
-	} else {
-		printf( "OK\n" );
 	}
 
 	VNIovecFreeBufferAndTail( &srcText );

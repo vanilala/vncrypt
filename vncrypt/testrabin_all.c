@@ -21,7 +21,7 @@ void TestSign( VNTestArgs_t * args )
 
 	VN_GenSrc( args, &srcPlain );
 
-	VNIovecPrint( "SrcText ", &srcPlain );
+	VNIovecPrint( "SrcText ", &srcPlain, 1 );
 
 	VNAsymCryptCtx_t * bnCtx = VNModRabinSign_BN_CtxNew();
 	VNAsymCryptCtx_t * gcCtx = VNModRabinSign_GC_CtxNew();
@@ -52,9 +52,9 @@ void TestSign( VNTestArgs_t * args )
 		ret = VNAsymCryptPrivEncrypt( lipCtx, srcPlain.i.iov_base, args->mLength, &lipCipher );
 		printf( "LIP %d\n", ret );
 
-		VNIovecPrint( "BN ", &bnCipher );
-		VNIovecPrint( "GC", &gcCipher );
-		VNIovecPrint( "LIP ", &lipCipher );
+		VNIovecPrint( "BN ", &bnCipher, 1 );
+		VNIovecPrint( "GC", &gcCipher, 1 );
+		VNIovecPrint( "LIP ", &lipCipher, 1 );
 	}
 
 	printf( "###### Try PubDecrypt ######\n" );
@@ -71,9 +71,9 @@ void TestSign( VNTestArgs_t * args )
 			&lipPlain, args->mLength );
 		printf( "LIP %d\n", ret );
 
-		VNIovecPrint( "BN ", &bnPlain );
-		VNIovecPrint( "GC", &gcPlain );
-		VNIovecPrint( "LIP", &lipPlain );
+		VNIovecPrint( "BN ", &bnPlain, 1 );
+		VNIovecPrint( "GC", &gcPlain, 1 );
+		VNIovecPrint( "LIP", &lipPlain, 1 );
 	}
 
 	VNIovecFreeBufferAndTail( &srcPlain );
@@ -101,7 +101,7 @@ void TestEnc( VNTestArgs_t * args )
 
 	VN_GenSrc( args, &srcPlain );
 
-	VNIovecPrint( "SrcText ", &srcPlain );
+	VNIovecPrint( "SrcText ", &srcPlain, 1 );
 
 	VNAsymCryptCtx_t * bnCtx = VNRabinEnc_BN_CtxNew();
 	VNAsymCryptCtx_t * gmpCtx = VNRabinEnc_GMP_CtxNew();
@@ -124,8 +124,8 @@ void TestEnc( VNTestArgs_t * args )
 		ret = VNAsymCryptPubEncrypt( gmpCtx, srcPlain.i.iov_base, args->mLength, &gmpCipher );
 		printf( "GMP %d\n", ret );
 
-		VNIovecPrint( "BN ", &bnCipher );
-		VNIovecPrint( "GMP", &gmpCipher );
+		VNIovecPrint( "BN ", &bnCipher, 1 );
+		VNIovecPrint( "GMP", &gmpCipher, 1 );
 	}
 
 	printf( "###### Try PrivDecrypt ######\n" );
@@ -138,8 +138,8 @@ void TestEnc( VNTestArgs_t * args )
 			&gmpPlain, args->mLength );
 		printf( "GMP %d\n", ret );
 
-		VNIovecPrint( "BN ", &bnPlain );
-		VNIovecPrint( "GMP", &gmpPlain );
+		VNIovecPrint( "BN ", &bnPlain, 1 );
+		VNIovecPrint( "GMP", &gmpPlain, 1 );
 	}
 
 	VNAsymCryptCtxFree( bnCtx );
