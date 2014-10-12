@@ -1,6 +1,8 @@
 
 #include "vncrypt_gc.h"
 
+#include <stdlib.h>
+
 unsigned long VN_gcry_mpi_mod_ui( const gcry_mpi_t za, unsigned long m )
 {
 	unsigned long ret = 0;

@@ -2,6 +2,7 @@
 #include "vncrypt_bn.h"
 
 #include <openssl/bn.h>
+#include <openssl/crypto.h>
 
 #include <string.h>
 

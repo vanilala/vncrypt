@@ -1,6 +1,7 @@
 #pragma once
 
 #include <sys/uio.h>
+#include <stdlib.h>
 
 typedef struct tagVNAsymCryptCtx VNAsymCryptCtx_t;
 
@@ -113,9 +114,8 @@ enum
 #define VN_CONTAINER_OF(addr,type,field) \
 	((type*)((unsigned char*)addr - (unsigned long)&((type*)0)->field))
 
-typedef struct tagVNAsymCryptCtx
-{
+struct tagVNAsymCryptCtx {
 	int mType;
 	VNAsymCryptMethod_t mMethod;
-} VNAsymCryptCtx_t;
+};
 

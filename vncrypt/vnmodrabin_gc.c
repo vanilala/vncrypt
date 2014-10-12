@@ -234,7 +234,7 @@ int VNModRabin_GC_PubDecrypt( const VNAsymCryptCtx_t * ctx,
 	{
 		gcry_mpi_swap( zm, zm1 );
 	} else if( mod == 3 ) {
-		gcry_mpi_lshift( zm, zm1, 1 );
+		gcry_mpi_mul_ui( zm, zm1, 2 );
 	} else if( mod == 7 ) {
 		gcry_mpi_sub( zm, gcCtx->mN, zm1 );
 	} else if( mod == 2 ) {
