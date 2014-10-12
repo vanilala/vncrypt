@@ -142,23 +142,17 @@ double VN_RunTime( unsigned long long prevUsec, unsigned long long * nowUsec )
 
 void VN_PrintKey( VNAsymCryptCtx_t * ctx )
 {
-	struct vn_iovec pubKey, privKey, * iter = NULL;
+	struct vn_iovec pubKey, privKey;
 
 	VNAsymCryptDumpPubKey( ctx, &pubKey );
 
-	for( iter = &pubKey; NULL != iter; iter = iter->next )
-	{
-		printf( "PubKey : %4zd, %s\n", iter->i.iov_len, (char*)iter->i.iov_base );
-	}
+	VNIovecPrint( "PubKey", &pubKey );
 
 	VNIovecFreeBufferAndTail( &pubKey );
 
 	VNAsymCryptDumpPrivKey( ctx, &pubKey, &privKey );
 
-	for( iter = &privKey; NULL != iter; iter = iter->next )
-	{
-		printf( "PirvKey: %4zd, %s\n", iter->i.iov_len, (char*)iter->i.iov_base );
-	}
+	VNIovecPrint( "PrivKey", &privKey );
 
 	VNIovecFreeBufferAndTail( &pubKey );
 	VNIovecFreeBufferAndTail( &privKey );

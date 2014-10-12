@@ -92,15 +92,22 @@ int VNDsa_ORG_GenKeys( VNAsymCryptCtx_t * ctx, int keyBits )
 
 void VNDsa_ORG_ClearKeys( VNAsymCryptCtx_t * ctx )
 {
-	//VNDsa_ORG_Ctx_t * orgCtx = VN_CONTAINER_OF( ctx, VNDsa_ORG_Ctx_t, mCtx );
-	//assert( VN_TYPE_VNDsaSign_ORG == ctx->mType );
+	VNDsa_ORG_Ctx_t * orgCtx = VN_CONTAINER_OF( ctx, VNDsa_ORG_Ctx_t, mCtx );
+	assert( VN_TYPE_VNDsaSign_ORG == ctx->mType );
+
+	DSA_free( orgCtx->mDSA );
+
+	orgCtx->mDSA = DSA_new();
 }
 
 int VNDsa_ORG_DumpPubKey( const VNAsymCryptCtx_t * ctx,
 	struct vn_iovec * hexPubKey )
 {
-	//const VNDsa_ORG_Ctx_t * orgCtx = VN_CONTAINER_OF( ctx, VNDsa_ORG_Ctx_t, mCtx );
-	//assert( VN_TYPE_VNDsaSign_ORG == ctx->mType );
+	const VNDsa_ORG_Ctx_t * orgCtx = VN_CONTAINER_OF( ctx, VNDsa_ORG_Ctx_t, mCtx );
+	assert( VN_TYPE_VNDsaSign_ORG == ctx->mType );
+
+	hexPubKey->i.iov_len = i2d_DSAPublicKey( orgCtx->mDSA,
+		(unsigned char**)&( hexPubKey->i.iov_base ));
 
 	return 0;
 }
@@ -108,8 +115,14 @@ int VNDsa_ORG_DumpPubKey( const VNAsymCryptCtx_t * ctx,
 int VNDsa_ORG_DumpPrivKey( const VNAsymCryptCtx_t * ctx,
 	struct vn_iovec * hexPubKey, struct vn_iovec * hexPrivKey )
 {
-	//const VNDsa_ORG_Ctx_t * orgCtx = VN_CONTAINER_OF( ctx, VNDsa_ORG_Ctx_t, mCtx );
-	//assert( VN_TYPE_VNDsaSign_ORG == ctx->mType );
+	const VNDsa_ORG_Ctx_t * orgCtx = VN_CONTAINER_OF( ctx, VNDsa_ORG_Ctx_t, mCtx );
+	assert( VN_TYPE_VNDsaSign_ORG == ctx->mType );
+
+	hexPubKey->i.iov_len = i2d_DSAPublicKey( orgCtx->mDSA,
+		(unsigned char**)&( hexPubKey->i.iov_base ));
+
+	hexPrivKey->i.iov_len = i2d_DSAPrivateKey( orgCtx->mDSA,
+		(unsigned char**)&( hexPrivKey->i.iov_base ));
 
 	return 0;
 }
@@ -117,8 +130,12 @@ int VNDsa_ORG_DumpPrivKey( const VNAsymCryptCtx_t * ctx,
 int VNDsa_ORG_LoadPubKey( VNAsymCryptCtx_t * ctx,
 	const struct vn_iovec * hexPubKey )
 {
-	//VNDsa_ORG_Ctx_t * orgCtx = VN_CONTAINER_OF( ctx, VNDsa_ORG_Ctx_t, mCtx );
-	//assert( VN_TYPE_VNDsaSign_ORG == ctx->mType );
+	VNDsa_ORG_Ctx_t * orgCtx = VN_CONTAINER_OF( ctx, VNDsa_ORG_Ctx_t, mCtx );
+	assert( VN_TYPE_VNDsaSign_ORG == ctx->mType );
+
+	const unsigned char * tmp = (const unsigned char*)( hexPubKey->i.iov_base );
+
+	d2i_DSAPublicKey( &( orgCtx->mDSA ), &tmp, hexPubKey->i.iov_len );
 
 	return 0;
 }
@@ -126,8 +143,12 @@ int VNDsa_ORG_LoadPubKey( VNAsymCryptCtx_t * ctx,
 int VNDsa_ORG_LoadPrivKey( VNAsymCryptCtx_t * ctx,
 	const struct vn_iovec * hexPubKey, const struct vn_iovec * hexPrivKey )
 {
-	//VNDsa_ORG_Ctx_t * orgCtx = VN_CONTAINER_OF( ctx, VNDsa_ORG_Ctx_t, mCtx );
-	//assert( VN_TYPE_VNDsaSign_ORG == ctx->mType );
+	VNDsa_ORG_Ctx_t * orgCtx = VN_CONTAINER_OF( ctx, VNDsa_ORG_Ctx_t, mCtx );
+	assert( VN_TYPE_VNDsaSign_ORG == ctx->mType );
+
+	const unsigned char * tmp = (const unsigned char*)( hexPrivKey->i.iov_base );
+
+	d2i_DSAPrivateKey( &( orgCtx->mDSA ), &tmp, hexPrivKey->i.iov_len );
 
 	return 0;
 }
