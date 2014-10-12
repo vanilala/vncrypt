@@ -93,14 +93,36 @@ int VN_Test( int argc, const char * argv[], VNTestEnv_t * env )
 
 void VN_Run( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
 {
-	if( ctx->mType < VN_TYPE_VNMaxSign )
+	VNTestFunc_t func;
+	memset( &func, 0, sizeof( func ) );
+
+	func.mIsSign = ctx->mType < VN_TYPE_VNMaxEnc ? 0 : 1;
+
+	if( ctx->mType < VN_TYPE_VNMaxEnc )
 	{
-		printf( "\nStart to run signature scheme ......\n\n" );
-		VN_Run_Sign( ctx, args );
-	} else {
 		printf( "\nStart to run encryption scheme ......\n\n" );
-		VN_Run_Enc( ctx, args );
+
+		func.mEncryptName = "PubEncrypt";
+		func.mEncrypt = VNAsymCryptPubEncrypt;
+		func.mDecryptName = "PrivDecrypt";
+		func.mDecrypt = VNAsymCryptPrivDecrypt;
+	} else if( ctx->mType < VN_TYPE_VNMaxSignType1 ) {
+		printf( "\nStart to run signature scheme with message recovery ......\n\n" );
+
+		func.mEncryptName = "PrivEncrypt";
+		func.mEncrypt = VNAsymCryptPrivEncrypt;
+		func.mDecryptName = "PubDecrypt";
+		func.mDecrypt = VNAsymCryptPubDecrypt;
+	} else if( ctx->mType < VN_TYPE_VNMaxSignType2 ) {
+		printf( "\nStart to run signature scheme with appendix ......\n\n" );
+
+		func.mEncryptName = "Sign";
+		func.mEncrypt = VNAsymCryptSign;
+		func.mDecryptName = "Verify";
+		func.mVerify = VNAsymCryptVerify;
 	}
+
+	VN_Run_Impl( ctx, args, &func );
 }
 
 double VN_RunTime( unsigned long long prevUsec, unsigned long long * nowUsec )
@@ -160,109 +182,15 @@ void VN_GenSrc( VNTestArgs_t * args, struct vn_iovec * src )
 	}
 }
 
-void VN_Run_Sign( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
+static void vn_iovec_copy( const struct vn_iovec * src, struct vn_iovec * dest )
 {
-	int i = 0, ret = 0, opCount = 0;
-	unsigned char tmp = 0, tmp1 = 0;
-
-	struct vn_iovec hexPubKey, hexPrivKey;
-	struct vn_iovec srcText, plainText, cipherText;
-
-	signal( SIGALRM, sigHandle );
-
-	VN_GenSrc( args, &srcText );
-
-	if( ! args->mSilent ) VNIovecPrint( "SrcText", &srcText );
-
-	// 1. generate keys
-	if( ! args->mSilent ) printf( "GenKeys ......\n" );
-
-	VNAsymCryptGenKeys( ctx, args->mKeyBits );
-
-	if( ! args->mSilent ) VN_PrintKey( ctx );
-
-	// 2. save pub/priv key, clear ctx
-	VNAsymCryptDumpPrivKey( ctx, &hexPubKey, &hexPrivKey );
-	VNAsymCryptClearKeys( ctx );
-
-	// 3. restore priv key, do PrivEncrypt
-	if( ! args->mSilent ) printf( "Load PrivKey ......\n" );
-	VNAsymCryptLoadPrivKey( ctx, &hexPubKey, &hexPrivKey );
-	if( ! args->mSilent ) VN_PrintKey( ctx );
-
-	alarm( args->mRunSeconds );
-	for( opCount = 0, gRunning = 1; 1 == gRunning; ++opCount )
-	{
-		ret = VNAsymCryptPrivEncrypt( ctx, srcText.i.iov_base, args->mLength, &cipherText );
-		VNIovecFreeBufferAndTail( &cipherText );
-
-		if( 0 != ret )
-		{
-			printf( "PrivEncrypt Fail, ret %d\n", ret );
-			exit( -1 );
-		}
-	}
-
-	ret = VNAsymCryptPrivEncrypt( ctx, srcText.i.iov_base, args->mLength, &cipherText );
-
-	printf( "PrivEncrypt %d, ops %d/s\n", opCount, opCount / args->mRunSeconds );
-
-	if( ! args->mSilent ) VNIovecPrint( "CipherText", &cipherText );
-
-	VNAsymCryptClearKeys( ctx );
-
-	// 4. restore pub key, do PubDecrypt
-	if( ! args->mSilent ) printf( "Load PubKey ......\n" );
-	VNAsymCryptLoadPubKey( ctx, &hexPubKey );
-
-	if( ! args->mSilent ) VN_PrintKey( ctx );
-
-	alarm( args->mRunSeconds );
-	for( opCount = 0, gRunning = 1; 1 == gRunning; ++opCount )
-	{
-		ret = VNAsymCryptPubDecrypt( ctx, (unsigned char*)cipherText.i.iov_base,
-			cipherText.i.iov_len, &plainText, 0 );
-		VNIovecFreeBufferAndTail( &plainText );
-
-		if( 0 != ret )
-		{
-			printf( "PubDecrypt Fail, ret %d\n", ret );
-			exit( -1 );
-		}
-	}
-
-	printf( "PubDecrypt  %d, ops %d/s\n", opCount, opCount / args->mRunSeconds );
-
-	VNAsymCryptPubDecrypt( ctx, (unsigned char*)cipherText.i.iov_base,
-		cipherText.i.iov_len, &plainText, args->mLength );
-
-	if( ! args->mSilent ) VNIovecPrint( "PlainText", &plainText );
-
-	assert( args->mLength == plainText.i.iov_len );
-
-	printf( "Verifing ...... " );
-
-	if( 0 != memcmp( srcText.i.iov_base, plainText.i.iov_base, args->mLength ) )
-	{
-		printf( "FAIL\n" );
-		for( i = 0; i < args->mLength; i++ )
-		{
-			tmp = ((unsigned char*)srcText.i.iov_base)[ i ];
-			tmp1 = ((unsigned char*)plainText.i.iov_base)[ i ];
-			if( tmp != tmp1 ) printf( "%d %d %d\n", i, tmp, tmp1 );
-		}
-	} else {
-		printf( "OK\n" );
-	}
-
-	VNIovecFreeBufferAndTail( &srcText );
-	VNIovecFreeBufferAndTail( &plainText );
-	VNIovecFreeBufferAndTail( &cipherText );
-	VNIovecFreeBufferAndTail( &hexPubKey );
-	VNIovecFreeBufferAndTail( &hexPrivKey );
+	dest->next = NULL;
+	dest->i.iov_len = src->i.iov_len;
+	dest->i.iov_base = calloc( 1, dest->i.iov_len + 1 );
+	memcpy( dest->i.iov_base, src->i.iov_base, dest->i.iov_len );
 }
 
-void VN_Run_Enc( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
+void VN_Run_Impl( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args, VNTestFunc_t * func )
 {
 	int i = 0, ret = 0, opCount = 0;
 	unsigned char tmp = 0, tmp1 = 0;
@@ -273,6 +201,8 @@ void VN_Run_Enc( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
 	signal( SIGALRM, sigHandle );
 
 	VN_GenSrc( args, &srcText );
+	if( NULL != func->mVerify ) vn_iovec_copy( &srcText, &plainText );
+
 	if( ! args->mSilent ) VNIovecPrint( "SrcText", &srcText );
 
 	// 1. generate keys
@@ -287,55 +217,75 @@ void VN_Run_Enc( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args )
 	VNAsymCryptClearKeys( ctx );
 
 	// 3. restore pub key, do PubEncrypt
-	if( ! args->mSilent ) printf( "Load PubKey ......\n" );
-	VNAsymCryptLoadPubKey( ctx, &hexPubKey );
+	if( func->mIsSign )
+	{
+		if( ! args->mSilent ) printf( "Load PrivKey ......\n" );
+		VNAsymCryptLoadPrivKey( ctx, &hexPubKey, &hexPrivKey );
+	} else {
+		if( ! args->mSilent ) printf( "Load PubKey ......\n" );
+		VNAsymCryptLoadPubKey( ctx, &hexPubKey );
+	}
 	if( ! args->mSilent ) VN_PrintKey( ctx );
 
 	alarm( args->mRunSeconds );
-	for( opCount = 0, gRunning = 1; 1 == gRunning; opCount++ )
+	for( opCount = 0, gRunning = 1; args->mSilent && ( 1 == gRunning ); opCount++ )
 	{
-		ret = VNAsymCryptPubEncrypt( ctx, srcText.i.iov_base, args->mLength, &cipherText );
+		ret = func->mEncrypt( ctx, srcText.i.iov_base, args->mLength, &cipherText );
 		VNIovecFreeBufferAndTail( &cipherText );
 
 		if( 0 != ret )
 		{
-			printf( "PubEncrypt Fail, ret %d\n", ret );
+			printf( "%s Fail, ret %d\n", func->mEncryptName, ret );
 			exit( -1 );
 		}
 	}
 
-	ret = VNAsymCryptPubEncrypt( ctx, srcText.i.iov_base, args->mLength, &cipherText );
+	ret = func->mEncrypt( ctx, srcText.i.iov_base, args->mLength, &cipherText );
 
-	printf( "PubEncrypt  %d, ops %d/s\n", opCount, opCount / args->mRunSeconds );
+	printf( "%s %d, ops %d/s\n", func->mEncryptName, opCount, opCount / args->mRunSeconds );
 
 	if( ! args->mSilent ) VNIovecPrint( "CipherText", &cipherText );
 
 	VNAsymCryptClearKeys( ctx );
 
 	// 4. restore priv key, do PrivDecrypt
-	if( ! args->mSilent ) printf( "Load PrivKey ......\n" );
-	VNAsymCryptLoadPrivKey( ctx, &hexPubKey, &hexPrivKey );
-
+	if( func->mIsSign )
+	{
+		if( ! args->mSilent ) printf( "Load PubKey ......\n" );
+		VNAsymCryptLoadPubKey( ctx, &hexPubKey );
+	} else {
+		if( ! args->mSilent ) printf( "Load PrivKey ......\n" );
+		VNAsymCryptLoadPrivKey( ctx, &hexPubKey, &hexPrivKey );
+	}
 	if( ! args->mSilent ) VN_PrintKey( ctx );
 
 	alarm( args->mRunSeconds );
-	for( opCount = 0, gRunning = 1; 1 == gRunning; opCount++ )
+	for( opCount = 0, gRunning = 1; args->mSilent && ( 1 == gRunning ); opCount++ )
 	{
-		ret = VNAsymCryptPrivDecrypt( ctx, (unsigned char*)cipherText.i.iov_base,
-			cipherText.i.iov_len, &plainText, 0 );
-		VNIovecFreeBufferAndTail( &plainText );
+		if( NULL != func->mDecrypt )
+		{
+			ret = func->mDecrypt( ctx, (unsigned char*)cipherText.i.iov_base,
+					cipherText.i.iov_len, &plainText, 0 );
+			VNIovecFreeBufferAndTail( &plainText );
+		} else {
+			ret = func->mVerify( ctx, (unsigned char*)cipherText.i.iov_base,
+					cipherText.i.iov_len, &plainText );
+		}
 
 		if( 0 != ret )
 		{
-			printf( "PrivEncrypt Fail, ret %d\n", ret );
+			printf( "%s Fail, ret %d\n", func->mDecryptName, ret );
 			exit( -1 );
 		}
 	}
 
-	printf( "PrivDecrypt %d, ops %d/s\n", opCount, opCount / args->mRunSeconds );
+	printf( "%s %d, ops %d/s\n", func->mDecryptName, opCount, opCount / args->mRunSeconds );
 
-	VNAsymCryptPrivDecrypt( ctx, (unsigned char*)cipherText.i.iov_base,
-		cipherText.i.iov_len, &plainText, args->mLength );
+	if( NULL != func->mDecrypt )
+	{
+		func->mDecrypt( ctx, (unsigned char*)cipherText.i.iov_base,
+				cipherText.i.iov_len, &plainText, args->mLength );
+	}
 
 	result = &plainText;
 

@@ -22,14 +22,6 @@ int VNAsymCryptLoadPubKey( VNAsymCryptCtx_t * ctx,
 int VNAsymCryptLoadPrivKey( VNAsymCryptCtx_t * ctx,
 		const struct vn_iovec * hexPubKey, const struct vn_iovec * hexPrivKey );
 
-int VNAsymCryptPrivEncrypt( const VNAsymCryptCtx_t * ctx,
-		const unsigned char * plainText, int length,
-		struct vn_iovec * cipherText );
-
-int VNAsymCryptPubDecrypt( const VNAsymCryptCtx_t * ctx,
-		const unsigned char * cipherText, const int length,
-		struct vn_iovec * plainText, const int fillUpLength );
-
 int VNAsymCryptPubEncrypt( const VNAsymCryptCtx_t * ctx,
 		const unsigned char * plainText, int length,
 		struct vn_iovec * cipherText );
@@ -38,9 +30,25 @@ int VNAsymCryptPrivDecrypt( const VNAsymCryptCtx_t * ctx,
 		const unsigned char * cipherText, const int length,
 		struct vn_iovec * plainText, const int fillUpLength );
 
+int VNAsymCryptPrivEncrypt( const VNAsymCryptCtx_t * ctx,
+		const unsigned char * plainText, int length,
+		struct vn_iovec * cipherText );
+
+int VNAsymCryptPubDecrypt( const VNAsymCryptCtx_t * ctx,
+		const unsigned char * cipherText, const int length,
+		struct vn_iovec * plainText, const int fillUpLength );
+
+int VNAsymCryptSign( const VNAsymCryptCtx_t * ctx,
+		const unsigned char * plainText, int length,
+		struct vn_iovec * signText );
+
+int VNAsymCryptVerify( const VNAsymCryptCtx_t * ctx,
+		const unsigned char * signText, const int length,
+		const struct vn_iovec * plainText );
+
 /* helper function */
 
-void VNIovecPrint( const char * prompt, struct vn_iovec * head );
+void VNIovecPrint( const char * prompt, const struct vn_iovec * head );
 
 void VNIovecFreeBufferAndTail( struct vn_iovec * head );
 

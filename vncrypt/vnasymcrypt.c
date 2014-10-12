@@ -132,12 +132,29 @@ int VNAsymCryptPrivDecrypt( const VNAsymCryptCtx_t * ctx,
 	return ret;
 }
 
+int VNAsymCryptSign( const VNAsymCryptCtx_t * ctx,
+		const unsigned char * plainText, int length,
+		struct vn_iovec * signText )
+{
+	signText->next = NULL;
+	signText->i.iov_base = NULL;
+
+	return ctx->mMethod.mSign( ctx, plainText, length, signText );
+}
+
+int VNAsymCryptVerify( const VNAsymCryptCtx_t * ctx,
+		const unsigned char * signText, const int length,
+		const struct vn_iovec * plainText )
+{
+	return ctx->mMethod.mVerify( ctx, signText, length, plainText );
+}
+
 /* helper function */
 
-void VNIovecPrint( const char * prompt, struct vn_iovec * head )
+void VNIovecPrint( const char * prompt, const struct vn_iovec * head )
 {
 	size_t i = 0;
-	struct vn_iovec * next = NULL;
+	const struct vn_iovec * next = NULL;
 
 	for( next = head; NULL != next; next = next->next )
 	{

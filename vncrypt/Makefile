@@ -7,7 +7,8 @@ PROGS = testrsa_all testrsa_bn testrsa_gmp testrsa_org \
 	testrabin_all \
 	testmodrabin_bn testmodrabin_gc testmodrabin_lip \
 	testrabin_gmp testrabin_bn \
-	testwilliams_bn
+	testwilliams_bn \
+	testdsa_org
 
 COMM_OBJS = vnasymcrypt.o testcomm.o
 
@@ -57,6 +58,15 @@ testrabin_gmp: $(COMM_OBJS) testrabin_gmp.o vnrabinenc_gmp.o vncrypt_gmp.o
 
 testwilliams_bn: $(COMM_OBJS) testwilliams_bn.o vncrypt_bn.o vnwilliams_bn.o
 	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lcrypto
+
+testdsa_org: $(COMM_OBJS) testdsa_org.o vndsa_org.o
+	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lcrypto
+
+test: $(PROGS)
+	for cmd in $(PROGS) ; \
+	do \
+		./$$cmd; \
+	done
 
 %.o: %.c
 	gcc $(CFLAGS) -c -o $@ $<
