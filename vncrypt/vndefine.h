@@ -107,6 +107,7 @@ enum
 
 	/* dsa signature */
 	VN_TYPE_VNDsaSign_ORG = 2000 + 1,
+	VN_TYPE_VNEcdsaSign_ORG = 2000 + 2,
 
 	VN_TYPE_VNMaxSignType2 = 3000,
 };
