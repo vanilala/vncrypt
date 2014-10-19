@@ -82,6 +82,9 @@ enum
 	/* williams encryption */
 	VN_TYPE_VNWilliamsEnc_BN = 21,
 
+	/* Ecies encryption */
+	VN_TYPE_VNEcies_CTP = 31,
+
 	VN_TYPE_VNMaxEnc = 1000,
 
 	/*
@@ -113,7 +116,7 @@ enum
 };
 
 #define VN_CONTAINER_OF(addr,type,field) \
-	((type*)((unsigned char*)addr - (unsigned long)&((type*)0)->field))
+	(type*)( ((unsigned char*)addr) - (unsigned long)&(((type*)0)->field) )
 
 struct tagVNAsymCryptCtx {
 	int mType;

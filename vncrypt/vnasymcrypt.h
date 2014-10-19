@@ -22,6 +22,8 @@ int VNAsymCryptLoadPubKey( VNAsymCryptCtx_t * ctx,
 int VNAsymCryptLoadPrivKey( VNAsymCryptCtx_t * ctx,
 		const struct vn_iovec * hexPubKey, const struct vn_iovec * hexPrivKey );
 
+/* Public-key encryption */
+
 int VNAsymCryptPubEncrypt( const VNAsymCryptCtx_t * ctx,
 		const unsigned char * plainText, int length,
 		struct vn_iovec * cipherText );
@@ -30,6 +32,8 @@ int VNAsymCryptPrivDecrypt( const VNAsymCryptCtx_t * ctx,
 		const unsigned char * cipherText, const int length,
 		struct vn_iovec * plainText, const int fillUpLength );
 
+/* Digital signature schemes with message recovery */
+
 int VNAsymCryptPrivEncrypt( const VNAsymCryptCtx_t * ctx,
 		const unsigned char * plainText, int length,
 		struct vn_iovec * cipherText );
@@ -37,6 +41,8 @@ int VNAsymCryptPrivEncrypt( const VNAsymCryptCtx_t * ctx,
 int VNAsymCryptPubDecrypt( const VNAsymCryptCtx_t * ctx,
 		const unsigned char * cipherText, const int length,
 		struct vn_iovec * plainText, const int fillUpLength );
+
+/* Digital signature schemes with appendix */
 
 int VNAsymCryptSign( const VNAsymCryptCtx_t * ctx,
 		const unsigned char * plainText, int length,

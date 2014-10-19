@@ -2,6 +2,8 @@
 CFLAGS = -Wall -Werror -g
 #-Wno-unused-result
 
+CPPFLAGS = $(CFLAGS) -Wno-invalid-offsetof
+
 LDFLAGS = 
 
 PROGS = testrsa_all testrsa_bn testrsa_gmp testrsa_org \
@@ -9,7 +11,8 @@ PROGS = testrsa_all testrsa_bn testrsa_gmp testrsa_org \
 	testmodrabin_bn testmodrabin_gc testmodrabin_lip \
 	testrabin_gmp testrabin_bn \
 	testwilliams_bn \
-	testdsa_org testecdsa_org
+	testdsa_org testecdsa_org \
+	testecies_ctp
 
 COMM_OBJS = vnasymcrypt.o testcomm.o
 
@@ -68,6 +71,9 @@ testdsa_org: $(COMM_OBJS) testdsa_org.o vndsa_org.o vncrypt_bn.o
 testecdsa_org: $(COMM_OBJS) testecdsa_org.o vnecdsa_org.o vncrypt_bn.o
 	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lcrypto
 
+testecies_ctp: $(COMM_OBJS) testecies_ctp.o vnecies_ctp.o
+	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lcryptopp
+
 test: $(PROGS)
 	for cmd in $(PROGS) ; \
 	do \
@@ -76,6 +82,9 @@ test: $(PROGS)
 
 %.o: %.c
 	gcc $(CFLAGS) -c -o $@ $<
+
+%.o: %.cpp
+	gcc $(CPPFLAGS) -c -o $@ $<
 
 clean:
 	rm -f *.o lip/*.o $(PROGS) vgcore.* core
