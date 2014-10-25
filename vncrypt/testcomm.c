@@ -25,10 +25,10 @@ static void VN_Usage( const char * program )
 	printf( "Usage: %s [-k <key bits>] [-l <src length>] [-t <src type>]\n"
 			"\t\t[-r <run seconds>] [-d <debug>]\n", program );
 	printf( "\n" );
-	printf( "\t-k default 64, key bits for p/q, half of the total key bits\n" );
-	printf( "\t-l default 15, [-l <src length>] should less than ( 1/4 * [-k <key bits>] )\n" );
+	printf( "\t-k default 128, key bits for p/q, half of the total key bits\n" );
+	printf( "\t-l default 13, [-l <src length>] should less than ( 1/4 * [-k <key bits>] )\n" );
 	printf( "\t-t default 1, use simple plain text for debug; set 2 to use random plain text\n" );
-	printf( "\t-r default 1, run 1 second for encrypt/decrypt\n" );
+	printf( "\t-r default 5, run 1 second for encrypt/decrypt\n" );
 	printf( "\t-d default 0, don't show debug message; set 1 to show debug message\n" );
 	printf( "\n" );
 
@@ -43,10 +43,10 @@ int VN_Test( int argc, const char * argv[], VNTestEnv_t * env )
 		.mArgc = argc,
 		.mArgv = argv,
 		.mDebug = 0,
-		.mKeyBits = 64,
-		.mLength = 15,
+		.mKeyBits = 128,
+		.mLength = 13,
 		.mSrcType = 1,
-		.mRunSeconds = 1,
+		.mRunSeconds = 5,
 	};
 
 	for( i = 1; i < argc; i += 2 )

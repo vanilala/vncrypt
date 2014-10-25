@@ -85,6 +85,9 @@ enum
 	/* Ecies encryption */
 	VN_TYPE_VNEcies_CTP = 31,
 
+	/* ElGamal encryption */
+	VN_TYPE_VNElGamal_CTP = 41,
+
 	VN_TYPE_VNMaxEnc = 1000,
 
 	/*

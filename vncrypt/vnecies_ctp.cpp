@@ -154,7 +154,7 @@ int VNEcies_CTP_DumpPubKey( const VNAsymCryptCtx_t * ctx,
 	HexEncoder encoder;
 	ctpCtx->mPubKey->Save( encoder );
 
-	hexPubKey->i.iov_base = calloc( 1, encoder.MaxRetrievable() );
+	hexPubKey->i.iov_base = calloc( 1, encoder.MaxRetrievable() + 1 );
 	hexPubKey->i.iov_len = encoder.Get( (byte*)hexPubKey->i.iov_base, encoder.MaxRetrievable() );
 
 	return 0;
@@ -173,7 +173,7 @@ int VNEcies_CTP_DumpPrivKey( const VNAsymCryptCtx_t * ctx,
 	HexEncoder encoder;
 	ctpCtx->mPrivKey->Save( encoder );
 
-	hexPrivKey->i.iov_base = calloc( 1, encoder.MaxRetrievable() );
+	hexPrivKey->i.iov_base = calloc( 1, encoder.MaxRetrievable() + 1 );
 	hexPrivKey->i.iov_len = encoder.Get( (byte*)hexPrivKey->i.iov_base, encoder.MaxRetrievable() );
 
 	return 0;
