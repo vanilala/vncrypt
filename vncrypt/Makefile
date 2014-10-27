@@ -12,7 +12,7 @@ PROGS = testrsa_all testrsa_bn testrsa_gmp testrsa_org \
 	testrabin_gmp testrabin_bn \
 	testwilliams_bn \
 	testdsa_org testecdsa_org \
-	testecies_ctp testelgamal_ctp
+	testmodrabin_ctp testecies_ctp testelgamal_ctp
 
 COMM_OBJS = vnasymcrypt.o testcomm.o
 
@@ -70,6 +70,9 @@ testdsa_org: $(COMM_OBJS) testdsa_org.o vndsa_org.o vncrypt_bn.o
 
 testecdsa_org: $(COMM_OBJS) testecdsa_org.o vnecdsa_org.o vncrypt_bn.o
 	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lcrypto
+
+testmodrabin_ctp: $(COMM_OBJS) vncrypt_ctp.o testmodrabin_ctp.o vnmodrabin_ctp.o
+	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lcryptopp
 
 testecies_ctp: $(COMM_OBJS) testecies_ctp.o vnecies_ctp.o
 	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lcryptopp

@@ -89,6 +89,8 @@ int VNRsa_BN_GenKeys( VNAsymCryptCtx_t * ctx, int keyBits )
 	VNRsa_BN_Ctx_t * bnCtx = VN_CONTAINER_OF( ctx, VNRsa_BN_Ctx_t, mCtx );
 	assert( VN_TYPE_VNRsaSign_BN == ctx->mType || VN_TYPE_VNRsaEnc_BN == ctx->mType );
 
+	keyBits = ( keyBits + 1 ) / 2;
+
 	BN_init( &zp );
 	BN_init( &zq );
 	BN_init( &zr );

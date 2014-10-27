@@ -106,6 +106,7 @@ enum
 	VN_TYPE_VNModRabinSign_BN = 1000 + 11,
 	VN_TYPE_VNModRabinSign_GC = 1000 + 13,
 	VN_TYPE_VNModRabinSign_LIP = 1000 + 14,
+	VN_TYPE_VNModRabinSign_CTP = 1000 + 15,
 
 	VN_TYPE_VNMaxSignType1 = 2000,
 

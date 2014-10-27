@@ -79,7 +79,7 @@ int VNRsa_ORG_GenKeys( VNAsymCryptCtx_t * ctx, int keyBits )
 	BN_init( &ze );
 	BN_set_word( &ze, bnCtx->mE );
 
-	RSA_generate_key_ex( bnCtx->mRSA, keyBits * 2, &ze, NULL );
+	RSA_generate_key_ex( bnCtx->mRSA, keyBits, &ze, NULL );
 
 	BN_free( &ze );
 

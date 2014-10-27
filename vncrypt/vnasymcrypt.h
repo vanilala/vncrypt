@@ -6,7 +6,7 @@
 
 void VNAsymCryptCtxFree( VNAsymCryptCtx_t * ctx );
 
-int VNAsymCryptGenKeys( VNAsymCryptCtx_t * ctx, int keyBits );
+int VNAsymCryptGenKeys( VNAsymCryptCtx_t * ctx, int pubKeyBits );
 
 void VNAsymCryptClearKeys( VNAsymCryptCtx_t * ctx );
 

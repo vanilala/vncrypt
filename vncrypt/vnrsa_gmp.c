@@ -86,6 +86,8 @@ int VNRsa_GMP_GenKeys( VNAsymCryptCtx_t * ctx, int keyBits )
 	VNRsa_GMP_Ctx_t * gmpCtx = VN_CONTAINER_OF( ctx, VNRsa_GMP_Ctx_t, mCtx );
 	assert( VN_TYPE_VNRsaSign_GMP == ctx->mType || VN_TYPE_VNRsaEnc_GMP == ctx->mType );
 
+	keyBits = ( keyBits + 1 ) / 2;
+
 	mpz_init( zp );
 	mpz_init( zq );
 	mpz_init( zr );

@@ -66,6 +66,8 @@ int VNWilliamsEnc_BN_GenKeys( VNAsymCryptCtx_t * ctx, int keyBits )
 	VNWilliamsEnc_BN_Ctx_t * bnCtx = VN_CONTAINER_OF( ctx, VNWilliamsEnc_BN_Ctx_t, mCtx );
 	assert( VN_TYPE_VNWilliamsEnc_BN == ctx->mType );
 
+	keyBits = ( keyBits + 1 ) / 2;
+
 	BN_init( &zp );
 	BN_init( &zq );
 

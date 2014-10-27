@@ -68,6 +68,8 @@ int VNModRabin_GC_GenKeys( VNAsymCryptCtx_t * ctx, int keyBits )
 {
 	gcry_mpi_t za, zb, zp, zq;
 
+	keyBits = ( keyBits + 1 ) / 2;
+
 	za = gcry_mpi_new( keyBits * 2 );
 	zb = gcry_mpi_new( keyBits * 2 );
 	zp = gcry_mpi_new( keyBits * 2 );

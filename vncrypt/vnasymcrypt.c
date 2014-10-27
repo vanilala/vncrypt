@@ -12,9 +12,9 @@ void VNAsymCryptCtxFree( VNAsymCryptCtx_t * ctx )
 	ctx->mMethod.mCtxFree( ctx );
 }
 
-int VNAsymCryptGenKeys( VNAsymCryptCtx_t * ctx, int keyBits )
+int VNAsymCryptGenKeys( VNAsymCryptCtx_t * ctx, int pubKeyBits )
 {
-	return ctx->mMethod.mGenKeys( ctx, keyBits );
+	return ctx->mMethod.mGenKeys( ctx, pubKeyBits );
 }
 
 void VNAsymCryptClearKeys( VNAsymCryptCtx_t * ctx )

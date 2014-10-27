@@ -70,6 +70,8 @@ int VNModRabin_LIP_GenKeys( VNAsymCryptCtx_t * ctx, int keyBits )
 	VNModRabin_LIP_Ctx_t * lipCtx = VN_CONTAINER_OF( ctx, VNModRabin_LIP_Ctx_t, mCtx );
 	assert( VN_TYPE_VNModRabinSign_LIP == ctx->mType );
 
+	keyBits = ( keyBits + 1 ) / 2;
+
 	zzero( &za );
 	zzero( &zp );
 	zzero( &zq );

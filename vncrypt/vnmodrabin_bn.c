@@ -78,6 +78,8 @@ int VNModRabin_BN_GenKeys( VNAsymCryptCtx_t * ctx, int keyBits )
 	VNModRabin_BN_Ctx_t * bnCtx = VN_CONTAINER_OF( ctx, VNModRabin_BN_Ctx_t, mCtx );
 	assert( VN_TYPE_VNModRabinSign_BN == ctx->mType );
 
+	keyBits = ( keyBits + 1 ) / 2;
+
 	/* choose a prime p such that p mod 8 == 3 */
 	do
 		BN_generate_prime_ex( &zp, keyBits, 0, NULL, NULL, NULL);

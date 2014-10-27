@@ -109,6 +109,8 @@ int VNRabinEnc_GMP_GenKeys( VNAsymCryptCtx_t * ctx, int keyBits )
 	VNRabinEnc_GMP_Ctx_t * gmpCtx = VN_CONTAINER_OF( ctx, VNRabinEnc_GMP_Ctx_t, mCtx );
 	assert( VN_TYPE_VNRabinEnc_GMP == ctx->mType );
 
+	keyBits = ( keyBits + 1 ) / 2;
+
 	mpz_init( zrand );
 
 	VNIovecGetRandomBuffer( &seed, ( keyBits / 8 + 1 ) );
