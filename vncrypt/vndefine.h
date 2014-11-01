@@ -72,21 +72,23 @@ enum
 	/* rsa encryption */
 	VN_TYPE_VNRsaEnc_BN = 1,
 	VN_TYPE_VNRsaEnc_GMP = 2,
+	VN_TYPE_VNRsaEnc_CTP = 3,
 
 	VN_TYPE_VNRsaEnc_ORG = 10,
 
 	/* rabin encryption */
 	VN_TYPE_VNRabinEnc_BN = 11,
 	VN_TYPE_VNRabinEnc_GMP = 12,
+	VN_TYPE_VNRabinEnc_CTP = 13,
 
 	/* williams encryption */
 	VN_TYPE_VNWilliamsEnc_BN = 21,
 
 	/* Ecies encryption */
-	VN_TYPE_VNEcies_CTP = 31,
+	VN_TYPE_VNEcies_CTP = 41,
 
 	/* ElGamal encryption */
-	VN_TYPE_VNElGamal_CTP = 41,
+	VN_TYPE_VNElGamal_CTP = 51,
 
 	VN_TYPE_VNMaxEnc = 1000,
 
@@ -99,6 +101,7 @@ enum
 	/* rsa signature */
 	VN_TYPE_VNRsaSign_BN = 1000 + 1,
 	VN_TYPE_VNRsaSign_GMP = 1000 + 2,
+	VN_TYPE_VNRsaSign_CTP = 1000 + 3,
 
 	VN_TYPE_VNRsaSign_ORG = 1000 + 10,
 
@@ -107,6 +110,8 @@ enum
 	VN_TYPE_VNModRabinSign_GC = 1000 + 13,
 	VN_TYPE_VNModRabinSign_LIP = 1000 + 14,
 	VN_TYPE_VNModRabinSign_CTP = 1000 + 15,
+
+	VN_TYPE_VNRabinSign_CTP = 1000 + 21,
 
 	VN_TYPE_VNMaxSignType1 = 2000,
 

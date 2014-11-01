@@ -6,10 +6,11 @@ CPPFLAGS = $(CFLAGS) -Wno-invalid-offsetof
 
 LDFLAGS = 
 
-PROGS = testrsa_all testrsa_bn testrsa_gmp testrsa_org \
+PROGS = testrsa_all \
+	testrsa_bn testrsa_gmp testrsa_org testrsa_ctp \
 	testrabin_all \
 	testmodrabin_bn testmodrabin_gc testmodrabin_lip \
-	testrabin_gmp testrabin_bn \
+	testrabin_gmp testrabin_bn testrabin_ctp \
 	testwilliams_bn \
 	testdsa_org testecdsa_org \
 	testmodrabin_ctp testecies_ctp testelgamal_ctp
@@ -20,15 +21,18 @@ LIP_OBJS = lip/lip.o
 
 all: $(PROGS)
 
-testrsa_all: $(COMM_OBJS) vncrypt_bn.o vncrypt_gmp.o \
-		testrsa_all.o vnrsa_bn.o vnrsa_gmp.o vnrsa_org.o
-	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lcrypto -lgmp
+testrsa_all: $(COMM_OBJS) vncrypt_bn.o vncrypt_gmp.o vncrypt_ctp.o \
+		testrsa_all.o vnrsa_bn.o vnrsa_gmp.o vnrsa_org.o vnrsa_ctp.o
+	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lcrypto -lgmp -lcryptopp
 
 testrsa_bn: $(COMM_OBJS) testrsa_bn.o vnrsa_bn.o vncrypt_bn.o
 	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lcrypto
 
 testrsa_org: $(COMM_OBJS) testrsa_org.o vnrsa_org.o vncrypt_bn.o
 	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lcrypto
+
+testrsa_ctp: $(COMM_OBJS) testrsa_ctp.o vnrsa_ctp.o vncrypt_ctp.o
+	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lcryptopp
 
 testrsa_gmp: $(COMM_OBJS) testrsa_gmp.o vnrsa_gmp.o vncrypt_gmp.o
 	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lgmp
@@ -61,6 +65,9 @@ testrabin_bn: $(COMM_OBJS) testrabin_bn.o vnrabinenc_bn.o vncrypt_bn.o
 
 testrabin_gmp: $(COMM_OBJS) testrabin_gmp.o vnrabinenc_gmp.o vncrypt_gmp.o
 	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lgmp
+
+testrabin_ctp: $(COMM_OBJS) testrabin_ctp.o vnrabin_ctp.o vncrypt_ctp.o
+	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lcryptopp
 
 testwilliams_bn: $(COMM_OBJS) testwilliams_bn.o vncrypt_bn.o vnwilliams_bn.o
 	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lcrypto
