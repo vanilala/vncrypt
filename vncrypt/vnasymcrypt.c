@@ -160,14 +160,19 @@ void VNIovecPrint( const char * prompt, const struct vn_iovec * head, int toHex 
 	{
 		printf( "%s: %zd, ", prompt, next->i.iov_len );
 
-		if( toHex )
+		if( next->i.iov_len < 1024 )
 		{
-			for( i = 0; i < next->i.iov_len; i++ )
+			if( toHex )
 			{
-				printf( "%02x", ((unsigned char*)next->i.iov_base)[i] );
+				for( i = 0; i < next->i.iov_len; i++ )
+				{
+					printf( "%02x", ((unsigned char*)next->i.iov_base)[i] );
+				}
+			} else {
+				printf( "%s", (char*)next->i.iov_base );
 			}
 		} else {
-			printf( "%s", (char*)next->i.iov_base );
+			printf( "......" );
 		}
 
 		printf( "\n" );

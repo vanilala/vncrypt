@@ -14,11 +14,14 @@ PROGS = testrsa_all \
 	testwilliams_bn \
 	testrw_ctp \
 	testdsa_org testecdsa_org \
-	testecies_ctp testelgamal_ctp
+	testecies_ctp testelgamal_ctp \
+	testmqq_org
 
 COMM_OBJS = vnasymcrypt.o testcomm.o
 
 LIP_OBJS = lip/lip.o
+
+MQQ_OBJS = mqqsign/keygen.o mqqsign/mqq-sign.o mqqsign/mqq-verify.o
 
 all: $(PROGS)
 
@@ -87,6 +90,11 @@ testecies_ctp: $(COMM_OBJS) testecies_ctp.o vnecies_ctp.o
 
 testelgamal_ctp: $(COMM_OBJS) testelgamal_ctp.o vnelgamal_ctp.o
 	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lcryptopp
+
+testmqq_org: $(COMM_OBJS) testmqq_org.o vnmqq_org.o $(MQQ_OBJS)
+	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS)
+
+$(MQQ_OBJS): CFLAGS = -g
 
 test: $(PROGS)
 	for cmd in $(PROGS) ; \
