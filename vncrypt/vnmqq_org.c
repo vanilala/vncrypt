@@ -14,6 +14,12 @@ extern int sign(unsigned char *hash, const unsigned char *sk, uint8_t result[N/8
 extern int verify(const uint8_t Signature[N/8],
 	const uint8_t publicKey[PUBLICKEY_SIZE_L][PUBLICKEY_SIZE_S], uint8_t hash[PUBLICKEY_SIZE_S]);
 
+extern int crypto_sign( unsigned char *sm,unsigned long long *smlen,
+	const unsigned char *m,unsigned long long mlen, const unsigned char *sk);
+
+extern int crypto_sign_open( unsigned char *m,unsigned long long *mlen,
+	const unsigned char *sm,unsigned long long smlen, const unsigned char *pk);
+
 typedef struct tagVNMqq_ORG_Ctx {
 	VNAsymCryptCtx_t mCtx;
 
@@ -120,8 +126,8 @@ int VNMqq_ORG_LoadPubKey( VNAsymCryptCtx_t * ctx,
 		unsigned char c0 = ((unsigned char*)hexPubKey->i.iov_base)[ i ];
 		unsigned char c1 = ((unsigned char*)hexPubKey->i.iov_base)[ i + 1 ];
 
-		c0 = ( c0 >= 'A' ) ? ( c0 - 'A' ) : ( c0 - '1' );
-		c1 = ( c1 >= 'A' ) ? ( c1 - 'A' ) : ( c1 - '1' );
+		c0 = ( c0 >= 'A' ) ? ( c0 - 'A' + 10 ) : ( c0 - '0' );
+		c1 = ( c1 >= 'A' ) ? ( c1 - 'A' + 10 ) : ( c1 - '0' );
 
 		orgCtx->mPK[ i / 2 ] = ( ( c0 & 0xFF ) << 4 ) | ( c1 & 0xFF );
 	}
@@ -144,8 +150,8 @@ int VNMqq_ORG_LoadPrivKey( VNAsymCryptCtx_t * ctx,
 		unsigned char c0 = ((unsigned char*)hexPrivKey->i.iov_base)[ i ];
 		unsigned char c1 = ((unsigned char*)hexPrivKey->i.iov_base)[ i + 1 ];
 
-		c0 = ( c0 >= 'A' ) ? ( c0 - 'A' ) : ( c0 - '1' );
-		c1 = ( c1 >= 'A' ) ? ( c1 - 'A' ) : ( c1 - '1' );
+		c0 = ( c0 >= 'A' ) ? ( c0 - 'A' + 10 ) : ( c0 - '0' );
+		c1 = ( c1 >= 'A' ) ? ( c1 - 'A' + 10 ) : ( c1 - '0' );
 
 		orgCtx->mSK[ i / 2 ] = ( ( c0 & 0xFF ) << 4 ) | ( c1 & 0xFF );
 	}
@@ -157,7 +163,7 @@ int VNMqq_ORG_Sign( const VNAsymCryptCtx_t * ctx,
 	const unsigned char * plainText, int length,
 	struct vn_iovec * cipherText )
 {
-	unsigned char hash[ PUBLICKEY_SIZE_S ] = { 0 };
+	unsigned char hash[ N ] = { 0 };
 
 	const VNMqq_ORG_Ctx_t * orgCtx = VN_CONTAINER_OF( ctx, VNMqq_ORG_Ctx_t, mCtx );
 	assert( VN_TYPE_VNMqqSign_ORG == ctx->mType );
@@ -174,14 +180,17 @@ int VNMqq_ORG_Verify( const VNAsymCryptCtx_t * ctx,
 	const unsigned char * cipherText, int length,
 	const struct vn_iovec * plainText )
 {
-	unsigned char hash[ PUBLICKEY_SIZE_S ] = { 0 };
+	int cmpLen = 0;
+	unsigned char result[ N ] = { 0 };
 
 	const VNMqq_ORG_Ctx_t * orgCtx = VN_CONTAINER_OF( ctx, VNMqq_ORG_Ctx_t, mCtx );
 	assert( VN_TYPE_VNMqqSign_ORG == ctx->mType );
 
-	memcpy( hash, plainText->i.iov_base,
-		plainText->i.iov_len > sizeof( hash ) ? sizeof( hash ) : plainText->i.iov_len );
+	verify( cipherText, (const uint8_t (*)[PUBLICKEY_SIZE_S])orgCtx->mPK, result );
 
-	return verify( cipherText, (const uint8_t (*)[PUBLICKEY_SIZE_S])orgCtx->mPK, hash );
+	cmpLen = plainText->i.iov_len - PUBLICKEY_FIRST_ROW / 8;
+	cmpLen = cmpLen > ( PUBLICKEY_ROWS_TO_STORE / 8 ) ? ( PUBLICKEY_ROWS_TO_STORE / 8 ) : cmpLen;
+
+	return ( 0 == memcmp( result, ((char*)plainText->i.iov_base + PUBLICKEY_FIRST_ROW/8), cmpLen ) ) ? 0 : -1;
 }
 

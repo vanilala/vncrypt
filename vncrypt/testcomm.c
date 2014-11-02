@@ -26,7 +26,7 @@ static void VN_Usage( const char * program )
 			"\t\t[-r <run seconds>] [-d <debug>] { [-e <rsa e>] }\n", program );
 	printf( "\n" );
 	printf( "\t-k default 128, public key bits for n\n" );
-	printf( "\t-l default 13, [-l <src length>] should less than ( 1/4 * [-k <key bits>] )\n" );
+	printf( "\t-l default 13, [-l <src length>] should less than ( 1/8 * [-k <key bits>] )\n" );
 	printf( "\t-t default 1, use simple plain text for debug; set 2 to use random plain text\n" );
 	printf( "\t-r default 5, run 1 second for encrypt/decrypt\n" );
 	printf( "\t-d default 0, don't show debug message; set 1 to show debug message\n" );
@@ -318,6 +318,10 @@ void VN_Run_Impl( VNAsymCryptCtx_t * ctx, VNTestArgs_t * args, VNTestFunc_t * fu
 		} else {
 			printf( "OK\n" );
 		}
+	} else {
+		ret = func->mVerify( ctx, (unsigned char*)cipherText.i.iov_base,
+				cipherText.i.iov_len, &plainText );
+		printf( "Verifing ...... %s\n", 0 == ret ? "OK" : "FAIL" );
 	}
 
 	VNIovecFreeBufferAndTail( &srcText );

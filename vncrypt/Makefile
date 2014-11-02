@@ -109,5 +109,5 @@ test: $(PROGS)
 	gcc $(CPPFLAGS) -c -o $@ $<
 
 clean:
-	rm -f *.o lip/*.o $(PROGS) vgcore.* core
+	rm -f *.o $(LIP_OBJS) $(MQQ_OBJS) $(PROGS) vgcore.* core
 
