@@ -1,20 +1,37 @@
 VNCrypt: A library for asymmetric cryptography algorithm
 =======
 
-Currently include:
-  1. RSA signature/encryption scheme, three version
-     * OpenSSL's origin RSA
+Encryption schemes
+  1. RSA signature/encryption scheme
+     * OpenSSL
      * OpenSSL's BIGNUM
      * GMP
-  2. Modified-Rabin signature scheme, three version
+     * Cryptopp
+  2. Rabin encryption scheme
+     * OpenSSL's BIGNUM
+     * GMP
+  3. H. C. Williams encryption scheme
+     * OpenSSL's BIGNUM
+  4. ElGamal encryption scheme
+     * Cryptopp
+
+Integrated encryption schemes
+  1. ECIES encryption scheme
+     * Cryptopp
+
+Digital signature schemes with message recovery
+  1. Modified-Rabin signature scheme
      * OpenSSL's BIGNUM
      * libgcrypt's MPI
      * FreeLIP
-  3. Rabin encryption scheme, tow version
-     * OpenSSL's BIGNUM
-     * GMP
-  4. H. C. Williams encryption scheme
-     * OpenSSL's BIGNUM
+  2. Rabin-Williams signature scheme
+     * Cryptopp
+
+Digital signature schemes with appendix
+  1. DSA signature scheme
+     * OpenSSL
+  2. ECDSA signature scheme
+     * OpenSSL
 
 Licensing
 =========
