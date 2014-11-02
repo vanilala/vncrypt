@@ -23,13 +23,14 @@ static void VN_Usage( const char * program )
 {
 	printf( "\n" );
 	printf( "Usage: %s [-k <key bits>] [-l <src length>] [-t <src type>]\n"
-			"\t\t[-r <run seconds>] [-d <debug>]\n", program );
+			"\t\t[-r <run seconds>] [-d <debug>] { [-e <rsa e>] }\n", program );
 	printf( "\n" );
 	printf( "\t-k default 128, public key bits for n\n" );
 	printf( "\t-l default 13, [-l <src length>] should less than ( 1/4 * [-k <key bits>] )\n" );
 	printf( "\t-t default 1, use simple plain text for debug; set 2 to use random plain text\n" );
 	printf( "\t-r default 5, run 1 second for encrypt/decrypt\n" );
 	printf( "\t-d default 0, don't show debug message; set 1 to show debug message\n" );
+	printf( "\t-e default 3, only rsa need it\n" );
 	printf( "\n" );
 
 	exit( 0 );
@@ -47,6 +48,7 @@ int VN_Test( int argc, const char * argv[], VNTestEnv_t * env )
 		.mLength = 13,
 		.mSrcType = 1,
 		.mRunSeconds = 5,
+		.mRsaE = 3,
 	};
 
 	for( i = 1; i < argc; i += 2 )
@@ -60,10 +62,11 @@ int VN_Test( int argc, const char * argv[], VNTestEnv_t * env )
 		if( 0 == strcmp( argv[ i ], "-t" ) ) args.mSrcType = atoi( argv[ i + 1 ] );
 		if( 0 == strcmp( argv[ i ], "-r" ) ) args.mRunSeconds = atoi( argv[ i + 1 ] );
 		if( 0 == strcmp( argv[ i ], "-d" ) ) args.mDebug = atoi( argv[ i + 1 ] );
+		if( 0 == strcmp( argv[ i ], "-e" ) ) args.mRsaE = atoi( argv[ i + 1 ] );
 	}
 
-	printf( "\ncmd: %s -k %d -l %d -t %d -r %d -d %d\n", argv[0], args.mKeyBits,
-		args.mLength, args.mSrcType, args.mRunSeconds, args.mDebug );
+	printf( "\ncmd: %s -k %d -l %d -t %d -r %d -d %d -e %d\n", argv[0], args.mKeyBits,
+		args.mLength, args.mSrcType, args.mRunSeconds, args.mDebug, args.mRsaE );
 	printf( "run [%s -v] to see detail usage\n", argv[0] );
 	printf( "\n" );
 

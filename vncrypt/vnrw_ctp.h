@@ -6,31 +6,31 @@
 extern "C" {
 #endif
 
-VNAsymCryptCtx_t * VNModRabinSign_CTP_CtxNew();
+VNAsymCryptCtx_t * VNRWSign_CTP_CtxNew();
 
-void VNModRabin_CTP_CtxFree( VNAsymCryptCtx_t * ctx );
+void VNRW_CTP_CtxFree( VNAsymCryptCtx_t * ctx );
 
-int VNModRabin_CTP_GenKeys( VNAsymCryptCtx_t * ctx, int keyBits );
+int VNRW_CTP_GenKeys( VNAsymCryptCtx_t * ctx, int keyBits );
 
-void VNModRabin_CTP_ClearKeys( VNAsymCryptCtx_t * ctx );
+void VNRW_CTP_ClearKeys( VNAsymCryptCtx_t * ctx );
 
-int VNModRabin_CTP_DumpPubKey( const VNAsymCryptCtx_t * ctx,
+int VNRW_CTP_DumpPubKey( const VNAsymCryptCtx_t * ctx,
 	struct vn_iovec * hexPubKey );
 
-int VNModRabin_CTP_DumpPrivKey( const VNAsymCryptCtx_t * ctx,
+int VNRW_CTP_DumpPrivKey( const VNAsymCryptCtx_t * ctx,
 	struct vn_iovec * hexPubKey, struct vn_iovec * hexPrivKey );
 
-int VNModRabin_CTP_LoadPubKey( VNAsymCryptCtx_t * ctx,
+int VNRW_CTP_LoadPubKey( VNAsymCryptCtx_t * ctx,
 	const struct vn_iovec * hexPubKey );
 
-int VNModRabin_CTP_LoadPrivKey( VNAsymCryptCtx_t * ctx,
+int VNRW_CTP_LoadPrivKey( VNAsymCryptCtx_t * ctx,
 	const struct vn_iovec * hexPubKey, const struct vn_iovec * hexPrivKey );
 
-int VNModRabin_CTP_PrivEncrypt( const VNAsymCryptCtx_t * ctx,
+int VNRW_CTP_PrivEncrypt( const VNAsymCryptCtx_t * ctx,
 	const unsigned char * plainText, int length,
 	struct vn_iovec * cipherText );
 
-int VNModRabin_CTP_PubDecrypt( const VNAsymCryptCtx_t * ctx,
+int VNRW_CTP_PubDecrypt( const VNAsymCryptCtx_t * ctx,
 	const unsigned char * cipherText, int length,
 	struct vn_iovec * plainText );
 

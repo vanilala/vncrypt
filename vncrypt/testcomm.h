@@ -9,6 +9,7 @@ typedef struct tagVNTestArgs {
         int mArgc;
         const char ** mArgv;
 
+	int mRsaE;
 	int mDebug;
 	int mKeyBits;
 	int mLength;

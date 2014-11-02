@@ -1,5 +1,5 @@
 
-#include "vnmodrabin_ctp.h"
+#include "vnrw_ctp.h"
 #include "vncrypt_ctp.h"
 
 #include <crypto++/osrng.h>
@@ -13,7 +13,7 @@
 using namespace CryptoPP;
 using namespace std;
 
-typedef struct tagVNModRabin_CTP_Ctx {
+typedef struct tagVNRW_CTP_Ctx {
 	VNAsymCryptCtx_t mCtx;
 
 	AutoSeededRandomPool mRng;
@@ -21,79 +21,68 @@ typedef struct tagVNModRabin_CTP_Ctx {
 	RW::PublicKey * mPubKey;
 	RW::PrivateKey * mPrivKey;
 
-	RWSS<PSSR, SHA>::Signer * mSigner;
-	RWSS<PSSR, SHA>::Verifier * mVerifier;
-} VNModRabin_CTP_Ctx_t;
+} VNRW_CTP_Ctx_t;
 
-VNAsymCryptCtx_t * VNModRabinSign_CTP_CtxNew()
+VNAsymCryptCtx_t * VNRWSign_CTP_CtxNew()
 {
-	VNModRabin_CTP_Ctx_t * ctpCtx = new VNModRabin_CTP_Ctx_t();
+	VNRW_CTP_Ctx_t * ctpCtx = new VNRW_CTP_Ctx_t();
 
-	ctpCtx->mCtx.mType = VN_TYPE_VNModRabinSign_CTP;
+	ctpCtx->mCtx.mType = VN_TYPE_VNRWSign_CTP;
 
-	ctpCtx->mCtx.mMethod.mCtxFree = VNModRabin_CTP_CtxFree;
-	ctpCtx->mCtx.mMethod.mGenKeys = VNModRabin_CTP_GenKeys;
-	ctpCtx->mCtx.mMethod.mClearKeys = VNModRabin_CTP_ClearKeys;
-	ctpCtx->mCtx.mMethod.mDumpPubKey = VNModRabin_CTP_DumpPubKey;
-	ctpCtx->mCtx.mMethod.mDumpPrivKey = VNModRabin_CTP_DumpPrivKey;
-	ctpCtx->mCtx.mMethod.mLoadPubKey = VNModRabin_CTP_LoadPubKey;
-	ctpCtx->mCtx.mMethod.mLoadPrivKey = VNModRabin_CTP_LoadPrivKey;
-	ctpCtx->mCtx.mMethod.mPrivEncrypt = VNModRabin_CTP_PrivEncrypt;
-	ctpCtx->mCtx.mMethod.mPubDecrypt = VNModRabin_CTP_PubDecrypt;
+	ctpCtx->mCtx.mMethod.mCtxFree = VNRW_CTP_CtxFree;
+	ctpCtx->mCtx.mMethod.mGenKeys = VNRW_CTP_GenKeys;
+	ctpCtx->mCtx.mMethod.mClearKeys = VNRW_CTP_ClearKeys;
+	ctpCtx->mCtx.mMethod.mDumpPubKey = VNRW_CTP_DumpPubKey;
+	ctpCtx->mCtx.mMethod.mDumpPrivKey = VNRW_CTP_DumpPrivKey;
+	ctpCtx->mCtx.mMethod.mLoadPubKey = VNRW_CTP_LoadPubKey;
+	ctpCtx->mCtx.mMethod.mLoadPrivKey = VNRW_CTP_LoadPrivKey;
+	ctpCtx->mCtx.mMethod.mPrivEncrypt = VNRW_CTP_PrivEncrypt;
+	ctpCtx->mCtx.mMethod.mPubDecrypt = VNRW_CTP_PubDecrypt;
 
 	ctpCtx->mPrivKey = NULL;
 	ctpCtx->mPubKey = NULL;
 
-	ctpCtx->mVerifier = NULL;
-	ctpCtx->mVerifier = NULL;
-
 	return &( ctpCtx->mCtx );
 }
 
-void VNModRabin_CTP_CtxFree( VNAsymCryptCtx_t * ctx )
+void VNRW_CTP_CtxFree( VNAsymCryptCtx_t * ctx )
 {
-	const VNModRabin_CTP_Ctx_t * ctpCtx = VN_CONTAINER_OF( ctx, VNModRabin_CTP_Ctx_t, mCtx );
-	assert( VN_TYPE_VNModRabinSign_CTP == ctx->mType );
+	const VNRW_CTP_Ctx_t * ctpCtx = VN_CONTAINER_OF( ctx, VNRW_CTP_Ctx_t, mCtx );
+	assert( VN_TYPE_VNRWSign_CTP == ctx->mType );
 
-	VNModRabin_CTP_ClearKeys( ctx );
+	VNRW_CTP_ClearKeys( ctx );
 
 	delete ctpCtx;
 }
 
-int VNModRabin_CTP_GenKeys( VNAsymCryptCtx_t * ctx, int keyBits )
+int VNRW_CTP_GenKeys( VNAsymCryptCtx_t * ctx, int keyBits )
 {
-	VNModRabin_CTP_Ctx_t * ctpCtx = VN_CONTAINER_OF( ctx, VNModRabin_CTP_Ctx_t, mCtx );
-	assert( VN_TYPE_VNModRabinSign_CTP == ctx->mType );
+	VNRW_CTP_Ctx_t * ctpCtx = VN_CONTAINER_OF( ctx, VNRW_CTP_Ctx_t, mCtx );
+	assert( VN_TYPE_VNRWSign_CTP == ctx->mType );
 
 	ctpCtx->mPrivKey = new RW::PrivateKey();
 	ctpCtx->mPubKey = new RW::PublicKey();
 
-	ctpCtx->mPrivKey->GenerateRandomWithKeySize( ctpCtx->mRng, keyBits );
+	ctpCtx->mPrivKey->Initialize( ctpCtx->mRng, keyBits );
 	ctpCtx->mPubKey->Initialize( ctpCtx->mPrivKey->GetModulus() );
-
-	ctpCtx->mSigner = new RWSS<PSSR, SHA>::Signer( *( ctpCtx->mPrivKey ) );
-	ctpCtx->mVerifier = new RWSS<PSSR, SHA>::Verifier( *( ctpCtx->mPubKey ) );
 
 	return 0;
 }
 
-void VNModRabin_CTP_ClearKeys( VNAsymCryptCtx_t * ctx )
+void VNRW_CTP_ClearKeys( VNAsymCryptCtx_t * ctx )
 {
-	VNModRabin_CTP_Ctx_t * ctpCtx = VN_CONTAINER_OF( ctx, VNModRabin_CTP_Ctx_t, mCtx );
-	assert( VN_TYPE_VNModRabinSign_CTP == ctx->mType );
+	VNRW_CTP_Ctx_t * ctpCtx = VN_CONTAINER_OF( ctx, VNRW_CTP_Ctx_t, mCtx );
+	assert( VN_TYPE_VNRWSign_CTP == ctx->mType );
 
 	if( NULL != ctpCtx->mPrivKey ) delete ctpCtx->mPrivKey, ctpCtx->mPrivKey = NULL;
 	if( NULL != ctpCtx->mPubKey ) delete ctpCtx->mPubKey, ctpCtx->mPubKey = NULL;
-
-	if( NULL != ctpCtx->mSigner ) delete ctpCtx->mSigner, ctpCtx->mSigner = NULL;
-	if( NULL != ctpCtx->mVerifier ) delete ctpCtx->mVerifier, ctpCtx->mVerifier = NULL;
 }
 
-int VNModRabin_CTP_DumpPubKey( const VNAsymCryptCtx_t * ctx,
+int VNRW_CTP_DumpPubKey( const VNAsymCryptCtx_t * ctx,
 	struct vn_iovec * hexPubKey )
 {
-	const VNModRabin_CTP_Ctx_t * ctpCtx = VN_CONTAINER_OF( ctx, VNModRabin_CTP_Ctx_t, mCtx );
-	assert( VN_TYPE_VNModRabinSign_CTP == ctx->mType );
+	const VNRW_CTP_Ctx_t * ctpCtx = VN_CONTAINER_OF( ctx, VNRW_CTP_Ctx_t, mCtx );
+	assert( VN_TYPE_VNRWSign_CTP == ctx->mType );
 
 	if( NULL == ctpCtx->mPubKey ) return 0;
 
@@ -102,13 +91,13 @@ int VNModRabin_CTP_DumpPubKey( const VNAsymCryptCtx_t * ctx,
 	return 0;
 }
 
-int VNModRabin_CTP_DumpPrivKey( const VNAsymCryptCtx_t * ctx,
+int VNRW_CTP_DumpPrivKey( const VNAsymCryptCtx_t * ctx,
 	struct vn_iovec * hexPubKey, struct vn_iovec * hexPrivKey )
 {
-	const VNModRabin_CTP_Ctx_t * ctpCtx = VN_CONTAINER_OF( ctx, VNModRabin_CTP_Ctx_t, mCtx );
-	assert( VN_TYPE_VNModRabinSign_CTP == ctx->mType );
+	const VNRW_CTP_Ctx_t * ctpCtx = VN_CONTAINER_OF( ctx, VNRW_CTP_Ctx_t, mCtx );
+	assert( VN_TYPE_VNRWSign_CTP == ctx->mType );
 
-	VNModRabin_CTP_DumpPubKey( ctx, hexPubKey );
+	VNRW_CTP_DumpPubKey( ctx, hexPubKey );
 
 	if( NULL == ctpCtx->mPrivKey ) return 0;
 
@@ -125,27 +114,26 @@ int VNModRabin_CTP_DumpPrivKey( const VNAsymCryptCtx_t * ctx,
 	return 0;
 }
 
-int VNModRabin_CTP_LoadPubKey( VNAsymCryptCtx_t * ctx,
+int VNRW_CTP_LoadPubKey( VNAsymCryptCtx_t * ctx,
 	const struct vn_iovec * hexPubKey )
 {
-	VNModRabin_CTP_Ctx_t * ctpCtx = VN_CONTAINER_OF( ctx, VNModRabin_CTP_Ctx_t, mCtx );
-	assert( VN_TYPE_VNModRabinSign_CTP == ctx->mType );
+	VNRW_CTP_Ctx_t * ctpCtx = VN_CONTAINER_OF( ctx, VNRW_CTP_Ctx_t, mCtx );
+	assert( VN_TYPE_VNRWSign_CTP == ctx->mType );
 
 	Integer n;
 	VN_CTP_load_hex( hexPubKey, &n );
 
 	ctpCtx->mPubKey = new RW::PublicKey();
 	ctpCtx->mPubKey->Initialize( n );
-	ctpCtx->mVerifier = new RWSS<PSSR, SHA>::Verifier( *( ctpCtx->mPubKey ) );
 
 	return 0;
 }
 
-int VNModRabin_CTP_LoadPrivKey( VNAsymCryptCtx_t * ctx,
+int VNRW_CTP_LoadPrivKey( VNAsymCryptCtx_t * ctx,
 	const struct vn_iovec * hexPubKey, const struct vn_iovec * hexPrivKey )
 {
-	VNModRabin_CTP_Ctx_t * ctpCtx = VN_CONTAINER_OF( ctx, VNModRabin_CTP_Ctx_t, mCtx );
-	assert( VN_TYPE_VNModRabinSign_CTP == ctx->mType );
+	VNRW_CTP_Ctx_t * ctpCtx = VN_CONTAINER_OF( ctx, VNRW_CTP_Ctx_t, mCtx );
+	assert( VN_TYPE_VNRWSign_CTP == ctx->mType );
 
 	Integer n, p, q, u;
 
@@ -157,40 +145,51 @@ int VNModRabin_CTP_LoadPrivKey( VNAsymCryptCtx_t * ctx,
 
 	ctpCtx->mPrivKey = new RW::PrivateKey();
 	ctpCtx->mPrivKey->Initialize( n, p, q, u );
-	ctpCtx->mSigner = new RWSS<PSSR, SHA>::Signer( *( ctpCtx->mPrivKey ) );
 
 	return 0;
 }
 
-int VNModRabin_CTP_PrivEncrypt( const VNAsymCryptCtx_t * ctx,
+int VNRW_CTP_PrivEncrypt( const VNAsymCryptCtx_t * ctx,
 	const unsigned char * plainText, int length,
 	struct vn_iovec * cipherText )
 {
-	VNModRabin_CTP_Ctx_t * ctpCtx = VN_CONTAINER_OF( ctx, VNModRabin_CTP_Ctx_t, mCtx );
-	assert( VN_TYPE_VNModRabinSign_CTP == ctx->mType );
+	VNRW_CTP_Ctx_t * ctpCtx = VN_CONTAINER_OF( ctx, VNRW_CTP_Ctx_t, mCtx );
+	assert( VN_TYPE_VNRWSign_CTP == ctx->mType );
 
-	cipherText->i.iov_len = ctpCtx->mSigner->MaxSignatureLength();
-	cipherText->i.iov_base = malloc( cipherText->i.iov_len + 1);
+	Integer m( (const byte*)plainText, length );
 
-	cipherText->i.iov_len = ctpCtx->mSigner->SignMessageWithRecovery( ctpCtx->mRng,
-		(const byte*)plainText, (size_t)length, NULL, 0, (byte*)cipherText->i.iov_base );
+	m = m * 16 + 12;
+
+	if( m >= ctpCtx->mPrivKey->GetModulus() )
+	{
+		return VN_ERR_PLAINTEXT_TOO_LONG;
+	}
+
+	Integer c = ctpCtx->mPrivKey->CalculateInverse( ctpCtx->mRng, m );
+
+	cipherText->i.iov_len = c.MinEncodedSize();
+	cipherText->i.iov_base = malloc( cipherText->i.iov_len + 1 );
+	c.Encode( (byte *)cipherText->i.iov_base, cipherText->i.iov_len );
 
 	return 0;
 }
 
-int VNModRabin_CTP_PubDecrypt( const VNAsymCryptCtx_t * ctx,
+int VNRW_CTP_PubDecrypt( const VNAsymCryptCtx_t * ctx,
 	const unsigned char * cipherText, int length,
 	struct vn_iovec * plainText )
 {
-	VNModRabin_CTP_Ctx_t * ctpCtx = VN_CONTAINER_OF( ctx, VNModRabin_CTP_Ctx_t, mCtx );
-	assert( VN_TYPE_VNModRabinSign_CTP == ctx->mType );
+	VNRW_CTP_Ctx_t * ctpCtx = VN_CONTAINER_OF( ctx, VNRW_CTP_Ctx_t, mCtx );
+	assert( VN_TYPE_VNRWSign_CTP == ctx->mType );
 
-	plainText->i.iov_len = ctpCtx->mVerifier->MaxRecoverableLengthFromSignatureLength( length );
+	Integer c( (const byte*)cipherText, length );
+
+	Integer m = ctpCtx->mPubKey->ApplyFunction( c );
+
+	m = ( m - 12 ) / 16;
+
+	plainText->i.iov_len = m.MinEncodedSize();
 	plainText->i.iov_base = malloc( plainText->i.iov_len + 1 );
-
-	DecodingResult result = ctpCtx->mVerifier->RecoverMessage(
-		(byte *)plainText->i.iov_base, NULL, 0, cipherText, (size_t)length );
-	plainText->i.iov_len = result.messageLength;
+	m.Encode( (byte *)plainText->i.iov_base, plainText->i.iov_len );
 
 	return 0;
 }

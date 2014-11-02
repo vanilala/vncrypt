@@ -4,7 +4,7 @@ CFLAGS = -Wall -Werror -g
 
 CPPFLAGS = $(CFLAGS) -Wno-invalid-offsetof
 
-LDFLAGS = 
+LDFLAGS =
 
 PROGS = testrsa_all \
 	testrsa_bn testrsa_gmp testrsa_org testrsa_ctp \
@@ -12,8 +12,9 @@ PROGS = testrsa_all \
 	testmodrabin_bn testmodrabin_gc testmodrabin_lip \
 	testrabin_gmp testrabin_bn testrabin_ctp \
 	testwilliams_bn \
+	testrw_ctp \
 	testdsa_org testecdsa_org \
-	testmodrabin_ctp testecies_ctp testelgamal_ctp
+	testecies_ctp testelgamal_ctp
 
 COMM_OBJS = vnasymcrypt.o testcomm.o
 
@@ -78,7 +79,7 @@ testdsa_org: $(COMM_OBJS) testdsa_org.o vndsa_org.o vncrypt_bn.o
 testecdsa_org: $(COMM_OBJS) testecdsa_org.o vnecdsa_org.o vncrypt_bn.o
 	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lcrypto
 
-testmodrabin_ctp: $(COMM_OBJS) vncrypt_ctp.o testmodrabin_ctp.o vnmodrabin_ctp.o
+testrw_ctp: $(COMM_OBJS) vncrypt_ctp.o testrw_ctp.o vnrw_ctp.o
 	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lcryptopp
 
 testecies_ctp: $(COMM_OBJS) testecies_ctp.o vnecies_ctp.o
