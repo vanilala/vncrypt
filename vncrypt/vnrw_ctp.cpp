@@ -107,10 +107,6 @@ int VNRW_CTP_DumpPrivKey( const VNAsymCryptCtx_t * ctx,
 	hexPrivKey = hexPrivKey->next;
 	VN_CTP_dump_hex( (void*)&( ctpCtx->mPrivKey->GetPrime2() ), hexPrivKey );
 
-	hexPrivKey->next = (struct vn_iovec*)calloc( sizeof( struct vn_iovec ), 1 );
-	hexPrivKey = hexPrivKey->next;
-	VN_CTP_dump_hex( (void*)&( ctpCtx->mPrivKey->GetMultiplicativeInverseOfPrime2ModPrime1() ), hexPrivKey );
-
 	return 0;
 }
 
@@ -141,10 +137,13 @@ int VNRW_CTP_LoadPrivKey( VNAsymCryptCtx_t * ctx,
 
 	VN_CTP_load_hex( hexPrivKey, &p );
 	VN_CTP_load_hex( hexPrivKey->next, &q );
-	VN_CTP_load_hex( hexPrivKey->next->next, &u );
+
+	u = q.InverseMod( p );
 
 	ctpCtx->mPrivKey = new RW::PrivateKey();
 	ctpCtx->mPrivKey->Initialize( n, p, q, u );
+
+	VNRW_CTP_LoadPubKey( ctx, hexPubKey );
 
 	return 0;
 }

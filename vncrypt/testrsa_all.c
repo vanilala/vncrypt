@@ -55,7 +55,7 @@ void test( VNTestArgs_t * args )
 		printf( "GMP %d\n", ret );
 
 		ret = VNAsymCryptPrivEncrypt( ctpCtx, srcPlain.i.iov_base, args->mLength, &ctpCipher );
-		printf( "GMP %d\n", ret );
+		printf( "CTP %d\n", ret );
 
 		VNIovecPrint( "ORG", &orgCipher, 1 );
 		VNIovecPrint( "BN ", &bnCipher, 1 );
@@ -79,7 +79,7 @@ void test( VNTestArgs_t * args )
 
 		ret = VNAsymCryptPubDecrypt( ctpCtx, ctpCipher.i.iov_base, ctpCipher.i.iov_len,
 			&ctpPlain, args->mLength );
-		printf( "GMP %d\n", ret );
+		printf( "CTP %d\n", ret );
 
 		VNIovecPrint( "ORG", &orgPlain, 1 );
 		VNIovecPrint( "BN ", &bnPlain, 1 );
@@ -108,7 +108,7 @@ void test( VNTestArgs_t * args )
 		printf( "GMP %d\n", ret );
 
 		ret = VNAsymCryptPubEncrypt( ctpCtx, srcPlain.i.iov_base, args->mLength, &ctpCipher );
-		printf( "GMP %d\n", ret );
+		printf( "CTP %d\n", ret );
 
 		VNIovecPrint( "ORG", &orgCipher, 1 );
 		VNIovecPrint( "BN ", &bnCipher, 1 );
@@ -132,7 +132,7 @@ void test( VNTestArgs_t * args )
 
 		ret = VNAsymCryptPrivDecrypt( ctpCtx, ctpCipher.i.iov_base, ctpCipher.i.iov_len,
 			&ctpPlain, args->mLength );
-		printf( "GMP %d\n", ret );
+		printf( "CTP %d\n", ret );
 
 		VNIovecPrint( "ORG", &orgPlain, 1 );
 		VNIovecPrint( "BN ", &bnPlain, 1 );

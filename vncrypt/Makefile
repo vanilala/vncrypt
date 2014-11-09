@@ -6,22 +6,33 @@ CPPFLAGS = $(CFLAGS) -Wno-invalid-offsetof
 
 LDFLAGS =
 
-PROGS = testrsa_all \
-	testrsa_bn testrsa_gmp testrsa_org testrsa_ctp \
-	testrabin_all \
-	testmodrabin_bn testmodrabin_gc testmodrabin_lip \
-	testrabin_gmp testrabin_bn testrabin_ctp \
-	testwilliams_bn \
-	testrw_ctp \
-	testdsa_org testecdsa_org \
-	testecies_ctp testelgamal_ctp \
+######################################################################
+
+BN_PROGS = testrsa_bn testmodrabin_bn testrabin_bn testwilliams_bn
+
+ORG_PROGS = testrsa_org testdsa_org testecdsa_org
+
+GMP_PROGS = testrsa_gmp testrabin_gmp testrw_gmp testmodrabin_gmp
+
+CTP_PROGS = testrsa_ctp testrabin_ctp testrw_ctp testecies_ctp testelgamal_ctp
+
+GC_PROGS = testmodrabin_gc 
+
+LIP_PROGS = testmodrabin_lip
+
+PROGS = $(LIP_PROGS) $(BN_PROGS) $(ORG_PROGS) $(GMP_PROGS) $(CTP_PROGS) $(GC_PROGS) \
+	testrsa_all testrabin_all testrw_all \
 	testmqq_org
+
+######################################################################
 
 COMM_OBJS = vnasymcrypt.o testcomm.o
 
 LIP_OBJS = lip/lip.o
 
 MQQ_OBJS = mqqsign/keygen.o mqqsign/mqq-sign.o mqqsign/mqq-verify.o
+
+######################################################################
 
 all: $(PROGS)
 
@@ -51,6 +62,9 @@ testrabin_all: $(COMM_OBJS) \
 
 testmodrabin_bn: $(COMM_OBJS) vncrypt_bn.o testmodrabin_bn.o vnmodrabin_bn.o
 	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lcrypto
+
+testmodrabin_gmp: $(COMM_OBJS) vncrypt_gmp.o testmodrabin_gmp.o vnmodrabin_gmp.o
+	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lgmp
 
 testmodrabin_gc: $(COMM_OBJS) vncrypt_gc.o testmodrabin_gc.o vnmodrabin_gc.o
 	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lgcrypt -lgpg-error
@@ -82,8 +96,14 @@ testdsa_org: $(COMM_OBJS) testdsa_org.o vndsa_org.o vncrypt_bn.o
 testecdsa_org: $(COMM_OBJS) testecdsa_org.o vnecdsa_org.o vncrypt_bn.o
 	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lcrypto
 
+testrw_all: $(COMM_OBJS) vncrypt_ctp.o vnrw_ctp.o vncrypt_gmp.o vnrw_gmp.o testrw_all.o
+	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lcryptopp -lgmp
+
 testrw_ctp: $(COMM_OBJS) vncrypt_ctp.o testrw_ctp.o vnrw_ctp.o
 	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lcryptopp
+
+testrw_gmp: $(COMM_OBJS) vncrypt_gmp.o testrw_gmp.o vnrw_gmp.o
+	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lgmp
 
 testecies_ctp: $(COMM_OBJS) testecies_ctp.o vnecies_ctp.o
 	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lcryptopp

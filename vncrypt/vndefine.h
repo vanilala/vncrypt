@@ -83,6 +83,7 @@ enum
 
 	/* williams encryption */
 	VN_TYPE_VNWilliamsEnc_BN = 21,
+	VN_TYPE_VNRWEnc_GMP = 22,
 
 	/* Ecies encryption */
 	VN_TYPE_VNEcies_CTP = 41,
@@ -107,12 +108,14 @@ enum
 
 	/* modified rabin signature */
 	VN_TYPE_VNModRabinSign_BN = 1000 + 11,
+	VN_TYPE_VNModRabinSign_GMP = 1000 + 12,
 	VN_TYPE_VNModRabinSign_GC = 1000 + 13,
 	VN_TYPE_VNModRabinSign_LIP = 1000 + 14,
 
 	VN_TYPE_VNRabinSign_CTP = 1000 + 21,
 
 	VN_TYPE_VNRWSign_CTP = 1000 + 31,
+	VN_TYPE_VNRWSign_GMP = 1000 + 32,
 
 	VN_TYPE_VNMaxSignType1 = 2000,
 
