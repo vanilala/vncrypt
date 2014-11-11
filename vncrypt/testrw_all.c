@@ -20,18 +20,6 @@ void test( VNTestArgs_t * args )
 	VNAsymCryptCtx_t * gmpCtx = VNRWSign_GMP_CtxNew();
 	VNAsymCryptCtx_t * ctpCtx = VNRWSign_CTP_CtxNew();
 
-#if 1
-	printf( "###### GenKeys from CTP ######\n" );
-	VNAsymCryptGenKeys( ctpCtx, args->mKeyBits );
-	VN_PrintKey( ctpCtx );
-
-	VNAsymCryptDumpPrivKey( ctpCtx, &pubKey, &privKey );
-
-	printf( "###### LoadKeys to GMP ######\n" );
-	VNAsymCryptLoadPrivKey( gmpCtx, &pubKey, &privKey );
-	VN_PrintKey( gmpCtx );
-#else
-
 	printf( "###### GenKeys from GMP ######\n" );
 	VNAsymCryptGenKeys( gmpCtx, args->mKeyBits );
 	VN_PrintKey( gmpCtx );
@@ -41,7 +29,6 @@ void test( VNTestArgs_t * args )
 	printf( "###### LoadKeys to CTP ######\n" );
 	VNAsymCryptLoadPrivKey( ctpCtx, &pubKey, &privKey );
 	VN_PrintKey( ctpCtx );
-#endif
 
 	printf( "###### Try PrivEncrypt ######\n" );
 	{

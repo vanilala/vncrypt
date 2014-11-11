@@ -4,6 +4,8 @@
 #include <crypto++/hex.h>
 #include <crypto++/integer.h>
 
+#include <stdio.h>
+
 using namespace CryptoPP;
 
 void VN_CTP_dump_hex( void * integer, struct vn_iovec * hex )
@@ -23,6 +25,7 @@ void VN_CTP_load_hex( const struct vn_iovec * hex, void * integer )
 
 	HexDecoder decoder;
 	decoder.Put2( (byte*)hex->i.iov_base, hex->i.iov_len, 1, 1 );
-	p->Decode( decoder, hex->i.iov_len / 2 );
+
+	p->Decode( decoder, decoder.MaxRetrievable() );
 }
 
