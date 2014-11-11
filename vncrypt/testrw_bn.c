@@ -1,13 +1,13 @@
 
-#include "vnwilliams_bn.h"
+#include "vnrw_bn.h"
 #include "testcomm.h"
 
 int main( int argc, const char * argv[] )
 {
 	VNTestEnv_t env = {
 		.mTestMain = NULL,
-		.mSignCtxNew = VNWilliamsEnc_BN_CtxNew,
-		.mEncCtxNew = NULL,
+		.mSignCtxNew = VNRWSign_BN_CtxNew,
+		.mEncCtxNew = VNRWEnc_BN_CtxNew,
 	};
 
 	VN_Test( argc, argv, &env );

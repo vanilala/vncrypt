@@ -8,7 +8,7 @@ LDFLAGS =
 
 ######################################################################
 
-BN_PROGS = testrsa_bn testmodrabin_bn testrabin_bn testwilliams_bn
+BN_PROGS = testrsa_bn testmodrabin_bn testrabin_bn testrw_bn
 
 ORG_PROGS = testrsa_org testdsa_org testecdsa_org
 
@@ -64,8 +64,9 @@ testrabin_all: $(COMM_OBJS) \
 		$(LIP_OBJS)
 	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lcrypto -lgmp -lgcrypt -lgpg-error -lm
 
-testrw_all: $(COMM_OBJS) vncrypt_ctp.o vnrw_ctp.o vncrypt_gmp.o vnrw_gmp.o testrw_all.o
-	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lgmp -lcryptopp
+testrw_all: $(COMM_OBJS) vncrypt_ctp.o vncrypt_gmp.o vncrypt_bn.o \
+		vnrw_ctp.o vnrw_gmp.o vnrw_bn.o testrw_all.o
+	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lgmp -lcryptopp -lcrypto
 
 #=====================================================================
 
@@ -95,7 +96,7 @@ testmodrabin_bn: $(COMM_OBJS) vncrypt_bn.o testmodrabin_bn.o vnmodrabin_bn.o
 testrabin_bn: $(COMM_OBJS) testrabin_bn.o vnrabinenc_bn.o vncrypt_bn.o
 	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lcrypto
 
-testwilliams_bn: $(COMM_OBJS) testwilliams_bn.o vncrypt_bn.o vnwilliams_bn.o
+testrw_bn: $(COMM_OBJS) testrw_bn.o vncrypt_bn.o vnrw_bn.o
 	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lcrypto
 
 testdsa_org: $(COMM_OBJS) testdsa_org.o vndsa_org.o vncrypt_bn.o
