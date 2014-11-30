@@ -143,6 +143,25 @@ void VN_BN_gcdext( const BIGNUM * za, const BIGNUM * zb,
 	BN_free( &tmp );
 }
 
+int VN_BN_lcm( BIGNUM * zr,const BIGNUM * za,const BIGNUM * zb,BN_CTX * ctx )
+{
+	BIGNUM gcd, n;
+
+	BN_init( &gcd );
+	BN_init( &n );
+
+	BN_mul( &n, za, zb, ctx );
+
+	BN_gcd( &gcd, za, zb, ctx );
+
+	BN_div( zr, NULL, &n, &gcd, ctx );
+
+	BN_free( &gcd );
+	BN_free( &n );
+
+	return 0;
+}
+
 void VN_BN_dump_hex( const BIGNUM * za, struct vn_iovec * hex )
 {
 	char * tmp = BN_bn2hex( za );

@@ -1,18 +1,12 @@
 
-#include "vnrsa_org.h"
+#include "vnp1363rw_bn.h"
 #include "testcomm.h"
-
-#include <openssl/err.h>
 
 void test( VNTestArgs_t * args )
 {
-	VNAsymCryptCtx_t * ctx = VNRsaSign_ORG_CtxNew( args->mE );
+	if( 3 == args->mE ) args->mE = 2;
 
-	VN_Run( ctx, args );
-
-	VNAsymCryptCtxFree( ctx );
-
-	ctx = VNRsaEnc_ORG_CtxNew( args->mE );
+	VNAsymCryptCtx_t * ctx = VNP1363RWSign_BN_CtxNew( args->mE );
 
 	VN_Run( ctx, args );
 
@@ -27,11 +21,7 @@ int main( int argc, const char * argv[] )
 		.mEncCtxNew = NULL,
 	};
 
-	ERR_load_crypto_strings();
-
 	VN_Test( argc, argv, &env );
-
-	ERR_free_strings();
 
 	return 0;
 }

@@ -307,9 +307,7 @@ int VNRW_BN_PubEncrypt( const VNAsymCryptCtx_t * ctx,
 
 	VNRW_BN_E2( ctx, &zm );
 
-	cipherText->i.iov_len = BN_num_bytes( &zm );
-	cipherText->i.iov_base = malloc( cipherText->i.iov_len + 1);
-	BN_bn2bin( &zm, cipherText->i.iov_base );
+	VN_BN_dump_bin( &zm, cipherText );
 
 	BN_free( &zm );
 
@@ -330,9 +328,7 @@ int VNRW_BN_PrivDecrypt( const VNAsymCryptCtx_t * ctx,
 
 	VNRW_BN_D1( ctx, &zm );
 
-	plainText->i.iov_len = BN_num_bytes( &zm );
-	plainText->i.iov_base = malloc( plainText->i.iov_len + 1);
-	BN_bn2bin( &zm, plainText->i.iov_base );
+	VN_BN_dump_bin( &zm, plainText );
 
 	BN_free( &zm );
 
@@ -361,9 +357,7 @@ int VNRW_BN_PrivEncrypt( const VNAsymCryptCtx_t * ctx,
 
 	VNRW_BN_D2( ctx, &zm );
 
-	cipherText->i.iov_len = BN_num_bytes( &zm );
-	cipherText->i.iov_base = malloc( cipherText->i.iov_len + 1);
-	BN_bn2bin( &zm, cipherText->i.iov_base );
+	VN_BN_dump_bin( &zm, cipherText );
 
 	BN_free( &zm );
 
@@ -384,9 +378,7 @@ int VNRW_BN_PubDecrypt( const VNAsymCryptCtx_t * ctx,
 
 	VNRW_BN_D1( ctx, &zm );
 
-	plainText->i.iov_len = BN_num_bytes( &zm );
-	plainText->i.iov_base = malloc( plainText->i.iov_len + 1);
-	BN_bn2bin( &zm, plainText->i.iov_base );
+	VN_BN_dump_bin( &zm, plainText );
 
 	BN_free( &zm );
 

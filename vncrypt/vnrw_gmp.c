@@ -1,8 +1,8 @@
 /**
  *
- * RW
+ * Williams Encryption scheme
  *
- * See "IEEE Std 1363-2000"
+ * See "A modification of the RSA Public-Key Encryption Procedure" by H. C. Williams
  *
  */
 

@@ -3,6 +3,7 @@
 #include "vnrw_gmp.h"
 #include "vnrw_bn.h"
 #include "vnrw_botan.h"
+#include "vnp1363rw_bn.h"
 
 #include "vnasymcrypt.h"
 
@@ -14,7 +15,7 @@ void test( VNTestArgs_t * args )
 
 	struct vn_iovec pubKey, privKey;
 	struct vn_iovec srcPlain, gmpPlain, gmpCipher, ctpPlain, ctpCipher,
-		bnPlain, bnCipher, botanPlain, botanCipher;
+		bnPlain, bnCipher, botanPlain, botanCipher, bnP1363Plain, bnP1363Cipher;
 
 	VN_GenSrc( args, &srcPlain );
 
@@ -24,6 +25,7 @@ void test( VNTestArgs_t * args )
 	VNAsymCryptCtx_t * ctpCtx = VNRWSign_CTP_CtxNew();
 	VNAsymCryptCtx_t * bnCtx = VNRWSign_BN_CtxNew();
 	VNAsymCryptCtx_t * botanCtx = VNRWSign_Botan_CtxNew();
+	VNAsymCryptCtx_t * bnP1363Ctx = VNP1363RWSign_BN_CtxNew( 2 );
 
 	printf( "###### GenKeys from GMP ######\n" );
 	VNAsymCryptGenKeys( gmpCtx, args->mKeyBits );
@@ -43,6 +45,10 @@ void test( VNTestArgs_t * args )
 	VNAsymCryptLoadPrivKey( botanCtx, &pubKey, &privKey );
 	VN_PrintKey( botanCtx );
 
+	printf( "###### LoadKeys to bnP1363 ######\n" );
+	VNAsymCryptLoadPrivKey( bnP1363Ctx, &pubKey, &privKey );
+	VN_PrintKey( bnP1363Ctx );
+
 	printf( "###### Try PrivEncrypt ######\n" );
 	{
 		ret = VNAsymCryptPrivEncrypt( gmpCtx, srcPlain.i.iov_base, args->mLength, &gmpCipher );
@@ -55,12 +61,16 @@ void test( VNTestArgs_t * args )
 		printf( "BN %d\n", ret );
 
 		ret = VNAsymCryptPrivEncrypt( botanCtx, srcPlain.i.iov_base, args->mLength, &botanCipher );
-		printf( "BN %d\n", ret );
+		printf( "Botan %d\n", ret );
+
+		ret = VNAsymCryptPrivEncrypt( bnP1363Ctx, srcPlain.i.iov_base, args->mLength, &bnP1363Cipher );
+		printf( "bnP1363 %d\n", ret );
 
 		VNIovecPrint( "GMP", &gmpCipher, 1 );
 		VNIovecPrint( "CTP", &ctpCipher, 1 );
 		VNIovecPrint( "BN", &bnCipher, 1 );
 		VNIovecPrint( "Botan", &botanCipher, 1 );
+		VNIovecPrint( "bnP1363", &bnP1363Cipher, 1 );
 	}
 
 	printf( "###### Try PubDecrypt ######\n" );
@@ -81,10 +91,15 @@ void test( VNTestArgs_t * args )
 			&botanPlain, args->mLength );
 		printf( "Botan %d\n", ret );
 
+		ret = VNAsymCryptPubDecrypt( bnP1363Ctx, bnP1363Cipher.i.iov_base, bnP1363Cipher.i.iov_len,
+			&bnP1363Plain, args->mLength );
+		printf( "bnP1363 %d\n", ret );
+
 		VNIovecPrint( "GMP", &gmpPlain, 1 );
 		VNIovecPrint( "CTP", &ctpPlain, 1 );
 		VNIovecPrint( "BN", &bnPlain, 1 );
 		VNIovecPrint( "Botan", &botanPlain, 1 );
+		VNIovecPrint( "bnP1363", &bnPlain, 1 );
 	}
 
 	VNIovecFreeBufferAndTail( &gmpPlain );
@@ -95,6 +110,8 @@ void test( VNTestArgs_t * args )
 	VNIovecFreeBufferAndTail( &bnCipher );
 	VNIovecFreeBufferAndTail( &botanPlain );
 	VNIovecFreeBufferAndTail( &botanCipher );
+	VNIovecFreeBufferAndTail( &bnP1363Plain );
+	VNIovecFreeBufferAndTail( &bnP1363Cipher );
 
 	printf( "###### Try PubEncrypt ######\n" );
 	{

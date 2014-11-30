@@ -48,7 +48,7 @@ int VN_Test( int argc, const char * argv[], VNTestEnv_t * env )
 		.mLength = 13,
 		.mSrcType = 1,
 		.mRunSeconds = 5,
-		.mRsaE = 3,
+		.mE = 3,
 	};
 
 	for( i = 1; i < argc; i += 2 )
@@ -62,11 +62,11 @@ int VN_Test( int argc, const char * argv[], VNTestEnv_t * env )
 		if( 0 == strcmp( argv[ i ], "-t" ) ) args.mSrcType = atoi( argv[ i + 1 ] );
 		if( 0 == strcmp( argv[ i ], "-r" ) ) args.mRunSeconds = atoi( argv[ i + 1 ] );
 		if( 0 == strcmp( argv[ i ], "-d" ) ) args.mDebug = atoi( argv[ i + 1 ] );
-		if( 0 == strcmp( argv[ i ], "-e" ) ) args.mRsaE = atoi( argv[ i + 1 ] );
+		if( 0 == strcmp( argv[ i ], "-e" ) ) args.mE = atoi( argv[ i + 1 ] );
 	}
 
 	printf( "\ncmd: %s -k %d -l %d -t %d -r %d -d %d -e %d\n", argv[0], args.mKeyBits,
-		args.mLength, args.mSrcType, args.mRunSeconds, args.mDebug, args.mRsaE );
+		args.mLength, args.mSrcType, args.mRunSeconds, args.mDebug, args.mE );
 	printf( "run [%s -v] to see detail usage\n", argv[0] );
 	printf( "\n" );
 

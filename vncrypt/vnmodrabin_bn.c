@@ -196,9 +196,7 @@ int VNModRabin_BN_PrivProcess( const VNAsymCryptCtx_t * ctx,
 		BN_mod_exp( &zs, &zm, &( bnCtx->mD ), &( bnCtx->mN ), bnCtx->mBNCtx );
 	}
 
-	cipherText->i.iov_len = BN_num_bytes( &zs );
-	cipherText->i.iov_base = malloc( cipherText->i.iov_len + 1);
-	BN_bn2bin( &zs, cipherText->i.iov_base );
+	VN_BN_dump_bin( &zs, cipherText );
 
 	BN_free( &zm );
 	BN_free( &zs );
@@ -244,9 +242,7 @@ int VNModRabin_BN_PubProcess( const VNAsymCryptCtx_t * ctx,
 		BN_sub_word( &zm, 6 );
 		BN_div_word( &zm, 16 );
 
-		plainText->i.iov_len = BN_num_bytes( &zm );
-		plainText->i.iov_base = malloc( plainText->i.iov_len + 1);
-		BN_bn2bin( &zm, plainText->i.iov_base );
+		VN_BN_dump_bin( &zm, plainText );
 	} else {
 		ret = -1;
 	}

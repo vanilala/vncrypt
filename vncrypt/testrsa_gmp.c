@@ -4,13 +4,13 @@
 
 void test( VNTestArgs_t * args )
 {
-	VNAsymCryptCtx_t * ctx = VNRsaSign_GMP_CtxNew( args->mRsaE );
+	VNAsymCryptCtx_t * ctx = VNRsaSign_GMP_CtxNew( args->mE );
 
 	VN_Run( ctx, args );
 
 	VNAsymCryptCtxFree( ctx );
 
-	ctx = VNRsaEnc_GMP_CtxNew( args->mRsaE );
+	ctx = VNRsaEnc_GMP_CtxNew( args->mE );
 
 	VN_Run( ctx, args );
 

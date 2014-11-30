@@ -118,6 +118,7 @@ enum
 	VN_TYPE_VNRWSign_GMP = 1000 + 32,
 	VN_TYPE_VNRWSign_CTP = 1000 + 33,
 	VN_TYPE_VNRWSign_Botan = 1000 + 34,
+	VN_TYPE_VNP1363RWSign_BN = 1000 + 35,
 
 	VN_TYPE_VNMaxSignType1 = 2000,
 

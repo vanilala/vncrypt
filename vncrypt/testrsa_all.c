@@ -20,10 +20,10 @@ void test( VNTestArgs_t * args )
 
 	VNIovecPrint( "SrcText ", &srcPlain, 1 );
 
-	VNAsymCryptCtx_t * orgCtx = VNRsaSign_ORG_CtxNew( args->mRsaE );
-	VNAsymCryptCtx_t * bnCtx = VNRsaSign_BN_CtxNew( args->mRsaE );
-	VNAsymCryptCtx_t * gmpCtx = VNRsaSign_GMP_CtxNew( args->mRsaE );
-	VNAsymCryptCtx_t * ctpCtx = VNRsaSign_CTP_CtxNew( args->mRsaE );
+	VNAsymCryptCtx_t * orgCtx = VNRsaSign_ORG_CtxNew( args->mE );
+	VNAsymCryptCtx_t * bnCtx = VNRsaSign_BN_CtxNew( args->mE );
+	VNAsymCryptCtx_t * gmpCtx = VNRsaSign_GMP_CtxNew( args->mE );
+	VNAsymCryptCtx_t * ctpCtx = VNRsaSign_CTP_CtxNew( args->mE );
 
 	printf( "###### GenKeys from ORG ######\n" );
 	VNAsymCryptGenKeys( orgCtx, args->mKeyBits );
