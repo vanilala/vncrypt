@@ -2,7 +2,7 @@ VNCrypt: A library for asymmetric cryptography algorithm
 =======
 
 Encryption schemes
-  1. RSA signature/encryption scheme
+  1. RSA encryption scheme
      * OpenSSL
      * OpenSSL's BIGNUM
      * GMP
@@ -21,14 +21,19 @@ Integrated encryption schemes
      * Cryptopp
 
 Digital signature schemes with message recovery
-  1. Modified-Rabin signature scheme
+  1. RSA signature scheme
+     * OpenSSL
+     * OpenSSL's BIGNUM
+     * GMP
+     * Cryptopp
+  2. Modified-Rabin signature scheme
      * OpenSSL's BIGNUM
      * libgcrypt's MPI
      * FreeLIP
-  2. Rabin-Williams signature scheme
+  3. Rabin-Williams signature scheme
      * OpenSSL's BIGNUM
      * GMP
-  3. IEEE Std P1363-2000 RW
+  4. IEEE Std P1363-2000 RW
      * OpenSSL's BIGNUM
      * Botan
      * Cryptopp
