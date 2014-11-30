@@ -23,6 +23,7 @@ int main( int argc, const char * argv[] )
 		.mTestMain = test,
 		.mSignCtxNew = NULL,
 		.mEncCtxNew = NULL,
+		.mDefaultE = 3
 	};
 
 	VN_Test( argc, argv, &env );

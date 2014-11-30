@@ -4,8 +4,6 @@
 
 void test( VNTestArgs_t * args )
 {
-	if( 3 == args->mE ) args->mE = 2;
-
 	VNAsymCryptCtx_t * ctx = VNP1363RWSign_BN_CtxNew( args->mE );
 
 	VN_Run( ctx, args );
@@ -19,6 +17,7 @@ int main( int argc, const char * argv[] )
 		.mTestMain = test,
 		.mSignCtxNew = NULL,
 		.mEncCtxNew = NULL,
+		.mDefaultE = 2
 	};
 
 	VN_Test( argc, argv, &env );

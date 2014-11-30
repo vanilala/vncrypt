@@ -21,9 +21,11 @@ typedef struct tagVNRW_Botan_Ctx {
 	RW_PrivateKey * mPrivKey;
 	RW_PublicKey * mPubKey;
 
+	unsigned long mE;
+
 } VNRW_Botan_Ctx_t;
 
-VNAsymCryptCtx_t * VNRWSign_Botan_CtxNew()
+VNAsymCryptCtx_t * VNRWSign_Botan_CtxNew( unsigned long e )
 {
 	VNRW_Botan_Ctx_t * botanCtx = new VNRW_Botan_Ctx_t();
 
@@ -41,6 +43,8 @@ VNAsymCryptCtx_t * VNRWSign_Botan_CtxNew()
 
 	botanCtx->mPrivKey = NULL;
 	botanCtx->mPubKey = NULL;
+
+	botanCtx->mE = e;
 
 	return &( botanCtx->mCtx );
 }
@@ -60,7 +64,7 @@ int VNRW_Botan_GenKeys( VNAsymCryptCtx_t * ctx, int keyBits )
 	VNRW_Botan_Ctx_t * botanCtx = VN_CONTAINER_OF( ctx, VNRW_Botan_Ctx_t, mCtx );
 	assert( VN_TYPE_VNRWSign_Botan == ctx->mType );
 
-	botanCtx->mPrivKey = new RW_PrivateKey( botanCtx->mRng, keyBits );
+	botanCtx->mPrivKey = new RW_PrivateKey( botanCtx->mRng, keyBits, botanCtx->mE );
 	botanCtx->mPubKey = new RW_PublicKey( botanCtx->mPrivKey->get_n(), botanCtx->mPrivKey->get_e() );
 
 	return 0;

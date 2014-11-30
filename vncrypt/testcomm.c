@@ -44,11 +44,11 @@ int VN_Test( int argc, const char * argv[], VNTestEnv_t * env )
 		.mArgc = argc,
 		.mArgv = argv,
 		.mDebug = 0,
-		.mKeyBits = 128,
+		.mKeyBits = env->mDefaultKeyBits > 0 ? env->mDefaultKeyBits : 128,
 		.mLength = 13,
 		.mSrcType = 1,
 		.mRunSeconds = 5,
-		.mE = 3,
+		.mE = env->mDefaultE,
 	};
 
 	for( i = 1; i < argc; i += 2 )

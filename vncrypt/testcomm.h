@@ -22,6 +22,9 @@ typedef struct tagVNTestEnv {
 
 	VNAsymCryptCtx_t * ( * mSignCtxNew )();
 	VNAsymCryptCtx_t * ( * mEncCtxNew )();
+
+	int mDefaultE;
+	int mDefaultKeyBits;
 } VNTestEnv_t;
 
 typedef struct tagVNTestFunc {

@@ -25,6 +25,7 @@ int main( int argc, const char * argv[] )
 		.mTestMain = test,
 		.mSignCtxNew = NULL,
 		.mEncCtxNew = NULL,
+		.mDefaultE = 3
 	};
 
 	ERR_load_crypto_strings();

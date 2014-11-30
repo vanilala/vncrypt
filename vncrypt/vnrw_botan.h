@@ -6,7 +6,7 @@
 extern "C" {
 #endif
 
-VNAsymCryptCtx_t * VNRWSign_Botan_CtxNew();
+VNAsymCryptCtx_t * VNRWSign_Botan_CtxNew( unsigned long e );
 
 void VNRW_Botan_CtxFree( VNAsymCryptCtx_t * ctx );
 

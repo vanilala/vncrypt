@@ -24,7 +24,7 @@ void test( VNTestArgs_t * args )
 	VNAsymCryptCtx_t * gmpCtx = VNRWSign_GMP_CtxNew();
 	VNAsymCryptCtx_t * ctpCtx = VNRWSign_CTP_CtxNew();
 	VNAsymCryptCtx_t * bnCtx = VNRWSign_BN_CtxNew();
-	VNAsymCryptCtx_t * botanCtx = VNRWSign_Botan_CtxNew();
+	VNAsymCryptCtx_t * botanCtx = VNRWSign_Botan_CtxNew( 2 );
 	VNAsymCryptCtx_t * bnP1363Ctx = VNP1363RWSign_BN_CtxNew( 2 );
 
 	printf( "###### GenKeys from GMP ######\n" );
