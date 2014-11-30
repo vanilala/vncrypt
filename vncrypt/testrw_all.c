@@ -2,6 +2,7 @@
 #include "vnrw_ctp.h"
 #include "vnrw_gmp.h"
 #include "vnrw_bn.h"
+#include "vnrw_botan.h"
 
 #include "vnasymcrypt.h"
 
@@ -12,7 +13,8 @@ void test( VNTestArgs_t * args )
 	int ret = 0;
 
 	struct vn_iovec pubKey, privKey;
-	struct vn_iovec srcPlain, gmpPlain, gmpCipher, ctpPlain, ctpCipher, bnPlain, bnCipher;
+	struct vn_iovec srcPlain, gmpPlain, gmpCipher, ctpPlain, ctpCipher,
+		bnPlain, bnCipher, botanPlain, botanCipher;
 
 	VN_GenSrc( args, &srcPlain );
 
@@ -21,6 +23,7 @@ void test( VNTestArgs_t * args )
 	VNAsymCryptCtx_t * gmpCtx = VNRWSign_GMP_CtxNew();
 	VNAsymCryptCtx_t * ctpCtx = VNRWSign_CTP_CtxNew();
 	VNAsymCryptCtx_t * bnCtx = VNRWSign_BN_CtxNew();
+	VNAsymCryptCtx_t * botanCtx = VNRWSign_Botan_CtxNew();
 
 	printf( "###### GenKeys from GMP ######\n" );
 	VNAsymCryptGenKeys( gmpCtx, args->mKeyBits );
@@ -34,7 +37,11 @@ void test( VNTestArgs_t * args )
 
 	printf( "###### LoadKeys to BN ######\n" );
 	VNAsymCryptLoadPrivKey( bnCtx, &pubKey, &privKey );
-	VN_PrintKey( ctpCtx );
+	VN_PrintKey( bnCtx );
+
+	printf( "###### LoadKeys to Botan ######\n" );
+	VNAsymCryptLoadPrivKey( botanCtx, &pubKey, &privKey );
+	VN_PrintKey( botanCtx );
 
 	printf( "###### Try PrivEncrypt ######\n" );
 	{
@@ -47,9 +54,13 @@ void test( VNTestArgs_t * args )
 		ret = VNAsymCryptPrivEncrypt( bnCtx, srcPlain.i.iov_base, args->mLength, &bnCipher );
 		printf( "BN %d\n", ret );
 
+		ret = VNAsymCryptPrivEncrypt( botanCtx, srcPlain.i.iov_base, args->mLength, &botanCipher );
+		printf( "BN %d\n", ret );
+
 		VNIovecPrint( "GMP", &gmpCipher, 1 );
 		VNIovecPrint( "CTP", &ctpCipher, 1 );
 		VNIovecPrint( "BN", &bnCipher, 1 );
+		VNIovecPrint( "Botan", &botanCipher, 1 );
 	}
 
 	printf( "###### Try PubDecrypt ######\n" );
@@ -66,9 +77,14 @@ void test( VNTestArgs_t * args )
 			&bnPlain, args->mLength );
 		printf( "BN %d\n", ret );
 
+		ret = VNAsymCryptPubDecrypt( botanCtx, botanCipher.i.iov_base, botanCipher.i.iov_len,
+			&botanPlain, args->mLength );
+		printf( "Botan %d\n", ret );
+
 		VNIovecPrint( "GMP", &gmpPlain, 1 );
 		VNIovecPrint( "CTP", &ctpPlain, 1 );
 		VNIovecPrint( "BN", &bnPlain, 1 );
+		VNIovecPrint( "Botan", &botanPlain, 1 );
 	}
 
 	VNIovecFreeBufferAndTail( &gmpPlain );
@@ -77,6 +93,8 @@ void test( VNTestArgs_t * args )
 	VNIovecFreeBufferAndTail( &ctpCipher );
 	VNIovecFreeBufferAndTail( &bnPlain );
 	VNIovecFreeBufferAndTail( &bnCipher );
+	VNIovecFreeBufferAndTail( &botanPlain );
+	VNIovecFreeBufferAndTail( &botanCipher );
 
 	printf( "###### Try PubEncrypt ######\n" );
 	{
@@ -115,6 +133,8 @@ void test( VNTestArgs_t * args )
 	VNIovecFreeBufferAndTail( &ctpCipher );
 	VNIovecFreeBufferAndTail( &bnPlain );
 	VNIovecFreeBufferAndTail( &bnCipher );
+	VNIovecFreeBufferAndTail( &botanPlain );
+	VNIovecFreeBufferAndTail( &botanCipher );
 
 	VNIovecFreeBufferAndTail( &pubKey );
 	VNIovecFreeBufferAndTail( &privKey );

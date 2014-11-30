@@ -20,7 +20,9 @@ GC_PROGS = testmodrabin_gc
 
 LIP_PROGS = testmodrabin_lip
 
-PROGS = $(LIP_PROGS) $(BN_PROGS) $(ORG_PROGS) $(GMP_PROGS) $(CTP_PROGS) $(GC_PROGS) \
+BOTAN_PROGS = testrw_botan
+
+PROGS = $(LIP_PROGS) $(BN_PROGS) $(ORG_PROGS) $(GMP_PROGS) $(CTP_PROGS) $(GC_PROGS) $(BOTAN_PROGS) \
 	testrsa_all testrabin_all testrw_all \
 	testmqq_org
 
@@ -64,9 +66,9 @@ testrabin_all: $(COMM_OBJS) \
 		$(LIP_OBJS)
 	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lcrypto -lgmp -lgcrypt -lgpg-error -lm
 
-testrw_all: $(COMM_OBJS) vncrypt_ctp.o vncrypt_gmp.o vncrypt_bn.o \
-		vnrw_ctp.o vnrw_gmp.o vnrw_bn.o testrw_all.o
-	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lgmp -lcryptopp -lcrypto
+testrw_all: $(COMM_OBJS) vncrypt_ctp.o vncrypt_gmp.o vncrypt_bn.o vncrypt_botan.o \
+		vnrw_ctp.o vnrw_gmp.o vnrw_bn.o vnrw_botan.o testrw_all.o
+	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lgmp -lcryptopp -lcrypto -lbotan
 
 #=====================================================================
 
@@ -126,6 +128,11 @@ testelgamal_ctp: $(COMM_OBJS) testelgamal_ctp.o vnelgamal_ctp.o
 
 testmodrabin_gc: $(COMM_OBJS) vncrypt_gc.o testmodrabin_gc.o vnmodrabin_gc.o
 	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lgcrypt -lgpg-error
+
+#=====================================================================
+
+testrw_botan: $(COMM_OBJS) vncrypt_botan.o vnrw_botan.o testrw_botan.o
+	gcc $(CFLAGS) -o $@ $^ $(LDFLAGS) -lbotan
 
 #=====================================================================
 
