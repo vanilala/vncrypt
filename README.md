@@ -10,8 +10,9 @@ Encryption schemes
   2. Rabin encryption scheme
      * OpenSSL's BIGNUM
      * GMP
-  3. H. C. Williams encryption scheme
+  3. Rabin-Williams encryption scheme
      * OpenSSL's BIGNUM
+     * GMP
   4. ElGamal encryption scheme
      * Cryptopp
 
@@ -25,6 +26,11 @@ Digital signature schemes with message recovery
      * libgcrypt's MPI
      * FreeLIP
   2. Rabin-Williams signature scheme
+     * OpenSSL's BIGNUM
+     * GMP
+  3. IEEE Std P1363-2000 RW
+     * OpenSSL's BIGNUM
+     * Botan
      * Cryptopp
 
 Digital signature schemes with appendix
